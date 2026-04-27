@@ -1,0 +1,119 @@
+{
+  "_comment": "GoElectriQ Configuration File - Used across the application",
+  
+  "api": {
+    "_comment": "API Configuration - Used by all API calls",
+    "baseUrl": "http://localhost:5000/api",
+    "timeout": 30000,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+
+  "endpoints": {
+    "_comment": "API Endpoints",
+    "driver": {
+      "_comment": "DriverPartnerPage.jsx - Driver registration endpoints",
+      "register": "/partners/driver/register"
+    },
+    "cab": {
+      "_comment": "CabPartnerPage.jsx - Cab/Vehicle registration endpoints",
+      "register": "/partners/cab/register"
+    }
+  },
+
+  "app": {
+    "_comment": "Application Metadata",
+    "name": "GoElectriQ",
+    "version": "1.0.0",
+    "environment": "development"
+  },
+
+  "driver": {
+    "_comment": "DriverPartnerPage.jsx - All driver-related configuration and validation rules",
+    "minAge": 18,
+    "maxPhoneLength": 10,
+    "phoneStartDigits": ["6", "7", "8", "9"],
+    
+    "_earnings_comment": "Display values in DriverPartnerPage (Hero Banner, Earning Potential cards, Why Drive with Us section)",
+    "earningsDaily": {
+      "min": 1500,
+      "max": 2000
+    },
+    "earningsWeekly": {
+      "min": 1000,
+      "max": 15000
+    },
+    "earningsMonthly": {
+      "min": 40000,
+      "max": 60000
+    },
+    
+    "_fileUpload_comment": "File upload validation in DriverPartnerPage registration form",
+    "maxFileSize": 5242880,
+    "allowedFileTypes": [".pdf", ".jpg", ".jpeg", ".png"]
+  },
+
+  "cab": {
+    "_comment": "CabPartnerPage.jsx - All cab/vehicle partner configuration and validation rules",
+    "maxPhoneLength": 10,
+    "phoneStartDigits": ["6", "7", "8", "9"],
+    
+    "_evTypes_comment": "EV types available in CabPartnerPage dropdown",
+    "evTypes": [
+      { "label": "Tesla", "value": "tesla" },
+      { "label": "Tata Nexon EV", "value": "tata_nexon_ev" },
+      { "label": "Hyundai Kona", "value": "hyundai_kona" },
+      { "label": "MG ZS EV", "value": "mg_zs_ev" },
+      { "label": "BYD", "value": "byd" },
+      { "label": "Other", "value": "other" }
+    ],
+
+    "_earnings_comment": "Display values in CabPartnerPage earnings cards",
+    "earningsMonthly": {
+      "_comment": "Monthly earnings for cab owner",
+      "min": 30000,
+      "text": "₹30,000+"
+    },
+    "earningsPerRide": {
+      "_comment": "Per ride earnings",
+      "min": 300,
+      "max": 800
+    },
+    "earningsDailyAverage": {
+      "_comment": "Daily average for 6-8 hours",
+      "min": 1000,
+      "max": 2500
+    },
+
+    "_commission_comment": "Commission structure for cab owners",
+    "commission": {
+      "firstRides": {
+        "rides": 100,
+        "percentage": 0,
+        "label": "First 100 Rides"
+      },
+      "standardCommission": {
+        "percentage": 15,
+        "label": "After 100 Rides"
+      },
+      "bonus": {
+        "min": 50,
+        "max": 100,
+        "label": "Bonus Rides"
+      }
+    },
+
+    "_payment_comment": "Payment schedule for cab owners",
+    "payment": {
+      "frequency": "Weekly",
+      "day": "Monday",
+      "processingHours": "24-48 Hours",
+      "withdrawalPolicy": "Anytime"
+    },
+    
+    "_fileUpload_comment": "File upload validation in CabPartnerPage registration form (RC and Insurance documents)",
+    "maxFileSize": 5242880,
+    "allowedFileTypes": [".pdf", ".jpg", ".jpeg", ".png"]
+  }
+}

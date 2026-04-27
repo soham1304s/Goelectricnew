@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Allow Google Sign-In popup to communicate with parent window -->
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+  <title>GoElectriQ - Electric Vehicle Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Console Error/Warning Suppression for Third-Party Libraries -->
+  <script>
+    (function () {
+      const originalError = console.error;
+      const originalWarn = console.warn;
+      const originalLog = console.log;
+
+      const shouldSuppress = (msg) => {
+        if (!msg) return false;
+        const str = String(msg);
+        return (
+          // Razorpay & Web Share API errors
+          str.includes('web-share') ||
+          str.includes('Unrecognized feature') ||
+          str.includes('checkout.js') ||
+          // Google APIs & Sign-In issues
+          str.includes('GSI_LOGGER') ||
+          str.includes('origin is not allowed') ||
+          str.includes('credential_button_library') ||
+          str.includes('[GSI_LOGGER]') ||
+          str.includes('button width') ||
+          str.includes('REQUEST_DENIED') ||
+          str.includes('Access to fetch') ||
+          str.includes('Cross-Origin-Opener-Policy') ||
+          str.includes('postMessage') && str.includes('COOP') ||
+          str.includes('The given origin') ||
+          str.includes('gsi_') ||
+          str.includes('accounts.google.com') ||
+          // Resource preload warnings
+          str.includes('preload') && str.includes('not used') ||
+          // Location Services
+          str.includes('Nominatim') ||
+          str.includes('CORS') && (str.includes('Nominatim') || str.includes('overpass'))
+        );
+      };
+
+      console.error = function (...args) {
+        if (args[0] && !shouldSuppress(args[0])) {
+          originalError.apply(console, args);
+        }
+      };
+
+      console.warn = function (...args) {
+        if (args[0] && !shouldSuppress(args[0])) {
+          originalWarn.apply(console, args);
+        }
+      };
+
+      console.log = function (...args) {
+        if (args[0] && !shouldSuppress(args[0])) {
+          originalLog.apply(console, args);
+        }
+      };
+    })();
+  </script>
+  <!-- Mobile Optimization CSS -->
+  <style>
+    /* Ensure buttons are clickable on mobile */
+    button,
+    input[type="submit"],
+    a {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Make sure links have proper cursor and pointer */
+    a {
+      cursor: pointer;
+      pointer-events: auto !important;
+    }
+
+    /* Prevent zoom on input focus (iOS) */
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+
+    /* Ensure proper z-index for modals and overlays on mobile */
+    @media (max-width: 768px) {
+      button:active {
+        opacity: 0.8;
+      }
+
+      /* Ensure links are clickable on mobile */
+      a {
+        pointer-events: auto !important;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      /* Google Sign-In button responsive */
+      .google-signin-button {
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
