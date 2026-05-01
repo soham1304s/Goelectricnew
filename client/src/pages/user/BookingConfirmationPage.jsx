@@ -50,21 +50,29 @@ export default function BookingConfirmationPage() {
       return;
     }
 
-    // Try to fetch booking from backend
     const fetchBooking = async () => {
       try {
         let bookingId = params.bookingId;
-        console.log("📱 Trying to fetch booking with ID from params:", bookingId);
+        
+        // If no bookingId in params, try to get from query string (?id=...)
+        if (!bookingId) {
+          const queryParams = new URLSearchParams(location.search);
+          bookingId = queryParams.get('id');
+          if (bookingId) {
+            console.log("📱 Got booking ID from query parameter:", bookingId);
+          }
+        }
 
-        // If no bookingId in params, try to get from localStorage (for page refresh)
+        // If still no bookingId, try to get from localStorage (for page refresh)
         if (!bookingId) {
           bookingId = localStorage.getItem('lastViewedBookingId');
-          console.log("📱 Got booking ID from localStorage:", bookingId);
+          if (bookingId) {
+            console.log("📱 Got booking ID from localStorage:", bookingId);
+          }
         }
 
         if (!bookingId) {
-          console.log("⚠️ No booking ID found in params or localStorage");
-          setError("");
+          console.log("⚠️ No booking ID found in params, query, or localStorage");
           setLoading(false);
           return;
         }
@@ -73,7 +81,7 @@ export default function BookingConfirmationPage() {
         // Fetch the booking from backend
         const res = await bookingService.getBookingById(bookingId);
         console.log("📱 Response from backend:", res);
-        
+
         if (res?.data) {
           setBooking(res.data);
           setMessage("Booking loaded successfully");
@@ -341,11 +349,10 @@ export default function BookingConfirmationPage() {
           booking.status?.toLowerCase() === "completed") &&
           message?.includes("Redirecting") && (
             <div
-              className={`mb-6 p-4 rounded-lg border-2 ${
-                booking.status?.toLowerCase() === "cancelled"
+              className={`mb-6 p-4 rounded-lg border-2 ${booking.status?.toLowerCase() === "cancelled"
                   ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300"
                   : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 <div className="animate-spin">
@@ -420,8 +427,7 @@ export default function BookingConfirmationPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                        booking.status?.toLowerCase() === "confirmed"
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${booking.status?.toLowerCase() === "confirmed"
                           ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
                           : booking.status?.toLowerCase() === "completed"
                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
@@ -432,7 +438,7 @@ export default function BookingConfirmationPage() {
                                 : booking.status?.toLowerCase() === "ongoing"
                                   ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
                                   : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                      }`}
+                        }`}
                     >
                       {booking.status?.toLowerCase() === "confirmed" && "✅"}
                       {booking.status?.toLowerCase() === "completed" && "🎉"}
@@ -458,11 +464,10 @@ export default function BookingConfirmationPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                        booking.paymentStatus?.toLowerCase() === "paid"
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${booking.paymentStatus?.toLowerCase() === "paid"
                           ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
                           : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
-                      }`}
+                        }`}
                     >
                       💳 {booking.paymentStatus?.toUpperCase() || "PENDING"}
                     </span>

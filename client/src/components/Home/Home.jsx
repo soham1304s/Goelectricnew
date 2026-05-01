@@ -1292,7 +1292,7 @@ const GoelectriqLanding = () => {
 
             <div className="flex flex-wrap gap-4 pt-4">
               <button
-                onClick={() => scrollToSection('home')}
+                onClick={() => navigate('/services')}
                 className="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-emerald-600/20 transition-all hover:-translate-y-1 active:scale-95"
               >
                 Book a Ride

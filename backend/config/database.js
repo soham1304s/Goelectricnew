@@ -33,6 +33,8 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error("❌ Error connecting to MongoDB:", error.message);
+    console.log("💡 Tip: Make sure your MONGODB_URI is correct in the backend/.env file.");
+    console.log("💡 If using a local database, ensure MongoDB is running: 'sudo systemctl start mongod'");
     process.exit(1);
   }
 };

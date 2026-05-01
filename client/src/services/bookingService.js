@@ -2,8 +2,14 @@ import api from './api.js';
 
 export const bookingService = {
   async createBooking(bookingData) {
-    const { data } = await api.post('/bookings', bookingData);
-    return data;
+    try {
+      const response = await api.post('/bookings', bookingData);
+      console.log('✅ Booking Service Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error creating booking:', error);
+      throw error;
+    }
   },
 
   async getMyBookings(page = 1, limit = 10, status) {

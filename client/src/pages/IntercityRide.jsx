@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Calendar, CarTaxiFront, ChevronLeft, Clock3, Loader2, Navigation } from 'lucide-react';
+import { Calendar, CarTaxiFront, ChevronLeft, Clock3, Loader2, Navigation, AlertCircle, MapPin, CheckCircle2, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
@@ -8,6 +8,7 @@ import { bookingService } from '../services/bookingService.js';
 import { estimateDistance } from '../services/locationService.js';
 import { fetchCarRates } from '../services/rateService.js';
 import { ridePaymentService } from '../services/ridePaymentService.js';
+import GoogleMapComponent from '../components/GoogleMapComponent.jsx';
 
 const popularRoutes = [
   { id: 'jaipur-udaipur', from: 'Jaipur', to: 'Udaipur', fromLat: 26.9124, fromLng: 75.7873, toLat: 24.5854, toLng: 73.7125 },
@@ -80,12 +81,12 @@ export default function IntercityRidePage() {
         setRatesLoading(false);
       }
     };
-    
+
     loadRates();
-    
+
     // Refetch rates every 10 seconds to stay in sync with admin updates
     const interval = setInterval(loadRates, 10000);
-    
+
     // Refetch when page becomes visible (tab switched back)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -93,7 +94,7 @@ export default function IntercityRidePage() {
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -127,11 +128,15 @@ export default function IntercityRidePage() {
       try {
         setDistanceLoading(true);
 
-        // Use backend API for accurate distance calculation
-        const result = await estimateDistance(fromCity, toCity);
+        // Pass pickupCoordinates if available to avoid backend geocoding
+        const result = await estimateDistance(
+          fromCity.trim(),
+          toCity.trim(),
+          geocodedFromCoordinates || customFromCoordinates
+        );
         if (result && result.distance) {
           setCalculatedDistance(Math.max(result.distance, 10)); // Minimum 10 km for intercity
-          
+
           // Extract and set geocoded coordinates from response
           if (result.pickupCoords) {
             setGeocodedFromCoordinates({
@@ -163,9 +168,39 @@ export default function IntercityRidePage() {
     calculateDistance();
   }, [selectedRoute, customFromCity, customToCity]);
 
+  const getDisplayCities = () => {
+    if (selectedRoute === 'custom') {
+      return {
+        from: customFromCity,
+        to: customToCity,
+        fromCoordinates: geocodedFromCoordinates || customFromCoordinates,
+        toCoordinates: geocodedToCoordinates || customToCoordinates,
+      };
+    }
+    const route = popularRoutes.find(r => r.id === selectedRoute);
+    return route ? {
+      from: route.from,
+      to: route.to,
+      fromCoordinates: geocodedFromCoordinates || { latitude: route.fromLat, longitude: route.fromLng },
+      toCoordinates: geocodedToCoordinates || { latitude: route.toLat, longitude: route.toLng },
+    } : {
+      from: '',
+      to: '',
+      fromCoordinates: null,
+      toCoordinates: null,
+    };
+  };
+
+  const displayCities = getDisplayCities();
   const selectedCarData = carTypes.find(car => car.id === selectedCar);
-  const estimatedDistance = calculatedDistance || 0;
-  const baseFare = selectedCarData ? selectedCarData.additionalCharge * estimatedDistance : 0;
+  // Ensure we have a fallback distance for intercity (usually longer, e.g. 100km) if locations are entered but distance is 0
+  const displayDistance = (displayCities.from && displayCities.to && (!calculatedDistance || calculatedDistance === 0)) ? 100 : calculatedDistance;
+  const estimatedDistance = displayDistance || 0;
+  
+  // Intercity ride pricing: baseRate is per-km rate. Minimum fare is ₹1500 for intercity.
+  const distanceFare = selectedCarData ? selectedCarData.additionalCharge * estimatedDistance : 0;
+  const baseFare = Math.max(distanceFare, 1500); // Minimum fare ₹1500 for Intercity
+  
   const totalAmount = baseFare;
   const advancePayment = Math.round(totalAmount * 0.2); // 20% advance
   const remainingAmount = totalAmount - advancePayment;
@@ -176,30 +211,9 @@ export default function IntercityRidePage() {
 
   const formatMoney = (value) => `₹${Math.round(value).toLocaleString('en-IN')}`;
 
-  const getDisplayCities = () => {
-    if (selectedRoute === 'custom') {
-      return { 
-        from: customFromCity, 
-        to: customToCity,
-        fromCoordinates: geocodedFromCoordinates || customFromCoordinates,
-        toCoordinates: geocodedToCoordinates || customToCoordinates,
-      };
-    }
-    const route = popularRoutes.find(r => r.id === selectedRoute);
-    return route ? { 
-      from: route.from, 
-      to: route.to,
-      fromCoordinates: geocodedFromCoordinates || { latitude: route.fromLat, longitude: route.fromLng },
-      toCoordinates: geocodedToCoordinates || { latitude: route.toLat, longitude: route.toLng },
-    } : { 
-      from: '', 
-      to: '',
-      fromCoordinates: null,
-      toCoordinates: null,
-    };
-  };
 
-  const displayCities = getDisplayCities();
+
+
 
   const handleBooking = async () => {
     try {
@@ -234,6 +248,11 @@ export default function IntercityRidePage() {
 
       if (selectedDateTime < new Date()) {
         setBookingError('Pickup time cannot be in the past');
+        return;
+      }
+
+      if (!calculatedDistance && displayDistance <= 0) {
+        setBookingError('Unable to calculate distance. Please check your locations and try again');
         return;
       }
 
@@ -273,16 +292,25 @@ export default function IntercityRidePage() {
       const booking = bookingResponse.data;
 
       // Now process 20% advance payment via Razorpay
-      const paymentOrderResponse = await ridePaymentService.createRidePaymentOrder({
-        bookingId: booking._id || booking.bookingId,
+      // Safety check for payment amount
+      if (!advancePayment || advancePayment <= 0) {
+        setBookingError('Fare could not be calculated. Please check your car selection and distance.');
+        setBookingLoading(false);
+        return;
+      }
+
+      const paymentPayload = {
+        bookingId: booking._id,
         amount: advancePayment, // 20% of total
         rideType: 'intercity',
-        pickupLocation: from,
-        dropLocation: to,
-      });
+        pickupLocation: bookingData.pickupLocation.address,
+        dropLocation: bookingData.dropLocation.address,
+      };
+      console.log('📡 Sending Intercity Payment Order Request:', paymentPayload);
+      const paymentOrderResponse = await ridePaymentService.createRidePaymentOrder(paymentPayload);
 
       if (!paymentOrderResponse.success) {
-        setBookingError('Failed to create payment order');
+        setBookingError(paymentOrderResponse.message || 'Failed to create payment order');
         setBookingLoading(false);
         return;
       }
@@ -338,37 +366,45 @@ export default function IntercityRidePage() {
   };
 
   return (
-    <div className={`min-h-screen font-['Poppins'] transition-colors duration-300 ${isDark ? 'bg-gradient-to-b from-black via-[#05120a] to-black' : 'bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50'}`}>
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
+      <div className="container mx-auto px-4 py-8 md:py-16">
+        <div className="mx-auto max-w-6xl">
+          {/* Header Section */}
+          <div className="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-            
-              <h1 className={`text-2xl font-bold md:text-4xl ${isDark ? 'text-white' : 'text-slate-900'}`}>Intercity Ride Booking</h1>
-              <p className={`mt-2 text-sm md:text-base ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>
-                Comfortable long-distance travel between cities.
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs mb-4">
+                <MapPin size={14} />
+                <span>100% Electric Intercity Travel</span>
+              </div>
+              <h1 className={`text-4xl font-black tracking-tight md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Intercity <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Rides</span>
+              </h1>
+              <p className={`mt-3 text-base md:text-lg ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Premium, long-distance travel between cities in zero-emission comfort.
               </p>
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className={`rounded-3xl p-6 shadow-2xl lg:col-span-2 ${isDark ? 'border border-gray-800 bg-gray-900/90' : 'border border-orange-100 bg-white/95'}`}>
+          <div className="grid gap-8 lg:grid-cols-12">
+            {/* Left Column: Form */}
+            <div className={`rounded-3xl p-6 md:p-8 shadow-sm lg:col-span-8 ${isDark ? 'border border-zinc-800 bg-zinc-900/50' : 'border border-slate-200 bg-white'}`}>
               {bookingError && (
-                <div className="mb-6 rounded-xl border border-red-400/50 bg-red-500/10 p-4 text-red-500">
+                <div className="mb-6 rounded-xl border border-red-400/50 bg-red-50 p-4 text-red-600 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <p className="text-sm font-medium">{bookingError}</p>
                 </div>
               )}
 
-              <div className="mb-5">
-                <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>Choose Route</label>
-                <div className="relative">
-                  <Navigation className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${isDark ? 'text-gray-400' : 'text-slate-500'}`} />
+              <div className="mb-8">
+                <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Choose Route</label>
+                <div className="relative group">
+                  <Navigation className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
                   <select
                     value={selectedRoute}
                     onChange={(e) => setSelectedRoute(e.target.value)}
-                    className={`w-full rounded-xl border py-3 pl-12 pr-4 transition-all focus:outline-none focus:ring-2 focus:ring-orange-500 ${isDark ? 'border-gray-700 bg-black/40 text-white' : 'border-slate-200 bg-white text-slate-900'}`}
+                    className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 appearance-none ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
                   >
-                    <option value="">Select route</option>
+                    <option value="">Select a popular route or create custom</option>
                     {popularRoutes.map((route) => (
                       <option key={route.id} value={route.id}>
                         {route.from} → {route.to}
@@ -379,168 +415,193 @@ export default function IntercityRidePage() {
               </div>
 
               {selectedRoute === 'custom' && (
-                <>
-                  <div className="mb-5 grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>From City</label>
-                      <LocationPickerComponent
-                        value={customFromCity}
-                        onChange={(value) => setCustomFromCity(value)}
-                        onSelectLocation={(location) => {
-                          if (location && (location.lat || location.latitude)) {
-                            setCustomFromCoordinates({
-                              lat: location.lat || location.latitude,
-                              lng: location.lng || location.longitude,
-                            });
-                          }
-                        }}
-                        placeholder="Enter starting city"
-                        showMap={false}
-                      />
-                    </div>
-                    <div>
-                      <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>To City</label>
-                      <LocationPickerComponent
-                        value={customToCity}
-                        onChange={(value) => setCustomToCity(value)}
-                        onSelectLocation={(location) => {
-                          if (location && (location.lat || location.latitude)) {
-                            setCustomToCoordinates({
-                              lat: location.lat || location.latitude,
-                              lng: location.lng || location.longitude,
-                            });
-                          }
-                        }}
-                        placeholder="Enter destination city"
-                        showMap={false}
-                      />
-                    </div>
+                <div className="mb-8 grid gap-6 md:grid-cols-2">
+                  <div>
+                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>From City</label>
+                    <LocationPickerComponent
+                      value={customFromCity}
+                      onChange={(value) => setCustomFromCity(value)}
+                      onSelectLocation={(location) => {
+                        if (location && (location.lat || location.latitude)) {
+                          setCustomFromCoordinates({
+                            lat: location.lat || location.latitude,
+                            lng: location.lng || location.longitude,
+                          });
+                        }
+                      }}
+                      placeholder="Enter starting city"
+                      showMap={false}
+                    />
                   </div>
-                </>
+                  <div>
+                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>To City</label>
+                    <LocationPickerComponent
+                      value={customToCity}
+                      onChange={(value) => setCustomToCity(value)}
+                      onSelectLocation={(location) => {
+                        if (location && (location.lat || location.latitude)) {
+                          setCustomToCoordinates({
+                            lat: location.lat || location.latitude,
+                            lng: location.lng || location.longitude,
+                          });
+                        }
+                      }}
+                      placeholder="Enter destination city"
+                      showMap={false}
+                    />
+                  </div>
+                </div>
               )}
 
-              <div className="mb-5 grid gap-4 md:grid-cols-2">
+              {/* Time Section */}
+              <div className="mb-8 grid gap-6 md:grid-cols-2">
                 <div>
-                  <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>Travel Date</label>
-                  <div className="relative">
-                    <Calendar className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${isDark ? 'text-gray-400' : 'text-slate-500'}`} />
+                  <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Travel Date</label>
+                  <div className="relative group">
+                    <Calendar className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
                     <input
                       type="date"
                       min={minDate}
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
-                      className={`w-full rounded-xl border py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-orange-500 ${isDark ? 'border-gray-700 bg-black/40 text-white' : 'border-slate-200 bg-white text-slate-900'}`}
+                      className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>Departure Time</label>
-                  <div className="relative">
-                    <Clock3 className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${isDark ? 'text-gray-400' : 'text-slate-500'}`} />
+                  <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Departure Time</label>
+                  <div className="relative group">
+                    <Clock3 className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
                     <input
                       type="time"
                       value={selectedTime}
                       min={minTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className={`w-full rounded-xl border py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-orange-500 ${isDark ? 'border-gray-700 bg-black/40 text-white' : 'border-slate-200 bg-white text-slate-900'}`}
+                      className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mb-5">
-                <label className={`mb-2 block text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-slate-900'}`}>Choose Vehicle</label>
-                <div className="grid gap-3 md:grid-cols-2">
+              {/* Vehicle Selection */}
+              <div>
+                <label className={`mb-4 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Choose Vehicle</label>
+                <div className="grid gap-4 md:grid-cols-2">
                   {carTypes.map((car) => (
                     <button
                       key={car.id}
                       type="button"
                       onClick={() => setSelectedCar(car.id)}
-                      className={`rounded-2xl border p-4 text-left transition-all ${selectedCar === car.id ? 'border-orange-500 bg-orange-500/10' : isDark ? 'border-gray-700 bg-black/20 hover:border-orange-500/50' : 'border-slate-200 bg-white hover:border-orange-400'}`}
+                      className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${selectedCar === car.id
+                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 shadow-sm ring-1 ring-emerald-500'
+                        : isDark
+                          ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                        }`}
                     >
-                      <div className="mb-3 flex items-center justify-between">
-                        <CarTaxiFront className={`h-6 w-6 ${selectedCar === car.id ? 'text-orange-500' : isDark ? 'text-gray-400' : 'text-slate-500'}`} />
-                        <span className={`rounded-full px-2 py-1 text-xs font-semibold ${selectedCar === car.id ? 'bg-orange-500 text-white' : isDark ? 'bg-gray-700 text-gray-200' : 'bg-slate-100 text-slate-700'}`}>
-                          {car.passengers} seats
-                        </span>
+                      {selectedCar === car.id && (
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-bl-[100px] -z-0"></div>
+                      )}
+
+                      <div className="relative z-10">
+                        <div className="mb-4 flex items-center justify-between">
+                          <div className={`p-2 rounded-xl ${selectedCar === car.id ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
+                            <CarTaxiFront className="h-6 w-6" />
+                          </div>
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedCar === car.id ? 'bg-emerald-600 text-white' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-600'}`}>
+                            {car.passengers} seats
+                          </span>
+                        </div>
+                        <p className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{car.name}</p>
+                        <p className={`text-sm mt-1 font-semibold ${selectedCar === car.id ? 'text-emerald-600 dark:text-emerald-400' : isDark ? 'text-zinc-500' : 'text-slate-500'}`}>
+                          ₹{Math.round(car.additionalCharge * estimatedDistance)} / ride
+                        </p>
                       </div>
-                      <p className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{car.name}</p>
-                      <p className="mt-1 text-sm font-semibold text-orange-500">₹{Math.round(car.additionalCharge * estimatedDistance)}</p>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="lg:sticky lg:top-24 lg:self-start">
-              <div className={`rounded-3xl border p-6 shadow-2xl ${isDark ? 'border-gray-800 bg-gray-900/90' : 'border-orange-100 bg-white/95'}`}>
-                <h2 className={`mb-4 text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
+            {/* Right Column: Summary */}
+            <div className="lg:col-span-4">
+              <div className="mb-6 h-[350px] rounded-3xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800">
+                <GoogleMapComponent
+                  pickupCoords={geocodedFromCoordinates || displayCities.fromCoordinates}
+                  dropCoords={geocodedToCoordinates || displayCities.toCoordinates}
+                  isDark={isDark}
+                />
+              </div>
+              <div className={`sticky top-24 rounded-3xl border p-6 md:p-8 shadow-sm ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-slate-200 bg-white'}`}>
+                <h2 className={`mb-6 text-xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
 
-                <div className="space-y-3 text-sm">
+                <div className="space-y-4 text-sm mb-6">
                   <div className="flex items-center justify-between">
-                    <span className={isDark ? 'text-gray-400' : 'text-slate-600'}>From</span>
-                    <span className={`max-w-[170px] truncate text-right font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{displayCities.from || 'Not selected'}</span>
+                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>From</span>
+                    <span className={`max-w-[150px] truncate text-right font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {displayCities.from || 'Not selected'}
+                    </span>
                   </div>
+
                   <div className="flex items-center justify-between">
-                    <span className={isDark ? 'text-gray-400' : 'text-slate-600'}>To</span>
-                    <span className={`max-w-[170px] truncate text-right font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{displayCities.to || 'Not selected'}</span>
+                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>To</span>
+                    <span className={`max-w-[150px] truncate text-right font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {displayCities.to || 'Not selected'}
+                    </span>
                   </div>
+
                   <div className="flex items-center justify-between">
-                    <span className={isDark ? 'text-gray-400' : 'text-slate-600'}>Distance</span>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Est. Distance</span>
+                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {distanceLoading ? (
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-1.5 text-emerald-500">
                           <Loader2 className="h-3 w-3 animate-spin" />
-                          Calculating...
+                          Calc...
                         </span>
                       ) : (
                         `${estimatedDistance} km`
                       )}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className={isDark ? 'text-gray-400' : 'text-slate-600'}>Rate</span>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>₹{Math.round((selectedCarData?.additionalCharge || 0) * estimatedDistance)}</span>
-                  </div>
                 </div>
 
-                <div className={`my-4 h-px ${isDark ? 'bg-gray-700' : 'bg-slate-200'}`} />
+                <div className={`my-6 h-px border-t border-dashed ${isDark ? 'border-zinc-700' : 'border-slate-200'}`} />
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between">
-                    <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Total Fare</span>
-                    <span className="text-lg font-bold text-orange-500">{formatMoney(totalAmount)}</span>
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-end justify-between">
+                    <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Total Fare</span>
+                    <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatMoney(totalAmount)}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`font-semibold text-green-500 ${isDark ? 'text-green-400' : ''}`}>20% Advance (Pay Now)</span>
-                    <span className="text-xl font-bold text-green-500">{formatMoney(advancePayment)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`font-semibold ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>Balance Due After Ride</span>
-                    <span className="font-semibold text-orange-500">{formatMoney(remainingAmount)}</span>
-                  </div>
-                </div>
 
-                <div className={`mb-5 rounded-xl border p-3 text-sm ${isDark ? 'border-green-700 bg-green-900/20' : 'border-green-200 bg-green-50'}`}>
-                  <p className={isDark ? 'text-green-300' : 'text-green-700'}>
-                    ✓ 20% advance payment required to confirm booking. Pay the balance {formatMoney(remainingAmount)} after ride completion.
-                  </p>
+                  <div className={`p-4 rounded-xl ${isDark ? 'bg-emerald-900/10 border border-emerald-900/30' : 'bg-emerald-50 border border-emerald-100'}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                        <CheckCircle2 size={16} /> Pay Now (20%)
+                      </span>
+                      <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">{formatMoney(advancePayment)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
+                      <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>Balance (Due later)</span>
+                      <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>{formatMoney(remainingAmount)}</span>
+                    </div>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleBooking}
-                  disabled={bookingLoading}
-                  className={`w-full rounded-xl py-4 font-semibold transition-all ${bookingLoading ? 'cursor-not-allowed bg-gray-400 text-gray-200' : 'bg-orange-500 text-white hover:bg-orange-400'}`}
+                  disabled={bookingLoading || (!calculatedDistance && displayDistance <= 0)}
+                  className={`w-full rounded-xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2 shadow-sm ${bookingLoading || (!calculatedDistance && displayDistance <= 0)
+                    ? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 shadow-none'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-500/25 hover:shadow-lg active:scale-[0.98]'
+                    }`}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    {bookingLoading && <Loader2 className="h-5 w-5 animate-spin" />}
-                    {bookingLoading ? 'Processing...' : 'Book Now'}
-                  </span>
+                  {bookingLoading && <Loader2 className="h-5 w-5 animate-spin" />}
+                  {bookingLoading ? 'Processing Booking...' : (!calculatedDistance && displayDistance <= 0) ? 'Enter locations to book' : 'Book Ride Now'}
                 </button>
 
-                <p className={`mt-3 text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                  Your selected date and time are live validated against current time.
+                <p className={`mt-4 text-center text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
+                  Instant confirmation • Secure payment
                 </p>
               </div>
             </div>

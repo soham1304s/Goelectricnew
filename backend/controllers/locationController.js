@@ -52,16 +52,13 @@ export const estimateDistance = async (req, res) => {
 
     let pickupCoords;
     if (providedPickupCoords) {
-      // Accept both 'lng' and 'lon' formats
-      const lat = providedPickupCoords.lat;
-      const lng = providedPickupCoords.lng || providedPickupCoords.lon;
-      
-      if (typeof lat === 'number' && typeof lng === 'number') {
+      const { lat, lng, lon } = providedPickupCoords;
+      if (typeof lat === 'number' && (typeof lng === 'number' || typeof lon === 'number')) {
         pickupCoords = {
           lat: parseFloat(lat.toFixed(8)),
-          lon: parseFloat(lng.toFixed(8)),
+          lon: parseFloat((lng || lon).toFixed(8)),
         };
-        console.log('Using provided pickup coordinates:', pickupCoords);
+        console.log('✅ Using provided pickup coordinates:', pickupCoords);
       } else {
         console.warn('Invalid pickup coordinates provided, geocoding address instead:', providedPickupCoords);
         try {
@@ -299,7 +296,8 @@ export const googlePlacesAutocomplete = async (req, res) => {
       } else if (data.status === 'ZERO_RESULTS') {
         console.warn(`⚠️ Google Places returned ZERO_RESULTS for "${input}"`);
       } else {
-        console.warn(`⚠️ Google Places status: ${data.status}`, data.error_message);
+        console.error(`❌ Google Places API Error Status: ${data.status}`);
+        if (data.error_message) console.error(`Error Message: ${data.error_message}`);
       }
 
       return res.json({
@@ -428,8 +426,8 @@ export const getAirportLocation = async (req, res) => {
     const airportData = {
       name: 'Jaipur International Airport',
       address: 'Sanganer, Jaipur, Rajasthan 302011',
-      lat: 25.1899,
-      lng: 75.1768,
+      lat: 26.8283,
+      lng: 75.8060,
       code: 'JAI',
       city: 'Jaipur',
     };

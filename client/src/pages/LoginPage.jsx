@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
-import { Eye, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff, Loader, ArrowRight } from 'lucide-react';
 import { animate, createTimeline, stagger } from 'animejs';
 import '../styles/Auth.css';
 
@@ -153,7 +153,12 @@ export default function LoginPage() {
             </div>
 
             <button type="submit" disabled={loading} className="auth-btn-primary">
-              {loading ? <Loader className="animate-spin mx-auto" size={20} /> : "Sign in"}
+              {loading ? <Loader className="animate-spin mx-auto" size={20} /> : (
+                <>
+                  Sign in
+                  <ArrowRight size={20} />
+                </>
+              )}
             </button>
           </form>
 

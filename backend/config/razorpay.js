@@ -36,11 +36,18 @@ export const createRazorpayOrder = async (amount, receiptId) => {
       receipt: `rcpt_${String(receiptId).slice(0, 36)}`,
       notes: { receiptId: String(receiptId) },
     };
+    console.log('📡 Sending order request to Razorpay:', options);
     const order = await instance.orders.create(options);
+    console.log('✅ Razorpay order created:', order.id);
     return order;
   } catch (error) {
-    console.error('Razorpay order creation error:', error);
-    throw new Error(error.message || 'Failed to create payment order');
+    console.error('❌ Razorpay order creation error:', error);
+    // Log specific Razorpay error details if available
+    if (error.error && error.error.description) {
+      console.error('❌ Razorpay Error Description:', error.error.description);
+      console.error('❌ Razorpay Error Code:', error.error.code);
+    }
+    throw new Error(error.description || error.message || 'Failed to create payment order');
   }
 };
 

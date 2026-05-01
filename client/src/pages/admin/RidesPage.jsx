@@ -13,12 +13,12 @@ export default function RidesPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [completionNotes, setCompletionNotes] = useState('');
 
-  const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api';
+  const API_BASE_URL = (import.meta.env.VITE_API_URL || '') + '/api';
   const token = localStorage.getItem('token');
-  
+
   // Debug: Log the API base URL being used
   useEffect(() => {
-    console.log('🔧 API Configuration:', { 
+    console.log('🔧 API Configuration:', {
       API_BASE_URL,
       env: import.meta.env.VITE_API_URL,
       token: token ? 'Present' : 'Missing'
@@ -30,7 +30,7 @@ export default function RidesPage() {
     setError('');
     try {
       let url = `${API_BASE_URL}/admin/bookings`;
-      
+
       if (status === 'pending') {
         url = `${API_BASE_URL}/admin/ride-bookings/pending`;
       } else if (status === 'confirmed') {
@@ -65,25 +65,25 @@ export default function RidesPage() {
 
         // Filter by payment status for different tabs
         if (status === 'pending') {
-          filteredBookings = filteredBookings.filter(b => 
-            b.adminApproval?.status === 'pending' && 
-            b.status !== 'cancelled' &&
-            b.paymentStatus !== 'pending' // User must have paid 20% advance to appear in pending approval
+          filteredBookings = filteredBookings.filter(b =>
+            b.adminApproval?.status === 'pending' &&
+            b.status !== 'cancelled'
+            // Show all pending approval rides, even if payment is not yet initiated
           );
         } else if (status === 'confirmed') {
-          filteredBookings = filteredBookings.filter(b => 
+          filteredBookings = filteredBookings.filter(b =>
             b.adminApproval?.status === 'approved' && b.paymentStatus !== 'paid' && b.status !== 'completed'
           );
         } else if (status === 'paid') {
-          filteredBookings = filteredBookings.filter(b => 
+          filteredBookings = filteredBookings.filter(b =>
             b.paymentStatus === 'paid' && b.status !== 'completed'
           );
         } else if (status === 'completed') {
-          filteredBookings = filteredBookings.filter(b => 
+          filteredBookings = filteredBookings.filter(b =>
             b.status === 'completed'
           );
         } else if (status === 'cancelled') {
-          filteredBookings = filteredBookings.filter(b => 
+          filteredBookings = filteredBookings.filter(b =>
             b.status === 'cancelled' || b.adminApproval?.status === 'rejected'
           );
         }
@@ -209,7 +209,7 @@ export default function RidesPage() {
   // Helper function to extract payment method from notes
   const getPaymentMethodBadge = (notes) => {
     if (!notes) return null;
-    
+
     const notesLower = notes.toLowerCase();
     if (notesLower.includes('cash')) {
       return {
@@ -231,11 +231,11 @@ export default function RidesPage() {
   };
 
   const tabs = [
-    { id: 'pending', label: 'Pending Approval (20% Paid)', count: 'new' },
-    { id: 'confirmed', label: 'Awaiting Payment', count: 'pending' },
+    { id: 'pending', label: 'New Requests', count: 'new' },
+    { id: 'confirmed', label: 'Awaiting Action', count: 'pending' },
     { id: 'paid', label: 'Ready to Complete', count: 'active' },
-    { id: 'completed', label: 'Completed', count: 'done' },
-    { id: 'cancelled', label: 'Cancelled', count: 'cancelled' },
+    { id: 'completed', label: 'Completed History', count: 'done' },
+    { id: 'cancelled', label: 'Cancelled/Rejected', count: 'cancelled' },
   ];
 
   return (
@@ -244,7 +244,7 @@ export default function RidesPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Ride Bookings Management</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage and approve ride bookings (Only shows requests with 20% advance payment)</p>
+          <p className="text-gray-600 dark:text-gray-400">Manage and approve all incoming ride bookings</p>
         </div>
 
         {/* Error Message */}
@@ -264,11 +264,10 @@ export default function RidesPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 font-medium whitespace-nowrap border-b-2 transition ${
-                activeTab === tab.id
+              className={`px-4 py-3 font-medium whitespace-nowrap border-b-2 transition ${activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -313,15 +312,14 @@ export default function RidesPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      booking.adminApproval?.status === 'pending'
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${booking.adminApproval?.status === 'pending'
                         ? 'bg-yellow-100 text-yellow-800'
                         : booking.adminApproval?.status === 'approved'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {booking.adminApproval?.status === 'pending' ? 'Pending' : 
-                       booking.adminApproval?.status === 'approved' ? 'Approved' : 'Rejected'}
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                      {booking.adminApproval?.status === 'pending' ? 'Pending' :
+                        booking.adminApproval?.status === 'approved' ? 'Approved' : 'Rejected'}
                     </span>
                   </div>
                 </div>
@@ -357,7 +355,7 @@ export default function RidesPage() {
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Pickup</p>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {booking.pickupLocation?.address 
+                        {booking.pickupLocation?.address
                           ? booking.pickupLocation.address.substring(0, 60) + (booking.pickupLocation.address.length > 60 ? '...' : '')
                           : 'N/A'}
                       </p>
@@ -368,7 +366,7 @@ export default function RidesPage() {
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Dropoff</p>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {booking.dropLocation?.address 
+                        {booking.dropLocation?.address
                           ? booking.dropLocation.address.substring(0, 60) + (booking.dropLocation.address.length > 60 ? '...' : '')
                           : 'N/A'}
                       </p>
@@ -401,7 +399,7 @@ export default function RidesPage() {
                       <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 uppercase">Total Fare</p>
                         <p className="font-bold text-green-600 text-lg">
-                          ₹{booking.pricing?.fixedCharge && booking.pricing?.parkingCharge 
+                          ₹{booking.pricing?.fixedCharge && booking.pricing?.parkingCharge
                             ? (parseFloat(booking.pricing.fixedCharge) + parseFloat(booking.pricing.parkingCharge)).toFixed(2)
                             : booking.pricing?.totalFare?.toFixed(2) || '0.00'}
                         </p>
@@ -413,7 +411,7 @@ export default function RidesPage() {
                         </p>
                         <p className="text-xs text-red-600 font-bold mt-1">
                           ⏳ Remaining: ₹{(
-                            (parseFloat(booking.pricing?.fixedCharge || 0) + parseFloat(booking.pricing?.parkingCharge || 0)) - 
+                            (parseFloat(booking.pricing?.fixedCharge || 0) + parseFloat(booking.pricing?.parkingCharge || 0)) -
                             parseFloat(booking.paidAmount || 0)
                           ).toFixed(2)}
                         </p>
@@ -439,24 +437,22 @@ export default function RidesPage() {
                           {booking.distance ? booking.distance.toFixed(2) : '0'} × ₹{booking.pricing?.perKmRate || '0'}
                         </p>
                         <p className="font-bold text-green-600">
-                          ₹{booking.distance && booking.pricing?.perKmRate 
+                          ₹{booking.pricing?.totalFare || (booking.distance && booking.pricing?.perKmRate
                             ? (booking.distance * booking.pricing.perKmRate).toFixed(2)
-                            : '0.00'}
+                            : '0.00')}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 uppercase">Payment Status</p>
                         <div className="flex flex-col gap-1">
                           {booking.rideCompletion?.completionNotes && getPaymentMethodBadge(booking.rideCompletion.completionNotes) ? (
-                            <span className={`inline-block text-sm font-semibold px-3 py-1 rounded w-fit ${
-                              getPaymentMethodBadge(booking.rideCompletion.completionNotes)?.color
-                            }`}>
+                            <span className={`inline-block text-sm font-semibold px-3 py-1 rounded w-fit ${getPaymentMethodBadge(booking.rideCompletion.completionNotes)?.color
+                              }`}>
                               {getPaymentMethodBadge(booking.rideCompletion.completionNotes)?.label}
                             </span>
                           ) : (
-                            <p className={`font-semibold text-sm ${
-                              booking.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
-                            }`}>
+                            <p className={`font-semibold text-sm ${booking.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                              }`}>
                               {booking.paymentStatus?.toUpperCase() || 'PENDING'}
                             </p>
                           )}
@@ -470,8 +466,8 @@ export default function RidesPage() {
                 <div className="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
                   <Clock size={18} />
                   <span>
-                    {booking.scheduledDate 
-                      ? new Date(booking.scheduledDate).toLocaleDateString() 
+                    {booking.scheduledDate
+                      ? new Date(booking.scheduledDate).toLocaleDateString()
                       : 'N/A'} at {booking.scheduledTime || 'N/A'}
                   </span>
                 </div>
@@ -495,27 +491,24 @@ export default function RidesPage() {
 
                 {/* Cancellation Details */}
                 {activeTab === 'cancelled' && booking.cancellation && (
-                  <div className={`mb-4 p-4 border-l-4 rounded-lg ${
-                    booking.cancellation.cancelledBy === 'admin'
+                  <div className={`mb-4 p-4 border-l-4 rounded-lg ${booking.cancellation.cancelledBy === 'admin'
                       ? 'bg-red-50 dark:bg-red-900/30 border-red-500'
                       : 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-500'
-                  }`}>
+                    }`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="w-full">
-                        <p className={`text-sm font-semibold mb-3 ${
-                          booking.cancellation.cancelledBy === 'admin'
+                        <p className={`text-sm font-semibold mb-3 ${booking.cancellation.cancelledBy === 'admin'
                             ? 'text-red-900 dark:text-red-200'
                             : 'text-yellow-900 dark:text-yellow-200'
-                        }`}>
-                          {booking.cancellation.cancelledBy === 'admin' 
-                            ? '🛑 Admin Cancelled' 
+                          }`}>
+                          {booking.cancellation.cancelledBy === 'admin'
+                            ? '🛑 Admin Cancelled'
                             : `📌 Cancelled by ${booking.cancellation.cancelledBy?.toUpperCase()}`}
                         </p>
-                        <div className={`space-y-2 text-sm ${
-                          booking.cancellation.cancelledBy === 'admin'
+                        <div className={`space-y-2 text-sm ${booking.cancellation.cancelledBy === 'admin'
                             ? 'text-red-800 dark:text-red-300'
                             : 'text-yellow-800 dark:text-yellow-300'
-                        }`}>
+                          }`}>
                           {booking.cancellation.cancelledAt && (
                             <p><strong>Cancelled At:</strong> {new Date(booking.cancellation.cancelledAt).toLocaleString()}</p>
                           )}
@@ -611,8 +604,8 @@ export default function RidesPage() {
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
             <AlertCircle size={48} className="mx-auto text-gray-400 mb-4" />
             <p className="text-gray-600 dark:text-gray-400">
-              {activeTab === 'pending' 
-                ? 'No ride requests with 20% payment yet' 
+              {activeTab === 'pending'
+                ? 'No ride requests with 20% payment yet'
                 : 'No bookings found for this category'}
             </p>
             {activeTab === 'pending' && (
@@ -730,7 +723,7 @@ export default function RidesPage() {
                 <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-4">
                   <p className="text-sm text-blue-700 dark:text-blue-300 font-semibold mb-2">Total Amount Due:</p>
                   <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    ₹{selectedBooking.pricing?.fixedCharge && selectedBooking.pricing?.parkingCharge 
+                    ₹{selectedBooking.pricing?.fixedCharge && selectedBooking.pricing?.parkingCharge
                       ? (parseFloat(selectedBooking.pricing.fixedCharge) + parseFloat(selectedBooking.pricing.parkingCharge)).toFixed(2)
                       : selectedBooking.pricing?.totalFare?.toFixed(2) || '0.00'}
                   </p>

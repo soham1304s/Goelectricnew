@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Plane, Calendar, MapPin, Users, Filter, Search } from 'lucide-react';
 import UserLayout from './UserLayout.jsx';
 import * as packageService from '../../services/packageService.js';
+import { ridePaymentService } from '../../services/ridePaymentService.js';
+import { toast } from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function ToursPage() {
+  const { user } = useAuth();
   const [tours, setTours] = useState([]);
   const [filteredTours, setFilteredTours] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +16,62 @@ export default function ToursPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  const handlePayAdvance = async (tour) => {
+    try {
+      if (!user) {
+        toast.error('Session expired. Please login again.');
+        return;
+      }
+
+      toast.loading('Initiating secure payment...', { id: 'payment' });
+      
+      const totalPrice = getTotalPrice(tour);
+      const advanceAmount = Math.round(totalPrice * 0.2);
+
+      const paymentPayload = {
+        bookingId: tour._id,
+        amount: advanceAmount,
+        tourName: tour.package?.title || tour.tourName
+      };
+
+      const paymentOrderResponse = await ridePaymentService.createTourPaymentOrder(paymentPayload);
+
+      if (!paymentOrderResponse.success) {
+        toast.error(paymentOrderResponse.message || 'Failed to create payment order', { id: 'payment' });
+        return;
+      }
+
+      await ridePaymentService.initiateRazorpayPayment(
+        paymentOrderResponse.data,
+        {
+          name: user.name || `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          phone: user.phone
+        },
+        { rideType: 'Tour' },
+        async (paymentData) => {
+          try {
+            const verifyResponse = await ridePaymentService.verifyTourPayment(paymentData);
+            if (verifyResponse.success) {
+              toast.success('Advance payment successful! Your tour is confirmed.', { id: 'payment' });
+              loadTours(); // Refresh the list
+            } else {
+              toast.error('Payment verification failed', { id: 'payment' });
+            }
+          } catch (err) {
+            toast.error('Verification failed: ' + err.message, { id: 'payment' });
+          }
+        },
+        (error) => {
+          toast.error(error || 'Payment failed. Please try again.', { id: 'payment' });
+        }
+      );
+    } catch (err) {
+      toast.error('Something went wrong. Please try again.', { id: 'payment' });
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     loadTours();
@@ -46,10 +106,6 @@ export default function ToursPage() {
 
   const filterTours = (toursData, status, search) => {
     let filtered = toursData;
-
-    // 🔒 IMPORTANT: Only show tours where user has paid 20% advance
-    filtered = filtered.filter(t => has20PercentPaid(t));
-    console.log(`🔒 After 20% payment filter: ${filtered.length} tours out of ${toursData.length}`);
 
     if (status !== 'all') {
       filtered = filtered.filter(t => t.status?.toLowerCase() === status.toLowerCase());
@@ -155,16 +211,16 @@ export default function ToursPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg p-6 border border-purple-400">
-            <p className="text-purple-100 text-sm font-medium uppercase">Total Tours (20% Paid)</p>
-            <p className="text-4xl font-bold mt-2">{tours.filter(t => has20PercentPaid(t)).length}</p>
+            <p className="text-purple-100 text-sm font-medium uppercase">Total Tours</p>
+            <p className="text-4xl font-bold mt-2">{tours.length}</p>
           </div>
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl shadow-lg p-6 border border-green-400">
             <p className="text-green-100 text-sm font-medium uppercase">Completed</p>
-            <p className="text-4xl font-bold mt-2">{tours.filter(t => has20PercentPaid(t) && t.status?.toLowerCase() === 'completed').length}</p>
+            <p className="text-4xl font-bold mt-2">{tours.filter(t => t.status?.toLowerCase() === 'completed').length}</p>
           </div>
           <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl shadow-lg p-6 border border-orange-400">
             <p className="text-orange-100 text-sm font-medium uppercase">Pending</p>
-            <p className="text-4xl font-bold mt-2">{tours.filter(t => has20PercentPaid(t) && t.status?.toLowerCase() === 'pending').length}</p>
+            <p className="text-4xl font-bold mt-2">{tours.filter(t => t.status?.toLowerCase() === 'pending').length}</p>
           </div>
         </div>
 
@@ -214,8 +270,6 @@ export default function ToursPage() {
               <p className="text-gray-600 dark:text-gray-400">
                 {tours.length === 0 
                   ? "You haven't booked any tours yet."
-                  : tours.filter(t => has20PercentPaid(t)).length === 0
-                  ? "Please pay 20% advance to see your tour booking."
                   : "No tours match your filters."}
               </p>
             </div>
@@ -297,12 +351,21 @@ export default function ToursPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => navigate(`/user/booking-confirmation?id=${tour._id}`)}
-                          className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold text-sm transition"
-                        >
-                          View
-                        </button>
+                        {!has20PercentPaid(tour) ? (
+                          <button
+                            onClick={() => handlePayAdvance(tour)}
+                            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm transition"
+                          >
+                            Pay Now
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => navigate(`/user/booking-confirmation?id=${tour._id}`)}
+                            className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold text-sm transition"
+                          >
+                            View
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -316,7 +379,7 @@ export default function ToursPage() {
         {filteredTours.length > 0 && (
           <div className="bg-gradient-to-r from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700">
             <p className="text-gray-900 dark:text-white font-semibold">
-              Showing {filteredTours.length} tours (with 20% advance paid) out of {tours.filter(t => has20PercentPaid(t)).length} total
+              Showing {filteredTours.length} tours out of {tours.length} total
             </p>
           </div>
         )}

@@ -626,7 +626,7 @@ export const googleAuth = async (req, res) => {
       // Split name into firstName and lastName for Google login
       const nameParts = (name || email.split('@')[0]).split(' ');
       const firstName = nameParts[0] || 'User';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      const lastName = nameParts.slice(1).join(' ') || '.'; // Fallback for required field
 
       user = await User.create({
         firstName,

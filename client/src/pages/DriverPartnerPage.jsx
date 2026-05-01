@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Car, Phone, User, FileText, Calendar, CheckCircle, Zap, Clock, Award, Users } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import apiConfig from '../config/api.config.json';
 
 export default function DriverPartnerPage() {
@@ -91,14 +91,9 @@ export default function DriverPartnerPage() {
       formDataToSend.append('experience', formData.experience);
       formDataToSend.append('licenseDocument', formData.licenseUpload);
 
-      const response = await axios.post(
-        `${apiConfig.api.baseUrl}${apiConfig.endpoints.driver.register}`,
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+      const response = await api.post(
+        apiConfig.endpoints.driver.register,
+        formDataToSend
       );
 
       if (response.data.success) {

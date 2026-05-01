@@ -14,7 +14,20 @@ import {
   Settings,
   LogOut,
   Box,
+  PieChart as PieIcon,
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { Link } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { getAnalytics } from '../../services/adminService';
@@ -193,6 +206,117 @@ const DashboardPage = () => {
               </Link>
             );
           })}
+        </div>
+
+        {/* Business Overview - Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Revenue Trend Chart */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Revenue Trends</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Daily revenue for the last 7 days</p>
+              </div>
+              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-600">
+                <TrendingUp size={20} />
+              </div>
+            </div>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={analytics?.revenueData || []}>
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fill: '#94a3b8', fontSize: 12}}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fill: '#94a3b8', fontSize: 12}}
+                    tickFormatter={(value) => `₹${value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#8b5cf6" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorRev)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Booking Distribution Pie Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Distribution</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Rides vs Tours</p>
+              </div>
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600">
+                <PieIcon size={20} />
+              </div>
+            </div>
+            <div className="h-[300px] w-full relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Rides', value: analytics?.rideBookings || 0 },
+                      { name: 'Tours', value: analytics?.tourBookings || 0 },
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    <Cell fill="#6366f1" />
+                    <Cell fill="#ec4899" />
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.totalBookings || 0}</p>
+                <p className="text-xs text-gray-500 font-medium uppercase">Total</p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#6366f1]"></div>
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Ride Bookings</span>
+                </div>
+                <span className="font-bold text-gray-900 dark:text-white">{analytics?.rideBookings || 0}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ec4899]"></div>
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Tour Bookings</span>
+                </div>
+                <span className="font-bold text-gray-900 dark:text-white">{analytics?.tourBookings || 0}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Management Quick Links - Enhanced */}

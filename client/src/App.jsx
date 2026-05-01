@@ -2,8 +2,9 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom
 import Navbar from './components/Navbar'; // ✅ ADD THIS
 import Loader from './components/Loader';
 import WhatsAppButton from './components/WhatsAppButton';
+import ScrollToTop from './components/ScrollToTop';
 
-import Home from './pages/home';
+import Home from './components/Home/Home';
 import AboutPage from './pages/publicpage/Aboutpage.jsx';
 import ContactPage from './pages/publicpage/contactpage.jsx';
 import ServicesPage from './pages/publicpage/ServicesPage.jsx';
@@ -140,6 +141,7 @@ function App() {
       <Loader />
       <WhatsAppButton />
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
 
           {/* ================= PUBLIC ROUTES ================= */}
@@ -151,10 +153,7 @@ function App() {
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+
             <Route path="/airport" element={<AirportRidePage />} />
             <Route path="/intercity-ride" element={<IntercityRidePageEU />} />
             <Route path="/local-ride" element={<LocalRidePage />} />
@@ -186,6 +185,14 @@ function App() {
             <Route path="/user/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/user/booking-confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
             <Route path="/user/booking-confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
+          </Route>
+
+          {/* ================= AUTH ROUTES (No Navbar) ================= */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
           </Route>
 
 

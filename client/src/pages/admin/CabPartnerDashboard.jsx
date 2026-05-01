@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Eye, Filter, Users, CheckCircle, Clock } from 'lucide-react';
-import axios from 'axios';
-import apiConfig from '../../config/api.config.json';
+import api from '../../services/api';
 import AdminLayout from './AdminLayout';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || apiConfig.api.baseUrl;
 
 export default function CabPartnerDashboard() {
   const [partners, setPartners] = useState([]);
@@ -39,23 +36,7 @@ export default function CabPartnerDashboard() {
   const fetchPartners = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      
-      // Check if token exists
-      if (!token) {
-        setMessage({ 
-          type: 'error', 
-          text: 'Authentication required. Please login to access this page.' 
-        });
-        setPartners([]);
-        setTotalPages(1);
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`${API_BASE_URL}/api/admin/cab-partners`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/admin/cab-partners');
 
       console.log('📊 Cab Partners Response:', response.data);
 
@@ -81,7 +62,7 @@ export default function CabPartnerDashboard() {
       setFilterStatus('all');
       setCurrentPage(1);
     } catch (error) {
-      console.log('❌ Error fetching cab partners:', error.message);
+      console.error('❌ Error fetching cab partners:', error.message);
       
       // Handle specific error codes
       if (error.response?.status === 401) {
@@ -89,9 +70,6 @@ export default function CabPartnerDashboard() {
           type: 'error', 
           text: 'Unauthorized. Your session may have expired. Please login again.' 
         });
-        // Optionally clear token and redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
       } else if (error.response?.status === 403) {
         setMessage({ 
           type: 'error', 
@@ -136,12 +114,7 @@ export default function CabPartnerDashboard() {
   // Handle status update
   const handleStatusUpdate = async (partnerId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `${API_BASE_URL}/api/admin/cab-partners/${partnerId}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/admin/cab-partners/${partnerId}`, { status: newStatus });
 
       setPartners(partners.map(p =>
         p._id === partnerId ? { ...p, status: newStatus } : p
@@ -159,10 +132,7 @@ export default function CabPartnerDashboard() {
     if (!window.confirm('Are you sure you want to delete this cab partner?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/api/admin/cab-partners/${partnerId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/admin/cab-partners/${partnerId}`);
 
       setPartners(partners.filter(p => p._id !== partnerId));
       setMessage({ type: 'success', text: 'Cab partner deleted successfully' });

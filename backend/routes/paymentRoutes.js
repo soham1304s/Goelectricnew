@@ -10,12 +10,14 @@ import {
   verifyRidePayment,
   getPaymentHistory,
   createTourPaymentOrder,
-  verifyTourPayment
+  verifyTourPayment,
+  handleRazorpayWebhook
 } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
-// Public routes (no auth required for partner registration)
+// Public routes (no auth required for partner registration & webhook)
+router.post('/webhook', handleRazorpayWebhook);
 router.post('/partner/create-order', paymentLimiter, createPartnerRegistrationPayment);
 router.post('/partner/verify', verifyPartnerRegistrationPayment);
 router.get('/status/:paymentId', getPaymentStatus);

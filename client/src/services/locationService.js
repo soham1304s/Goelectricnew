@@ -38,8 +38,11 @@ function setCachedReverseGeocode(cacheKey, value) {
  */
 export async function estimateDistance(pickup, drop, pickupCoords = null) {
   const body = { pickup, drop };
-  if (pickupCoords && typeof pickupCoords.lat === 'number' && typeof pickupCoords.lon === 'number') {
-    body.pickupCoords = { lat: pickupCoords.lat, lon: pickupCoords.lon };
+  const lat = pickupCoords?.lat || pickupCoords?.latitude;
+  const lon = pickupCoords?.lon || pickupCoords?.longitude || pickupCoords?.lng;
+  
+  if (typeof lat === 'number' && typeof lon === 'number') {
+    body.pickupCoords = { lat, lon };
   }
   try {
     console.log('Estimating distance with:', body);

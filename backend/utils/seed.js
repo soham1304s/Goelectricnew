@@ -18,7 +18,8 @@ async function seedAdmin() {
     await User.deleteOne({ email: emailLower });
 
     await User.create({
-      name: 'Admin',
+      firstName: 'GoElectriQ',
+      lastName: 'Admin',
       email: emailLower,
       password: ADMIN_PASSWORD,
       phone: '9876543210', // valid 10-digit for schema

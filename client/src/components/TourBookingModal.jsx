@@ -89,56 +89,63 @@ export default function TourBookingModal({ isOpen, onClose, tourName, packagePri
           const paymentOrderResponse = await ridePaymentService.createTourPaymentOrder(paymentOrderData);
           
           if (paymentOrderResponse.success) {
-            const verificationResponse = await ridePaymentService.initiateRazorpayPayment(
+            await ridePaymentService.initiateRazorpayPayment(
               paymentOrderResponse.data,
               {
                 name: user?.name || 'Guest',
                 email: user?.email || '',
-                contact: user?.phone || ''
+                phone: user?.phone || ''
               },
               {
                 rideType: selectedCar || 'Tour',
                 tourName: tourName
               },
-              (paymentData) => {
-                // Success callback - payment data will be verified
+              async (paymentData) => {
+                // Success callback
+                try {
+                  console.log('✅ Tour payment successful, verifying...', paymentData);
+                  const verifyRes = await ridePaymentService.verifyTourPayment(paymentData);
+                  
+                  if (verifyRes?.success) {
+                    console.log('✅ Tour payment verified successfully!');
+                    setSubmitting(false);
+                    onClose();
+                    
+                    // Save booking ID for fallback
+                    if (booking && booking._id) {
+                      localStorage.setItem('lastTourBookingId', booking._id);
+                    }
+                    
+                    navigate(`/user/booking-confirmation/${booking._id}`, { 
+                      state: { 
+                        booking: booking,
+                        tourBookingConfirmed: true,
+                        paymentVerified: true,
+                        message: 'Tour booked successfully! Payment completed.',
+                        tourName: tourName
+                      } 
+                    });
+                  } else {
+                    setError('Tour payment verification failed');
+                    setSubmitting(false);
+                  }
+                } catch (err) {
+                  console.error('❌ Tour payment verification error:', err);
+                  setError('Payment verification failed: ' + err.message);
+                  setSubmitting(false);
+                }
               },
               (error) => {
-                console.error('Payment handler error:', error);
+                console.error('❌ Tour payment failed:', error);
+                setError('Payment failed: ' + error);
+                setSubmitting(false);
               }
             );
-            
-            await ridePaymentService.verifyTourPayment({
-              ...verificationResponse,
-              paymentId: paymentOrderResponse.data.paymentId
-            });
-            
-            onClose();
-            // Save booking ID for fallback
-            if (booking && booking._id) {
-              localStorage.setItem('lastTourBookingId', booking._id);
-              // Navigate to tour booking confirmation page with booking ID
-              navigate(`/user/booking-confirmation/${booking._id}`, { 
-                state: { 
-                  booking: booking,
-                  tourBookingConfirmed: true,
-                  paymentVerified: true,
-                  message: 'Tour booked successfully! Payment completed.',
-                  tourName: tourName
-                } 
-              });
-            } else {
-              // Fallback if booking ID not available
-              navigate('/user/dashboard', { 
-                state: { 
-                  message: 'Tour booked successfully! Payment completed.' 
-                } 
-              });
-            }
           }
         } catch (paymentError) {
           console.error('Payment failed:', paymentError);
           setError(paymentError.message || 'Payment failed. Please try again from your profile.');
+          setSubmitting(false);
         }
       } else {
         setError(res?.message || 'Booking failed');

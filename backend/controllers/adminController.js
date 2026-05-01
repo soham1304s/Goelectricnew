@@ -81,47 +81,44 @@ const ensureDefaultPricingExists = async () => {
 };
 
 export const getAllBookings = async (req, res) => {
-    try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 20;
-      const skip = (page - 1) * limit;
-      
-      const query = {
-        // 🔑 IMPORTANT: Only show bookings where 20% advance payment is made
-        // Exclude bookings with paymentStatus='pending' (no payment made yet)
-        paymentStatus: { $ne: 'pending' }
-      };
-      if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
-      
-      console.log('Admin Bookings Query (20% Advance Payment System):', query);
-      console.log('📌 Note: Admin panel shows only bookings with 20% advance payment made (paymentStatus != pending)');
-      
-      const bookings = await Booking.find(query)
-        .populate('user', 'name email phone')
-        .populate('driver', 'name phone vehicleDetails')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
-      
-      console.log('Bookings found (with payment):', bookings.length);
-      
-      const total = await Booking.countDocuments(query);
-      
-      res.status(200).json({
-        success: true,
-        data: {
-          bookings,
-          pagination: {
-            total,
-            page,
-            pages: Math.ceil(total / limit),
-          },
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const query = {
+      // Show all bookings regardless of payment status for admin oversight
+    };
+    if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
+
+    console.log('Admin Bookings Query:', query);
+
+    const bookings = await Booking.find(query)
+      .populate('user', 'firstName lastName email phone')
+      .populate('driver', 'name phone vehicleDetails')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    console.log('Bookings found (with payment):', bookings.length);
+
+    const total = await Booking.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        bookings,
+        pagination: {
+          total,
+          page,
+          pages: Math.ceil(total / limit),
         },
-      });
-    } catch (error) {
-      console.error('Error in getAllBookings:', error);
-      res.status(500).json({ success: false, message: error.message });
-    }
+      },
+    });
+  } catch (error) {
+    console.error('Error in getAllBookings:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const getAnalytics = async (req, res) => {
@@ -144,16 +141,41 @@ export const getAnalytics = async (req, res) => {
     const todayBookings = todayRideBookings + todayTourBookings;
 
     const rideRevenuePipeline = [
-      { $match: { paymentStatus: 'paid' } },
-      { $group: { _id: null, total: { $sum: '$pricing.totalFare' } } },
+      { $match: { paidAmount: { $gt: 0 } } },
+      { $group: { _id: null, total: { $sum: '$paidAmount' } } },
     ];
     const tourRevenuePipeline = [
       { $match: { status: { $in: ['confirmed', 'completed'] } } },
-      { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } },
+      { $group: { _id: null, total: { $sum: '$paidAmount' } } }, // Sum paidAmount for tours too
     ];
     const rideRevenue = await Booking.aggregate(rideRevenuePipeline);
     const tourRevenue = await TourBooking.aggregate(tourRevenuePipeline);
     const totalRevenue = (rideRevenue[0]?.total || 0) + (tourRevenue[0]?.total || 0);
+
+    // Get last 7 days revenue for chart
+    const revenueData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      const de = new Date(d);
+      de.setHours(23, 59, 59, 999);
+
+      const dayRideRevenue = await Booking.aggregate([
+        { $match: { createdAt: { $gte: d, $lte: de }, paidAmount: { $gt: 0 } } },
+        { $group: { _id: null, total: { $sum: '$paidAmount' } } }
+      ]);
+
+      const dayTourRevenue = await TourBooking.aggregate([
+        { $match: { createdAt: { $gte: d, $lte: de }, status: { $in: ['confirmed', 'completed'] } } },
+        { $group: { _id: null, total: { $sum: '$paidAmount' } } }
+      ]);
+
+      revenueData.push({
+        date: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        revenue: (dayRideRevenue[0]?.total || 0) + (dayTourRevenue[0]?.total || 0)
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -167,6 +189,7 @@ export const getAnalytics = async (req, res) => {
         activeUsers,
         activeDrivers,
         totalRevenue,
+        revenueData,
       },
     });
   } catch (error) {
@@ -204,20 +227,20 @@ export const createPackage = async (req, res) => {
       });
     }
     const price = basePrice ? Number(basePrice) : 0;
-    
+
     // Handle pricing - map form fields to schema fields
     // Form sends: economy, premium
     // Schema expects: economy, premium
     const pricingData = pricing && (pricing.economy || pricing.premium)
       ? {
-          economy: pricing.economy ? Number(pricing.economy) : price,
-          premium: pricing.premium ? Number(pricing.premium) : price,
-        }
-      : { 
-          economy: price, 
-          premium: price + 500,
-        };
-    
+        economy: pricing.economy ? Number(pricing.economy) : price,
+        premium: pricing.premium ? Number(pricing.premium) : price,
+      }
+      : {
+        economy: price,
+        premium: price + 500,
+      };
+
     const pkg = await Package.create({
       title,
       description,
@@ -277,12 +300,12 @@ export const getAdminTourBookings = async (req, res) => {
     console.log('Admin Tour Bookings Query:', query);
 
     const tourBookings = await TourBooking.find(query)
-      .populate('user', 'name email phone')
+      .populate('user', 'firstName lastName email phone')
       .populate('package', 'title coverImage tourCategory location basePrice pricing')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     console.log('Tour bookings found:', tourBookings.length);
 
     const total = await TourBooking.countDocuments(query);
@@ -313,7 +336,7 @@ export const updateTourBookingStatus = async (req, res) => {
       { status, ...(adminNotes != null && { adminNotes }) },
       { new: true }
     )
-      .populate('user', 'name email phone')
+      .populate('user', 'firstName lastName email phone')
       .populate('package', 'title tourCategory');
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Tour booking not found' });
@@ -330,17 +353,17 @@ export const updateTourBookingStatus = async (req, res) => {
 export const getTourBookingPayments = async (req, res) => {
   try {
     const { tourBookingId } = req.params;
-    
+
     // Find all payments linked to this tour booking
     const payments = await Payment.find({ tourBooking: tourBookingId })
       .select('amount paymentMethod status paidAt transactionId razorpayPaymentId')
       .sort({ createdAt: -1 });
-    
+
     // Calculate total paid
     const totalPaid = payments
       .filter(p => p.status === 'success')
       .reduce((sum, p) => sum + (p.amount || 0), 0);
-    
+
     console.log(`💳 Payment History for Tour Booking ${tourBookingId}:`, {
       totalPaid,
       paymentCount: payments.length,
@@ -351,7 +374,7 @@ export const getTourBookingPayments = async (req, res) => {
         paidAt: p.paidAt
       }))
     });
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -373,13 +396,13 @@ export const updatePackage = async (req, res) => {
   try {
     const { id } = req.params;
     const allowed = ['title', 'description', 'shortDescription', 'tourCategory', 'location', 'basePrice', 'coverImage', 'isActive', 'pricing'];
-    
+
     // Fetch existing package first to preserve data during merge
     const existingPackage = await Package.findById(id);
     if (!existingPackage) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
-    
+
     const updates = {};
     for (const k of allowed) {
       if (req.body[k] !== undefined) {
@@ -393,13 +416,13 @@ export const updatePackage = async (req, res) => {
             economy: undefined,
             premium: undefined,
           };
-          
+
           // Keep existing values
           if (existingPackage.pricing) {
             updates_pricing.economy = existingPackage.pricing.economy;
             updates_pricing.premium = existingPackage.pricing.premium;
           }
-          
+
           // Update with new values from form
           if (req.body[k].economy !== undefined && req.body[k].economy !== null && req.body[k].economy !== '') {
             updates_pricing.economy = Number(req.body[k].economy);
@@ -407,21 +430,21 @@ export const updatePackage = async (req, res) => {
           if (req.body[k].premium !== undefined && req.body[k].premium !== null && req.body[k].premium !== '') {
             updates_pricing.premium = Number(req.body[k].premium);
           }
-          
+
           // Remove undefined fields
           Object.keys(updates_pricing).forEach(key => {
             if (updates_pricing[key] === undefined) {
               delete updates_pricing[key];
             }
           });
-          
+
           updates[k] = updates_pricing;
         } else {
           updates[k] = req.body[k];
         }
       }
     }
-    
+
     // Handle duration fields
     if (req.body.durationDays !== undefined || req.body.durationHours !== undefined) {
       updates.duration = {
@@ -429,7 +452,7 @@ export const updatePackage = async (req, res) => {
         hours: req.body.durationHours ? Number(req.body.durationHours) : 0,
       };
     }
-    
+
     if (req.body.discountPercent !== undefined) {
       updates.discount = {
         percentage: Number(req.body.discountPercent),
@@ -488,23 +511,23 @@ export const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     const query = {};
     if (req.query.role && req.query.role !== 'all') query.role = req.query.role;
     if (req.query.status && req.query.status !== 'all') query.isActive = req.query.status === 'active';
-    
+
     console.log('Admin Users Query:', query);
-    
+
     const users = await User.find(query)
       .select('-password')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     console.log('Users found:', users.length);
-    
+
     const total = await User.countDocuments(query);
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -537,13 +560,13 @@ export const updateUserStatusAdmin = async (req, res) => {
   try {
     const { id } = req.params;
     const { isActive } = req.body;
-    
+
     const user = await User.findByIdAndUpdate(
       id,
       { isActive },
       { new: true }
     ).select('-password');
-    
+
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -557,18 +580,18 @@ export const getAllDriversAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     const query = {};
     if (req.query.status) query.status = req.query.status;
-    
+
     const drivers = await Driver.find(query)
       .select('-bankDetails -password')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     const total = await Driver.countDocuments(query);
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -600,17 +623,17 @@ export const updateDriverStatusAdmin = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    
+
     if (!['active', 'pending', 'rejected', 'suspended'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     }
-    
+
     const driver = await Driver.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     ).select('-bankDetails -password');
-    
+
     if (!driver) return res.status(404).json({ success: false, message: 'Driver not found' });
     res.status(200).json({ success: true, data: driver });
   } catch (error) {
@@ -634,19 +657,19 @@ export const updateBookingStatusAdmin = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    
+
     if (!['pending', 'confirmed', 'completed', 'cancelled'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     }
-    
+
     const booking = await Booking.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     )
-      .populate('user', 'name email phone')
+      .populate('user', 'firstName lastName email phone')
       .populate('driver', 'name phone vehicleDetails');
-    
+
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
     res.status(200).json({ success: true, data: booking });
   } catch (error) {
@@ -684,23 +707,23 @@ export const getAllPaymentsAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     const query = {};
     if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
-    
+
     console.log('Admin Payments Query:', query);
-    
+
     const payments = await Payment.find(query)
       .populate('user', 'firstName lastName email phone')
       .populate('booking', 'bookingId')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     console.log('Payments found:', payments.length);
-    
+
     const total = await Payment.countDocuments(query);
-    
+
     res.status(200).json({
       success: true,
       data: {
@@ -722,7 +745,7 @@ export const getAllPaymentsAdmin = async (req, res) => {
 export const getAdminProfile = async (req, res) => {
   try {
     const admin = await User.findById(req.user.id).select('-password');
-    
+
     if (!admin) {
       return res.status(404).json({ success: false, message: 'Admin not found' });
     }
@@ -972,7 +995,7 @@ export const getPendingRideBookings = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const bookings = await Booking.find({ 'adminApproval.status': 'pending' })
-      .populate('user', 'name email phone profileImage')
+      .populate('user', 'firstName lastName email phone')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -1096,7 +1119,7 @@ export const completeRideBooking = async (req, res) => {
     booking.rideCompletion.completedBy = adminId;
     booking.rideCompletion.completionNotes = completionNotes || '';
     booking.status = 'completed';
-    
+
     // Mark payment as paid when ride is completed (handles manual payments too)
     booking.paymentStatus = 'paid';
 
@@ -1105,7 +1128,7 @@ export const completeRideBooking = async (req, res) => {
     // Detect payment method from completion notes
     const notesLower = (completionNotes || '').toLowerCase();
     let paymentMethod = 'cash'; // Default to cash for manual payments
-    
+
     if (notesLower.includes('upi') || notesLower.includes('online') || notesLower.includes('razorpay')) {
       paymentMethod = 'razorpay';
     } else if (notesLower.includes('wallet')) {
@@ -1114,7 +1137,7 @@ export const completeRideBooking = async (req, res) => {
 
     // Check if payment already exists for this booking
     let existingPayment = await Payment.findOne({ booking: booking._id });
-    
+
     if (!existingPayment) {
       // Create payment record for manual completion
       const payment = new Payment({
@@ -1206,7 +1229,7 @@ export const collectRemainingPayment = async (req, res) => {
     // Update booking with payment info
     booking.paidAmount = alreadyPaid + collectAmount;
     booking.paymentMethod = paymentMethod;
-    
+
     // Mark as paid if full amount is collected
     if (booking.paidAmount >= totalFare) {
       booking.paymentStatus = 'paid';
@@ -1308,16 +1331,16 @@ export const getPendingPayments = async (req, res) => {
       const totalFare = booking.pricing?.totalFare || (booking.distance * (booking.pricing?.perKmRate || 0));
       const perKmRate = booking.pricing?.perKmRate || 0;
       const distance = booking.distance || 0;
-      
+
       const paidAmount = booking.paidAmount || 0;
       const remainingAmount = totalFare - paidAmount;
       const advanceAmount = Math.round(totalFare * 0.2);
-      
+
       // Construct full name from firstName and lastName
-      const fullName = booking.user 
+      const fullName = booking.user
         ? `${booking.user.firstName || ''} ${booking.user.lastName || ''}`.trim() || 'Unknown User'
         : 'Unknown User';
-      
+
       return {
         _id: booking._id,
         bookingId: booking.bookingId,
@@ -1332,8 +1355,8 @@ export const getPendingPayments = async (req, res) => {
         rideType: booking.rideType,
         cabType: booking.cabType || booking.carType || 'Standard',
         perKmRate: perKmRate,
-        pickupLocation: typeof booking.pickupLocation === 'string' 
-          ? booking.pickupLocation 
+        pickupLocation: typeof booking.pickupLocation === 'string'
+          ? booking.pickupLocation
           : (booking.pickupLocation?.address || 'N/A'),
         dropLocation: typeof booking.dropLocation === 'string'
           ? booking.dropLocation

@@ -2,6 +2,9 @@ import { rateLimit } from 'express-rate-limit';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Common skip function for all limiters in development
+const skipInDevelopment = () => !isProduction;
+
 const parsePositiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -10,27 +13,8 @@ const parsePositiveInt = (value, fallback) => {
 const RATE_LIMIT_WINDOW_MINUTES = parsePositiveInt(process.env.RATE_LIMIT_WINDOW, 15);
 const RATE_LIMIT_MAX_REQUESTS = parsePositiveInt(process.env.RATE_LIMIT_MAX_REQUESTS, 500);
 
-const shouldSkipGeneralLimiter = (req) => {
-  // Never throttle auth here, auth has a dedicated limiter.
-  if (req.originalUrl?.includes('/auth')) return true;
-
-  // Keep local development responsive and avoid noisy 429s while iterating.
-  if (!isProduction) return true;
-
-  // Public read endpoints on home page are intentionally high traffic.
-  if (req.method === 'GET') {
-    const url = req.originalUrl || '';
-    if (url.startsWith('/api/packages') || url.startsWith('/api/feedback')) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
 /**
- * General API rate limiter (skips auth - auth has its own limiter)
- * Increased limits to handle admin dashboard polling and high-traffic scenarios
+ * General API rate limiter
  */
 export const apiLimiter = rateLimit({
   windowMs: RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
@@ -41,16 +25,27 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: shouldSkipGeneralLimiter,
+  skip: (req) => {
+    if (skipInDevelopment()) return true;
+    if (req.originalUrl?.includes('/auth')) return true;
+    if (req.method === 'GET') {
+      const url = req.originalUrl || '';
+      if (url.startsWith('/api/packages') || url.startsWith('/api/feedback')) {
+        return true;
+      }
+    }
+    return false;
+  },
 });
 
 /**
- * Auth route rate limiter (stricter)
+ * Auth route rate limiter
  */
 export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // 10 attempts per window (was 5 - too strict for registration)
+  windowMs: 15 * 60 * 1000,
+  max: 10,
   skipSuccessfulRequests: true,
+  skip: skipInDevelopment,
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again after 15 minutes.',
@@ -61,8 +56,9 @@ export const authLimiter = rateLimit({
  * Payment route rate limiter
  */
 export const paymentLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 10, // 10 requests per window
+  windowMs: 10 * 60 * 1000,
+  max: 50, // Increased for testing
+  skip: skipInDevelopment,
   message: {
     success: false,
     message: 'Too many payment requests, please try again later.',
@@ -73,8 +69,9 @@ export const paymentLimiter = rateLimit({
  * Booking route rate limiter
  */
 export const bookingLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // 20 bookings per hour
+  windowMs: 60 * 60 * 1000,
+  max: 100, // Increased for testing
+  skip: skipInDevelopment,
   message: {
     success: false,
     message: 'Too many booking requests, please try again later.',
@@ -85,8 +82,9 @@ export const bookingLimiter = rateLimit({
  * OTP rate limiter
  */
 export const otpLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // 3 OTP requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  skip: skipInDevelopment,
   message: {
     success: false,
     message: 'Too many OTP requests, please try again after 15 minutes.',
@@ -94,22 +92,20 @@ export const otpLimiter = rateLimit({
 });
 
 /**
- * Admin dashboard rate limiter (more permissive for authenticated admin users)
- * Allows higher request rates for admin operations and polling
+ * Admin dashboard rate limiter
  */
 export const adminLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // 1000 requests per 15 minutes (about 67 req/min - allows for polling and rapid interactions)
-  message: {
-    success: false,
-    message: 'Admin dashboard rate limit exceeded. Please wait before making more requests.',
-  },
+  windowMs: 15 * 60 * 1000,
+  max: 2000,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // Skip rate limiting for admin users with valid auth token
-    // This is checked in admin routes with protect + isAdmin middleware
-    return !req.user || !req.user.isAdmin;
+    if (skipInDevelopment()) return true;
+    return req.user && req.user.isAdmin;
+  },
+  message: {
+    success: false,
+    message: 'Admin dashboard rate limit exceeded.',
   },
 });
 
@@ -120,5 +116,4 @@ export default {
   bookingLimiter,
   otpLimiter,
   adminLimiter,
-
 };

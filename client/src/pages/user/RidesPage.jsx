@@ -1,10 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Clock, Filter, Search, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  MapPin,
+  Calendar,
+  Clock,
+  Filter,
+  Search,
+  X,
+  Car,
+  ArrowRight,
+  CreditCard,
+  CheckCircle,
+  AlertCircle,
+  ChevronRight,
+  MoreVertical
+} from 'lucide-react';
 import UserLayout from './UserLayout.jsx';
 import * as bookingService from '../../services/bookingService.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { ridePaymentService } from '../../services/ridePaymentService.js';
+import { toast } from 'react-hot-toast';
 
 export default function RidesPage() {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +36,41 @@ export default function RidesPage() {
   const [cancelling, setCancelling] = useState(false);
   const navigate = useNavigate();
 
+  const handlePayAdvance = async (ride) => {
+    try {
+      if (!user) {
+        toast.error('Session expired. Please login again.');
+        return;
+      }
+
+      toast.loading('Initiating secure payment...', { id: 'payment' });
+      
+      const paymentParams = {
+        bookingId: ride.bookingId,
+        _id: ride._id,
+        amount: Math.round(ride.totalFare * 0.2), // 20% advance
+        user: {
+          name: user.name || `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          phone: user.phone
+        }
+      };
+
+      await ridePaymentService.initiateRazorpayPayment(
+        paymentParams,
+        (response) => {
+          toast.success('Advance payment successful! Your ride is confirmed.', { id: 'payment' });
+          loadRides(); // Refresh the list
+        },
+        (error) => {
+          toast.error(error || 'Payment failed. Please try again.', { id: 'payment' });
+        }
+      );
+    } catch (err) {
+      toast.error('Something went wrong. Please try again.', { id: 'payment' });
+    }
+  };
+
   useEffect(() => {
     loadRides();
   }, []);
@@ -25,23 +79,13 @@ export default function RidesPage() {
     try {
       setLoading(true);
       const response = await bookingService.getMyBookings?.();
-      console.log('📊 Rides API Response:', response);
       if (response?.success) {
-        // API returns { success: true, data: { bookings: [...], pagination: {...} } }
         const rides = response.data?.bookings || response.data || [];
-        console.log('🚗 Processed Rides:', rides);
-        console.log('Sample Ride Data:', rides[0] ? {
-          _id: rides[0]._id,
-          totalFare: rides[0].pricing?.totalFare || rides[0].totalFare,
-          paidAmount: rides[0].paidAmount,
-          paymentStatus: rides[0].paymentStatus,
-          has20Percent: rides[0].paidAmount >= ((rides[0].pricing?.totalFare || rides[0].totalFare) * 0.2)
-        } : null);
         setBookings(Array.isArray(rides) ? rides : []);
         filterRides(Array.isArray(rides) ? rides : [], 'all', '');
       }
     } catch (err) {
-      setError('Failed to load rides');
+      setError('Failed to sync ride data with the server');
       console.error(err);
     } finally {
       setLoading(false);
@@ -51,9 +95,8 @@ export default function RidesPage() {
   const filterRides = (ridesData, status, search) => {
     let filtered = ridesData;
 
-    // 🔒 IMPORTANT: Only show rides where user has paid 20% advance
-    filtered = filtered.filter(b => has20PercentPaid(b));
-    console.log(`🔒 After 20% payment filter: ${filtered.length} rides out of ${ridesData.length}`);
+    // Show all rides regardless of initial payment status to allow recovery
+    // filtered = filtered.filter(b => has20PercentPaid(b));
 
     if (status !== 'all') {
       filtered = filtered.filter(b => b.status?.toLowerCase() === status.toLowerCase());
@@ -61,8 +104,8 @@ export default function RidesPage() {
 
     if (search) {
       filtered = filtered.filter(b => {
-        const pickup = typeof b.pickupLocation === 'string' ? b.pickupLocation : b.pickupLocation?.address || '';
-        const drop = typeof b.dropLocation === 'string' ? b.dropLocation : b.dropLocation?.address || '';
+        const pickup = getLocationString(b.pickupLocation);
+        const drop = getLocationString(b.dropLocation);
         return pickup.toLowerCase().includes(search.toLowerCase()) || drop.toLowerCase().includes(search.toLowerCase());
       });
     }
@@ -81,9 +124,9 @@ export default function RidesPage() {
   };
 
   const getLocationString = (location) => {
-    if (!location) return 'Unknown';
+    if (!location) return 'Not Specified';
     if (typeof location === 'string') return location;
-    return location.address || location.name || 'Unknown';
+    return location.address || location.name || 'Not Specified';
   };
 
   const formatDate = (date) => {
@@ -94,18 +137,18 @@ export default function RidesPage() {
     return new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getStatusColor = (status) => {
+  const getStatusConfig = (status) => {
     switch (status?.toLowerCase()) {
       case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return { color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle, label: 'Completed' };
       case 'ongoing':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return { color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: Clock, label: 'On Journey' };
       case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        return { color: 'text-rose-500', bg: 'bg-rose-500/10', icon: X, label: 'Cancelled' };
       case 'confirmed':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return { color: 'text-amber-500', bg: 'bg-amber-500/10', icon: CheckCircle, label: 'Confirmed' };
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return { color: 'text-slate-500', bg: 'bg-slate-500/10', icon: AlertCircle, label: 'Processing' };
     }
   };
 
@@ -115,20 +158,11 @@ export default function RidesPage() {
     return totalFare > 0 && paidAmount >= (totalFare * 0.2);
   };
 
-  const get20PercentAmount = (ride) => {
-    const totalFare = ride.pricing?.totalFare || ride.totalFare || 0;
-    return (totalFare * 0.2).toFixed(2);
-  };
-
   const handleCancelRide = async () => {
-    if (!cancelReason.trim()) {
-      alert('Please provide a cancellation reason');
-      return;
-    }
-
+    if (!cancelReason.trim()) return;
     setCancelling(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/bookings/${selectedRideForCancel._id}/cancel`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api'}/bookings/${selectedRideForCancel._id}/cancel`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -136,35 +170,35 @@ export default function RidesPage() {
         },
         body: JSON.stringify({ reason: cancelReason })
       });
-
       const data = await response.json();
-
       if (data.success) {
-        alert('Ride cancelled successfully!');
         setShowCancelModal(false);
-        setCancelReason('');
-        setSelectedRideForCancel(null);
-        // Reload rides
         loadRides();
-      } else {
-        alert(data.message || 'Failed to cancel ride');
       }
     } catch (err) {
-      alert('Error cancelling ride: ' + err.message);
       console.error(err);
     } finally {
       setCancelling(false);
     }
   };
 
+  // Statistics calculation
+  const statsData = {
+    total: bookings.length,
+    distance: bookings.reduce((acc, b) => acc + (parseFloat(b.distance) || 0), 0).toFixed(1),
+    co2: (bookings.reduce((acc, b) => acc + (parseFloat(b.distance) || 0), 0) * 0.12).toFixed(1) // 0.12kg per km saved
+  };
+
   if (loading) {
     return (
       <UserLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Loading rides...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"
+          />
+          <p className="text-slate-500 font-medium animate-pulse">Synchronizing your journeys...</p>
         </div>
       </UserLayout>
     );
@@ -172,272 +206,246 @@ export default function RidesPage() {
 
   return (
     <UserLayout>
-      <div className="w-full space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3 mb-2">
-            <span className="text-4xl">🚗</span>
-            My Rides
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">View and manage all your ride bookings</p>
+      <div className="max-w-7xl mx-auto space-y-10">
+        {/* Premium Header Section */}
+        <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-slate-900 text-white p-8 md:p-12 shadow-2xl">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/20 to-transparent pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+                My <span className="text-emerald-400">Journeys</span>
+              </h1>
+              <p className="text-slate-400 text-lg max-w-md font-medium leading-relaxed">
+                Track your carbon-neutral travels and manage your upcoming reservations.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center">
+                <p className="text-emerald-400 text-2xl font-black mb-1">{statsData.total}</p>
+                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Total Rides</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center">
+                <p className="text-indigo-400 text-2xl font-black mb-1">{statsData.distance}km</p>
+                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Distance</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center hidden md:block">
+                <p className="text-rose-400 text-2xl font-black mb-1">{statsData.co2}kg</p>
+                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">CO2 Saved</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-600 text-red-800 dark:text-red-200 p-4 rounded-xl flex items-center gap-3">
-            <span className="text-2xl">❌</span>
-            {error}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 p-4 rounded-2xl flex items-center gap-4 text-rose-600 dark:text-rose-400"
+          >
+            <AlertCircle size={20} />
+            <p className="font-bold text-sm">{error}</p>
+          </motion.div>
         )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg p-6 border border-blue-400">
-            <p className="text-blue-100 text-sm font-medium uppercase">Total Rides (20% Paid)</p>
-            <p className="text-4xl font-bold mt-2">{bookings.filter(b => has20PercentPaid(b)).length}</p>
+        {/* Controls Section */}
+        <div className="flex flex-col md:flex-row gap-6 mb-10 items-center justify-between bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+          <div className="flex flex-wrap gap-2">
+            {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+              <button
+                key={status}
+                onClick={() => handleFilterChange(status)}
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+                  filterStatus === status
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg scale-105'
+                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
           </div>
-          <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl shadow-lg p-6 border border-green-400">
-            <p className="text-green-100 text-sm font-medium uppercase">Completed</p>
-            <p className="text-4xl font-bold mt-2">{bookings.filter(b => has20PercentPaid(b) && b.status?.toLowerCase() === 'completed').length}</p>
-          </div>
-          <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl shadow-lg p-6 border border-orange-400">
-            <p className="text-orange-100 text-sm font-medium uppercase">Pending</p>
-            <p className="text-4xl font-bold mt-2">{bookings.filter(b => has20PercentPaid(b) && b.status?.toLowerCase() === 'pending').length}</p>
+
+          <div className="relative w-full md:w-80 group">
+            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+            <input
+              type="text"
+              placeholder="Search destinations..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium transition-all"
+            />
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search by pickup or drop location..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
+        {/* Rides Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode='popLayout'>
+            {filteredBookings.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full py-20 text-center"
+              >
+                <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                  <Car size={40} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">No Journeys Found</h3>
+                <p className="text-slate-500 font-medium">Try adjusting your filters or book a new ride.</p>
+              </motion.div>
+            ) : (
+              filteredBookings.map((ride, idx) => {
+                const isPendingPayment = ride.paymentStatus === 'pending';
+                return (
+                  <motion.div
+                    key={ride._id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="group bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+                  >
+                    <div className="p-8">
+                      <div className="flex justify-between items-start mb-8">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Booking ID</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white font-mono">{ride.bookingId}</p>
+                        </div>
+                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                          ride.status === 'completed' ? 'bg-emerald-100 text-emerald-600' :
+                          ride.status === 'cancelled' ? 'bg-rose-100 text-rose-600' :
+                          'bg-indigo-100 text-indigo-600'
+                        }`}>
+                          {ride.status}
+                        </div>
+                      </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              <Filter size={20} className="text-gray-600 dark:text-gray-400" />
-              {['all', 'completed', 'ongoing', 'confirmed', 'pending', 'cancelled'].map(status => (
-                <button
-                  key={status}
-                  onClick={() => handleFilterChange(status)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap ${
-                    filterStatus === status
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
-                  }`}
-                >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+                      <div className="space-y-6 mb-8">
+                        <div className="flex gap-4">
+                          <div className="flex flex-col items-center gap-1 pt-1">
+                            <div className="w-2.5 h-2.5 rounded-full border-2 border-emerald-500" />
+                            <div className="w-0.5 h-10 bg-slate-100 dark:bg-slate-800" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/50" />
+                          </div>
+                          <div className="flex-1 flex flex-col justify-between py-0.5">
+                            <div className="line-clamp-1">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Pickup</p>
+                              <p className="text-sm font-bold text-slate-800 dark:text-white">{getLocationString(ride.pickupLocation)}</p>
+                            </div>
+                            <div className="line-clamp-1">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Destination</p>
+                              <p className="text-sm font-bold text-slate-800 dark:text-white">{getLocationString(ride.dropLocation)}</p>
+                            </div>
+                          </div>
+                        </div>
 
-        {/* Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          {filteredBookings.length === 0 ? (
-            <div className="p-12 text-center">
-              <MapPin size={48} className="text-gray-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Rides Found</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {bookings.length === 0 
-                  ? "You haven't booked any rides yet."
-                  : bookings.filter(b => has20PercentPaid(b)).length === 0
-                  ? "Please pay 20% advance to see your ride booking."
-                  : "No rides match your filters."}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">From - To</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Date</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Car Type</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Distance</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Amount</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Paid / 20% Needed</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 dark:text-white">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredBookings.map((ride, index) => (
-                    <tr key={ride._id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <MapPin size={16} className="text-gray-500 flex-shrink-0" />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-3xl">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Date</p>
+                            <div className="flex items-center gap-2">
+                              <Calendar size={12} className="text-indigo-500" />
+                              <p className="text-xs font-black text-slate-700 dark:text-slate-200">{formatDate(ride.scheduledDate || ride.createdAt)}</p>
+                            </div>
+                          </div>
+                          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-3xl text-right">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Fare</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">₹{ride.pricing?.totalFare || ride.totalFare || 0}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
+                            <Car size={20} />
+                          </div>
                           <div>
-                            <p className="font-semibold text-gray-900 dark:text-white text-sm">{getLocationString(ride.pickupLocation)}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">→ {getLocationString(ride.dropLocation)}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Vehicle</p>
+                            <p className="text-xs font-black text-slate-700 dark:text-slate-200">{ride.cabType || 'Electric Sedan'}</p>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
-                          <Calendar size={16} className="text-gray-500" />
-                          <div>
-                            <p className="font-semibold">{formatDate(ride.scheduledDate || ride.createdAt)}</p>
-                            <p className="text-xs text-gray-500">{formatTime(ride.scheduledDate || ride.createdAt)}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-lg font-semibold text-sm">
-                          {ride.cabType || ride.carType || 'Standard'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-gray-900 dark:text-white font-semibold">
-                          <Clock size={16} className="text-gray-500" />
-                          {ride.distance} km
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-green-600 dark:text-green-400 text-lg">
-                          ₹{ride.pricing?.totalFare || ride.totalFare || 0}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
-                          <div className="text-sm">
-                            <span className="font-semibold text-gray-900 dark:text-white">₹{ride.paidAmount || 0}</span>
-                            <span className="text-gray-500 dark:text-gray-400"> / ₹{get20PercentAmount(ride)}</span>
-                          </div>
-                          {has20PercentPaid(ride) ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 rounded text-xs font-semibold w-fit">
-                              <span>✓</span>
-                              Paid
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 rounded text-xs font-semibold w-fit">
-                              <span>⚠</span>
-                              Pending
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-lg font-semibold text-sm ${getStatusColor(ride.status)}`}>
-                          {ride.status || 'Pending'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
+
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => navigate(`/user/booking-confirmation?id=${ride._id}`)}
-                            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm transition"
-                          >
-                            View
-                          </button>
-                          {ride.status?.toLowerCase() !== 'completed' && ride.status?.toLowerCase() !== 'cancelled' && (
+                          {isPendingPayment && ride.status !== 'cancelled' ? (
                             <button
-                              onClick={() => {
-                                setSelectedRideForCancel(ride);
-                                setShowCancelModal(true);
-                              }}
-                              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold text-sm transition"
+                              onClick={() => handlePayAdvance(ride)}
+                              className="px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2"
                             >
-                              Cancel
+                              <CreditCard size={14} />
+                              Pay Now
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => navigate(`/user/booking-confirmation?id=${ride._id}`)}
+                              className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-xl"
+                            >
+                              Details
                             </button>
                           )}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </AnimatePresence>
         </div>
+      </div>
 
-        {/* Summary */}
-        {filteredBookings.length > 0 && (
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700">
-            <p className="text-gray-900 dark:text-white font-semibold">
-              Showing {filteredBookings.length} rides (with 20% advance paid) out of {bookings.filter(b => has20PercentPaid(b)).length} total
-            </p>
-          </div>
-        )}
-
-        {/* Cancel Ride Modal */}
+      {/* Modern Cancel Modal */}
+      <AnimatePresence>
         {showCancelModal && selectedRideForCancel && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Cancel Ride
-                </h2>
-                <button
-                  onClick={() => {
-                    setShowCancelModal(false);
-                    setCancelReason('');
-                    setSelectedRideForCancel(null);
-                  }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={24} />
-                </button>
-              </div>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCancelModal(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"
+            >
+              <div className="p-10 text-center">
+                <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                  <AlertCircle size={40} />
+                </div>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Cancel Journey?</h2>
+                <p className="text-slate-500 font-medium mb-8">This action cannot be undone. Please provide a reason for cancellation below.</p>
 
-              <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg p-3 mb-4">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
-                  ⚠️ Are you sure you want to cancel this ride? Cancellation charges may apply.
-                </p>
-              </div>
-
-              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Booking ID:</p>
-                <p className="font-semibold text-gray-900 dark:text-white">#{selectedRideForCancel.bookingId}</p>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Cancellation Reason <span className="text-red-500">*</span>
-                </label>
                 <textarea
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
-                  placeholder="Please tell us why you're cancelling this ride..."
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                  rows="4"
+                  placeholder="Reason for cancellation..."
+                  className="w-full p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none focus:ring-2 focus:ring-rose-500 text-sm font-medium mb-8"
+                  rows="3"
                 />
-              </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowCancelModal(false);
-                    setCancelReason('');
-                    setSelectedRideForCancel(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded-lg transition font-semibold"
-                  disabled={cancelling}
-                >
-                  Keep Booking
-                </button>
-                <button
-                  onClick={handleCancelRide}
-                  disabled={cancelling || !cancelReason.trim()}
-                  className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {cancelling ? 'Cancelling...' : 'Cancel Ride'}
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowCancelModal(false)}
+                    className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
+                  >
+                    No, Go Back
+                  </button>
+                  <button
+                    onClick={handleCancelRide}
+                    disabled={cancelling || !cancelReason.trim()}
+                    className="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    {cancelling ? 'Processing...' : 'Confirm Cancel'}
+                  </button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
-      </div>
+      </AnimatePresence>
     </UserLayout>
   );
 }

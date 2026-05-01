@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Zap, Phone, User, FileText, Car, DollarSign, Clock, Shield, TrendingUp, ChevronDown } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import apiConfig from '../config/api.config.json';
-
-const API_BASE_URL = (import.meta.env.VITE_API_URL || apiConfig.api.baseUrl).replace(/\/api$/, '');
-const API_ENDPOINT = `${API_BASE_URL}/api`;
 
 export default function CabPartnerPage() {
   const [formData, setFormData] = useState({
@@ -100,14 +97,9 @@ export default function CabPartnerPage() {
       formDataToSend.append('rcDocument', formData.rcUpload);
       formDataToSend.append('insuranceDocument', formData.insuranceUpload);
 
-      const response = await axios.post(
-        `${API_ENDPOINT}${apiConfig.endpoints.cab.register}`,
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+      const response = await api.post(
+        apiConfig.endpoints.cab.register,
+        formDataToSend
       );
 
       if (response.data.success) {

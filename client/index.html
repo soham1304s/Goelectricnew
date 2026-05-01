@@ -3,70 +3,41 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/Logo_black.jpeg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Primary Meta Tags -->
+  <title>GoElectriQ - Premium Electric Vehicle Mobility in Jaipur</title>
+  <meta name="title" content="GoElectriQ - Premium Electric Vehicle Mobility in Jaipur">
+  <meta name="description" content="Experience the future of mobility with GoElectriQ. Premium, eco-friendly electric vehicle rides in Jaipur. Affordable, sustainable, and smart transportation for everyone.">
+  <meta name="keywords" content="EV Cabs, Electric Vehicle Jaipur, Eco-friendly rides, GoElectriQ, Jaipur Transport, Sustainable Mobility">
+  <meta name="author" content="GoElectriQ">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://goelectriq.com/">
+  <meta property="og:title" content="GoElectriQ - Premium Electric Vehicle Mobility">
+  <meta property="og:description" content="Experience the future of mobility with GoElectriQ. Premium, eco-friendly electric vehicle rides in Jaipur.">
+  <meta property="og:image" content="/home-hero.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://goelectriq.com/">
+  <meta property="twitter:title" content="GoElectriQ - Premium Electric Vehicle Mobility">
+  <meta property="twitter:description" content="Experience the future of mobility with GoElectriQ. Premium, eco-friendly electric vehicle rides in Jaipur.">
+  <meta property="twitter:image" content="/home-hero.png">
+
   <!-- Allow Google Sign-In popup to communicate with parent window -->
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-  <title>GoElectriQ - Electric Vehicle Platform</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <!-- Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- Console Error/Warning Suppression for Third-Party Libraries -->
+  <!-- Console logging enabled for debugging -->
   <script>
-    (function () {
-      const originalError = console.error;
-      const originalWarn = console.warn;
-      const originalLog = console.log;
-
-      const shouldSuppress = (msg) => {
-        if (!msg) return false;
-        const str = String(msg);
-        return (
-          // Razorpay & Web Share API errors
-          str.includes('web-share') ||
-          str.includes('Unrecognized feature') ||
-          str.includes('checkout.js') ||
-          // Google APIs & Sign-In issues
-          str.includes('GSI_LOGGER') ||
-          str.includes('origin is not allowed') ||
-          str.includes('credential_button_library') ||
-          str.includes('[GSI_LOGGER]') ||
-          str.includes('button width') ||
-          str.includes('REQUEST_DENIED') ||
-          str.includes('Access to fetch') ||
-          str.includes('Cross-Origin-Opener-Policy') ||
-          str.includes('postMessage') && str.includes('COOP') ||
-          str.includes('The given origin') ||
-          str.includes('gsi_') ||
-          str.includes('accounts.google.com') ||
-          // Resource preload warnings
-          str.includes('preload') && str.includes('not used') ||
-          // Location Services
-          str.includes('Nominatim') ||
-          str.includes('CORS') && (str.includes('Nominatim') || str.includes('overpass'))
-        );
-      };
-
-      console.error = function (...args) {
-        if (args[0] && !shouldSuppress(args[0])) {
-          originalError.apply(console, args);
-        }
-      };
-
-      console.warn = function (...args) {
-        if (args[0] && !shouldSuppress(args[0])) {
-          originalWarn.apply(console, args);
-        }
-      };
-
-      console.log = function (...args) {
-        if (args[0] && !shouldSuppress(args[0])) {
-          originalLog.apply(console, args);
-        }
-      };
-    })();
+    console.log("GoElectriQ: Console ready.");
   </script>
   <!-- Mobile Optimization CSS -->
   <style>
@@ -113,6 +84,7 @@
       }
     }
   </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&libraries=places"></script>
 </head>
 
 <body>

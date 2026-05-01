@@ -101,7 +101,7 @@ export const createTourBooking = async (req, res) => {
 
     const populated = await TourBooking.findById(booking._id)
       .populate('package', 'title coverImage tourCategory basePrice pricing location')
-      .populate('user', 'name email phone');
+      .populate('user', 'firstName lastName email phone');
 
     // Send WhatsApp notification to user and admin
     try {

@@ -122,7 +122,7 @@ export default function RideBookingModal({
       setCalculatedDistance(result.distance);
       setCalculatedDuration(result.duration);
       setDistanceError('');
-      
+
       // Calculate estimated fare
       const selectedCarData = carTypes.find((car) => car.id === selectedCar);
       if (selectedCarData && result.distance > 0) {
@@ -234,6 +234,13 @@ export default function RideBookingModal({
         const advancePayment = Math.round(totalFare * 0.2);
         const remainingAmount = totalFare - advancePayment;
 
+        // Safety check for payment amount
+        if (!advancePayment || advancePayment <= 0) {
+          setError('Fare could not be calculated. Please check your car selection and locations.');
+          setSubmitting(false);
+          return;
+        }
+
         console.log('💰 Payment Details:', { totalFare, advancePayment, remainingAmount });
 
         // Create payment order for 20% advance
@@ -267,12 +274,12 @@ export default function RideBookingModal({
             try {
               console.log('✅ Payment successful, verifying...', paymentData);
               const verifyRes = await ridePaymentService.verifyRidePayment(paymentData);
-              
+
               if (verifyRes?.success) {
                 console.log('✅ Payment verified successfully!');
                 setSubmitting(false);
                 onClose();
-                
+
                 navigate('/booking-confirmation', {
                   state: {
                     bookingId: booking._id || booking.bookingId,
@@ -372,11 +379,10 @@ export default function RideBookingModal({
 
           {/* Distance & Duration Calculation Status */}
           <div className="grid grid-cols-2 gap-4">
-            <div className={`rounded-lg p-4 border-2 transition-all ${
-              calculatedDistance > 0
-                ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-                : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
-            }`}>
+            <div className={`rounded-lg p-4 border-2 transition-all ${calculatedDistance > 0
+              ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+              : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+              }`}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Distance</p>
@@ -390,11 +396,10 @@ export default function RideBookingModal({
               </div>
             </div>
 
-            <div className={`rounded-lg p-4 border-2 transition-all ${
-              calculatedDuration > 0
-                ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-                : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
-            }`}>
+            <div className={`rounded-lg p-4 border-2 transition-all ${calculatedDuration > 0
+              ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+              : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+              }`}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Duration</p>
@@ -422,11 +427,10 @@ export default function RideBookingModal({
                     <button
                       key={car.id}
                       onClick={() => setSelectedCar(car.id)}
-                      className={`p-4 rounded-lg border-2 text-left transition-all ${
-                        selectedCar === car.id
-                          ? 'bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-400'
-                          : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-green-500'
-                      }`}
+                      className={`p-4 rounded-lg border-2 text-left transition-all ${selectedCar === car.id
+                        ? 'bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-400'
+                        : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-green-500'
+                        }`}
                     >
                       <div className="font-semibold text-gray-900 dark:text-white">{car.name}</div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -526,7 +530,7 @@ export default function RideBookingModal({
             </div>
           </div>
 
-         
+
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

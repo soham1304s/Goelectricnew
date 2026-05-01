@@ -19,26 +19,23 @@ import Footer from '../../components/Footer.jsx';
 const services = [
   {
     icon: Building2,
-    title: 'City Ride',
+    title: 'Local City Ride',
     description: 'Effortless urban commuting in whisper-quiet electric comfort. Perfect for your daily office runs or city chores.',
     path: '/local-ride',
-    accent: 'emerald',
     features: ['Instant Booking', 'Zero Surge Pricing', 'Verified Captains']
   },
   {
     icon: Plane,
-    title: 'Airport Ride',
+    title: 'Airport Transfer',
     description: 'Reliable, on-time airport transfers. We track your flight and wait for you, so you never have to worry.',
     path: '/airport',
-    accent: 'blue',
     features: ['Flight Tracking', 'Free Waiting Time', 'Luggage Assistance']
   },
   {
     icon: Navigation,
     title: 'Intercity Ride',
-    description: 'Premium long-distance travel between cities. Safe, sustainable, and surprisingly affordable.',
+    description: 'Premium long-distance travel between cities. Safe, sustainable, and surprisingly affordable in our EV fleet.',
     path: '/intercity-ride',
-    accent: 'purple',
     features: ['Highway Specialists', 'Comfort Seats', 'Flexible Stops']
   },
   {
@@ -46,7 +43,6 @@ const services = [
     title: 'Tour Packages',
     description: 'Curated sightseeing experiences. Explore heritage sites and hidden gems in our eco-friendly fleet.',
     path: '/tours',
-    accent: 'amber',
     features: ['Guided Tours', 'Half/Full Day', 'Custom Itinerary']
   },
 ];
@@ -62,40 +58,40 @@ const ServicesPage = () => {
   };
 
   return (
-    <div className="pt-24 md:pt-32 transition-colors duration-500 dark:bg-[#020617]">
+    <div className="pt-24 md:pt-32 font-['Inter',sans-serif] transition-colors duration-500 bg-[#fafafa] dark:bg-black">
       {/* Header Section */}
-      <section className="max-w-7xl mx-auto px-4 mb-20 md:mb-32">
+      <section className="max-w-7xl mx-auto px-4 mb-16 md:mb-24">
         <div className="text-center max-w-4xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6"
+            className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.1em] mb-6"
           >
-            Our Offerings
+            <MapPin size={14} /> Our Offerings
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-8 tracking-tight"
+            className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight"
           >
-            Premium Mobility <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-blue-600">Tailored For You.</span>
+            Premium Mobility, <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">100% Electric.</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-500 dark:text-gray-400 font-medium leading-relaxed"
+            className="text-lg md:text-xl text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-2xl mx-auto"
           >
-            From daily commutes to luxury tours, our 100% electric fleet is at your service 24/7.
+            From daily commutes to luxury tours, our zero-emission fleet is at your service 24/7.
           </motion.p>
         </div>
       </section>
 
       {/* Services Grid */}
       <section className="max-w-7xl mx-auto px-4 mb-32">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {services.map((service, i) => {
             const Icon = service.icon;
             return (
@@ -103,52 +99,45 @@ const ServicesPage = () => {
                 key={service.title}
                 {...fadeIn}
                 transition={{ delay: i * 0.1 }}
-                className="group relative"
+                className="group h-full"
               >
-                <div className={`p-10 rounded-[3rem] h-full flex flex-col transition-all duration-500 border ${
-                  service.accent === 'emerald' ? 'hover:border-emerald-500/30' : 
-                  service.accent === 'blue' ? 'hover:border-blue-500/30' : 
-                  service.accent === 'purple' ? 'hover:border-purple-500/30' : 'hover:border-amber-500/30'
-                } bg-white dark:bg-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-black/20 hover:-translate-y-2`}
-              >
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-transform duration-500 group-hover:rotate-12 ${
-                    service.accent === 'emerald' ? 'bg-emerald-500/10 text-emerald-500' : 
-                    service.accent === 'blue' ? 'bg-blue-500/10 text-blue-500' : 
-                    service.accent === 'purple' ? 'bg-purple-500/10 text-purple-500' : 'bg-amber-500/10 text-amber-500'
-                  }`}>
-                    <Icon size={32} />
+                <div className="p-8 md:p-10 rounded-[2.5rem] h-full flex flex-col transition-all duration-300 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
+                  
+                  {/* Background Glow on Hover */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 dark:from-emerald-900/20 dark:to-teal-900/10 rounded-bl-full transition-transform duration-500 translate-x-8 -translate-y-8 group-hover:translate-x-0 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 -z-0"></div>
+
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
+                      <Icon size={32} />
+                    </div>
+
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
+                      {service.title}
+                    </h2>
+                    <p className="text-base text-slate-500 dark:text-zinc-400 font-medium leading-relaxed mb-8">
+                      {service.description}
+                    </p>
+
+                    <ul className="space-y-4 mb-10 mt-auto">
+                      {service.features.map(f => (
+                        <li key={f} className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-zinc-300">
+                          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => navigate(service.path)}
+                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-base text-white transition-all bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] shadow-sm hover:shadow-lg hover:shadow-emerald-500/20"
+                    >
+                      Book Now <ArrowRight size={18} />
+                    </button>
                   </div>
-
-                  <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-                    {service.title}
-                  </h2>
-                  <p className="text-lg text-slate-500 dark:text-gray-400 font-medium leading-relaxed mb-8">
-                    {service.description}
-                  </p>
-
-                  <ul className="space-y-3 mb-10">
-                    {service.features.map(f => (
-                      <li key={f} className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
-                        <div className={`w-1.5 h-1.5 rounded-full ${
-                          service.accent === 'emerald' ? 'bg-emerald-500' : 
-                          service.accent === 'blue' ? 'bg-blue-500' : 
-                          service.accent === 'purple' ? 'bg-purple-500' : 'bg-amber-500'
-                        }`} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => navigate(service.path)}
-                    className={`mt-auto inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-white transition-all shadow-lg ${
-                      service.accent === 'emerald' ? 'bg-emerald-500 shadow-emerald-500/20' : 
-                      service.accent === 'blue' ? 'bg-blue-500 shadow-blue-500/20' : 
-                      service.accent === 'purple' ? 'bg-purple-500 shadow-purple-500/20' : 'bg-amber-500 shadow-amber-500/20'
-                    }`}
-                  >
-                    Book Now <ArrowRight size={18} />
-                  </button>
                 </div>
               </motion.div>
             );

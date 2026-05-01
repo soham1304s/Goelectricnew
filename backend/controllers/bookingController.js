@@ -53,7 +53,7 @@ export const createBooking = async (req, res) => {
     // ===== STAGE 2: VALIDATE COORDINATES (Optional if distance already calculated) =====
     // If distance > 0, coordinates were already validated during distance calculation
     const hasDistance = distance && parseFloat(distance) > 0;
-    
+
     const pickupHasCoords = pickupLocation.coordinates &&
       (pickupLocation.coordinates.latitude || pickupLocation.coordinates.latitude) &&
       (pickupLocation.coordinates.longitude || pickupLocation.coordinates.longitude);
@@ -112,10 +112,10 @@ export const createBooking = async (req, res) => {
           dropLocation.coordinates
         );
         console.log('✅ Distance recalculated via Google Maps (verification):', recalulatedDistance);
-        
+
         // Only use recalculated if significantly different (more than 10%)
-        if (recalulatedDistance.distance && 
-            Math.abs(recalulatedDistance.distance - parsedDistance) > parsedDistance * 0.1) {
+        if (recalulatedDistance.distance &&
+          Math.abs(recalulatedDistance.distance - parsedDistance) > parsedDistance * 0.1) {
           console.warn('⚠️ Recalculated distance differs by >10% from provided:', {
             provided: parsedDistance,
             recalculated: recalulatedDistance.distance,
@@ -142,7 +142,7 @@ export const createBooking = async (req, res) => {
         economy: { baseFare: 50, perKmRate: 10, minimumFare: 100 },
         premium: { baseFare: 100, perKmRate: 18, minimumFare: 200 },
       };
-      
+
       const priceData = defaultPricing[cabType] || defaultPricing.economy;
       pricing = {
         cabType,
@@ -158,20 +158,20 @@ export const createBooking = async (req, res) => {
 
     // ===== STAGE 5: CALCULATE FARE =====
     let fareBreakdown;
-    
+
     if (rideType === 'airport') {
       // Airport rides use FLAT RATE (fixed charge + parking), NOT distance-based
       console.log('✈️  Airport ride detected - Using FLAT RATE pricing');
       console.log('📍 Airport Type:', airportType || 'not specified');
       console.log('💵 Pricing object structure:', JSON.stringify(pricing, null, 2));
-      
+
       // Get airport charges for specific ride type (pickup or drop)
       const airportTypeKey = airportType || 'pickup'; // Default to pickup if not specified
-      
+
       // Try to get airport charges from different possible locations in pricing object
       let fixedCharge = 0;
       let parkingCharge = 0;
-      
+
       // Try airportCharges nested structure first
       if (pricing.airportCharges && pricing.airportCharges[airportTypeKey]) {
         fixedCharge = pricing.airportCharges[airportTypeKey].fixedCharge || 0;
@@ -188,17 +188,17 @@ export const createBooking = async (req, res) => {
         fixedCharge = cabType === 'premium' ? 600 : 500;
         parkingCharge = 0; // No parking charge for defaults (only fixed charge)
       }
-      
+
       console.log(`💰 Airport charges extracted - Fixed: ₹${fixedCharge}, Parking: ₹${parkingCharge}`);
-      
+
       // Ensure no rounding issues - convert to numbers and calculate total
       const cleanFixedCharge = Math.round(parseFloat(fixedCharge) * 100) / 100;
       const cleanParkingCharge = Math.round(parseFloat(parkingCharge) * 100) / 100;
       const subTotal = cleanFixedCharge + cleanParkingCharge;
       const totalFare = subTotal; // No GST added - total is just the base amount
-      
+
       console.log(`✅ Final calculation - Fixed: ₹${cleanFixedCharge}, Parking: ₹${cleanParkingCharge}, Total: ₹${totalFare}`);
-      
+
       fareBreakdown = {
         fixedCharge: cleanFixedCharge,       // FLAT RATE (not per-km)
         parkingCharge: cleanParkingCharge,
@@ -218,7 +218,7 @@ export const createBooking = async (req, res) => {
           }
         }
       };
-      
+
       console.log('💰 Airport fare calculated (FLAT RATE):', fareBreakdown);
     } else {
       // Regular rides use normal per-km fare calculation
@@ -297,7 +297,7 @@ export const createBooking = async (req, res) => {
     });
 
     // Populate user details
-    await booking.populate('user', 'name email phone');
+    await booking.populate('user', 'firstName lastName email phone');
 
     // Send WhatsApp notification to user and admin
     try {
@@ -339,12 +339,9 @@ export const getMyBookings = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const query = { 
+    const query = {
       user: req.user._id,
-      // 🔑 IMPORTANT: Only show bookings where 20% advance payment is made
-      // Exclude bookings with paymentStatus='pending' (no payment made yet)
-      // This ensures bookings only appear after payment is initiated
-      paymentStatus: { $ne: 'pending' }
+      // Show all bookings including those with pending payments
     };
 
     // Filter by status if provided
@@ -359,9 +356,9 @@ export const getMyBookings = async (req, res) => {
       .limit(limit)
       .lean(); // Use lean for faster queries and complete data return
 
-    console.log('📊 Fetching user bookings (20% Advance Payment System):', { 
-      userId: req.user._id, 
-      query, 
+    console.log('📊 Fetching user bookings (20% Advance Payment System):', {
+      userId: req.user._id,
+      query,
       count: bookings.length,
       note: 'Only bookings with 20% advance payment appear here (paymentStatus != pending)',
       sampleBooking: bookings[0] ? {
@@ -545,13 +542,13 @@ export const downloadInvoice = async (req, res) => {
     // Generate invoice if not exists
     if (!booking.invoice || !booking.invoice.invoiceUrl) {
       const invoiceData = await generateInvoicePDF(booking, booking.user);
-      
+
       booking.invoice = {
         invoiceNumber: invoiceData.invoiceNumber,
         invoiceUrl: `/uploads/invoices/${invoiceData.filename}`,
         generatedAt: new Date(),
       };
-      
+
       await booking.save();
     }
 
@@ -649,11 +646,11 @@ export const completeBooking = async (req, res) => {
     // Update ride details
     if (actualDistance && actualDistance > 0) {
       booking.rideDetails.actualDistance = actualDistance;
-      
+
       // Recalculate fare if distance changed significantly
       const distanceDifference = Math.abs(actualDistance - booking.distance);
       const percentageDifference = (distanceDifference / booking.distance) * 100;
-      
+
       if (percentageDifference > 5 && !isdAdminOverride) {
         booking.rideDetails.actualDistance = actualDistance;
         booking.adminNotes = `Distance variance: estimated ${booking.distance}km, actual ${actualDistance}km (${percentageDifference.toFixed(2)}%)`;
@@ -662,7 +659,7 @@ export const completeBooking = async (req, res) => {
 
     booking.status = 'completed';
     booking.rideDetails.endTime = new Date();
-    
+
     // For regular rides: payment should be collected NOW
     // For tours: payment may already be collected
     if (booking.rideType === 'local' || booking.rideType === 'airport' || booking.rideType === 'intercity') {
@@ -728,7 +725,7 @@ export const collectPayment = async (req, res) => {
     // Update payment info
     booking.paidAmount = (booking.paidAmount || 0) + amount;
     booking.paymentMethod = paymentMethod || booking.paymentMethod;
-    
+
     if (razorpayPaymentId) {
       booking.paymentDetails.razorpayPaymentId = razorpayPaymentId;
       booking.paymentDetails.razorpayOrderId = razorpayOrderId;
@@ -849,7 +846,7 @@ export const getAirportBookings = async (req, res) => {
       carType: booking.carType || 'N/A',
       rideType: booking.rideType,
       airportType: booking.airportType || 'pickup',
-      totalFare: booking.totalFare || 0,
+      totalFare: booking.pricing?.totalFare || booking.totalFare || 0,
       paidAmount: booking.paidAmount || 0,
       paymentStatus: booking.paymentStatus || 'pending',
       createdAt: booking.createdAt,

@@ -27,12 +27,23 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
+  const guestLinks = [
     { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
     { name: "Services", path: "/services" },
-    { name: "Contact Us", path: "/contact" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ];
+
+  const loggedInLinks = [
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+    { name: "My Bookings", path: user?.role === 'admin' ? "/admin/rides" : "/user/rides" },
+    { name: "Profile", path: user?.role === 'admin' ? "/admin/profile" : "/user/profile" },
+    { name: "Contact", path: "/contact" },
+    { name: "Logout", action: logout },
+  ];
+
+  const currentNavLinks = isAuthenticated ? loggedInLinks : guestLinks;
 
   const isActive = (path) => location.pathname === path;
 
@@ -48,35 +59,55 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Nav Links */}
-        <div className="hidden lg:flex items-center space-x-10">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`text-sm font-black uppercase tracking-widest transition-all hover:text-emerald-600 ${isActive(link.path)
-                  ? "text-emerald-600"
-                  : isScrolled ? "text-slate-600" : "text-slate-900"
+        <div className="hidden lg:flex items-center space-x-8 xl:space-x-10">
+          {currentNavLinks.map((link) => (
+            link.action ? (
+              <button
+                key={link.name}
+                onClick={link.action}
+                className={`text-sm font-black uppercase tracking-widest transition-all hover:text-emerald-600 ${
+                  isScrolled ? "text-slate-600" : "text-slate-900"
                 }`}
-            >
-              {link.name}
-            </Link>
+              >
+                {link.name}
+              </button>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`text-sm font-black uppercase tracking-widest transition-all hover:text-emerald-600 ${isActive(link.path)
+                    ? "text-emerald-600"
+                    : isScrolled ? "text-slate-600" : "text-slate-900"
+                  }`}
+              >
+                {link.name}
+              </Link>
+            )
           ))}
         </div>
 
         {/* Right Side Actions */}
-        <div className="hidden lg:flex items-center space-x-5">
-          <a
-            href="tel:18001234567"
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${isScrolled
-                ? "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                : "bg-white/10 text-slate-900 backdrop-blur-md border border-slate-200/50 hover:bg-white/20"
-              }`}
-          >
-            <Phone size={16} />
-            1800 123 4567
-          </a>
-
-          {isAuthenticated ? (
+        <div className="hidden lg:flex items-center space-x-4">
+          {!isAuthenticated ? (
+            <>
+              <button
+                onClick={() => navigate("/login")}
+                className={`px-6 py-2.5 rounded-xl text-sm font-black transition-all border ${
+                  isScrolled 
+                    ? "border-emerald-600 text-emerald-600 hover:bg-emerald-50" 
+                    : "border-slate-300 text-slate-800 bg-white/10 backdrop-blur-md hover:bg-white/20"
+                }`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-black hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 active:scale-95"
+              >
+                Register
+              </button>
+            </>
+          ) : (
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/user/dashboard')}
@@ -85,21 +116,7 @@ const Navbar = () => {
                 <LayoutDashboard size={16} />
                 Dashboard
               </button>
-              <button
-                onClick={logout}
-                className="p-2.5 text-slate-400 hover:text-rose-500 transition-colors bg-slate-50 rounded-xl"
-                title="Logout"
-              >
-                <LogOut size={20} />
-              </button>
             </div>
-          ) : (
-            <button
-              onClick={() => navigate("/local-ride")}
-              className="px-8 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-black hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 active:scale-95"
-            >
-              Book Now
-            </button>
           )}
         </div>
 
@@ -116,34 +133,64 @@ const Navbar = () => {
       {showMobileMenu && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-xl border-t border-gray-100 animate-fadeIn">
           <div className="flex flex-col p-6 space-y-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setShowMobileMenu(false)}
-                className={`text-lg font-semibold ${isActive(link.path) ? "text-emerald-600" : "text-gray-800"
-                  }`}
-              >
-                {link.name}
-              </Link>
+            {currentNavLinks.map((link) => (
+              link.action ? (
+                <button
+                  key={link.name}
+                  onClick={() => {
+                    link.action();
+                    setShowMobileMenu(false);
+                  }}
+                  className="text-lg font-semibold text-gray-800 text-left hover:text-emerald-600"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setShowMobileMenu(false)}
+                  className={`text-lg font-semibold ${isActive(link.path) ? "text-emerald-600" : "text-gray-800"
+                    }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             <div className="pt-4 border-t border-gray-100 flex flex-col space-y-3">
-              <a
-                href="tel:18001234567"
-                className="flex items-center justify-center gap-2 px-4 py-3 border border-emerald-600 text-emerald-600 rounded-lg font-bold"
-              >
-                <Phone size={18} />
-                1800 123 4567
-              </a>
-              <button
-                onClick={() => {
-                  navigate("/local-ride");
-                  setShowMobileMenu(false);
-                }}
-                className="px-4 py-3 bg-emerald-600 text-white rounded-lg font-bold shadow-lg"
-              >
-                Book Now
-              </button>
+              {!isAuthenticated ? (
+                <>
+                  <button
+                    onClick={() => {
+                      navigate("/login");
+                      setShowMobileMenu(false);
+                    }}
+                    className="flex items-center justify-center w-full px-4 py-3 border border-emerald-600 text-emerald-600 rounded-lg font-bold"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/register");
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg font-bold shadow-lg"
+                  >
+                    Register
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigate(user?.role === 'admin' ? '/admin' : '/user/dashboard');
+                    setShowMobileMenu(false);
+                  }}
+                  className="flex items-center justify-center w-full gap-2 px-4 py-3 bg-emerald-600 text-white rounded-lg font-bold shadow-lg"
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -153,3 +200,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

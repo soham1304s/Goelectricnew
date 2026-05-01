@@ -3,7 +3,7 @@
   
   "api": {
     "_comment": "API Configuration - Used by all API calls",
-    "baseUrl": "http://localhost:5000/api",
+    "baseUrl": "/api",
     "timeout": 30000,
     "headers": {
       "Content-Type": "application/json"

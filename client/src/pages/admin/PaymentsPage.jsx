@@ -13,7 +13,7 @@ const PaymentsPage = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
   const token = localStorage.getItem('token');
 
   const fetchPayments = async (page = 1) => {

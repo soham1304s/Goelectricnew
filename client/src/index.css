@@ -47,7 +47,12 @@ body {
     color 0.3s ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Outfit', sans-serif;
 }
 
@@ -56,6 +61,7 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -112,6 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Mobile touch event optimization */
 @media (hover: none) and (pointer: coarse) {
+
   button,
   input[type="button"],
   input[type="submit"] {

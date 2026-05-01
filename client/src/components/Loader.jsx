@@ -34,8 +34,8 @@ export default function Loader() {
         <div className="loader-content">
           {/* Logo Image */}
           <img 
-            src="/vite.svg" 
-            alt="Logo" 
+            src="/Logo_black.jpeg" 
+            alt="GoElectriQ Logo" 
             className="loader-logo"
           />
           
