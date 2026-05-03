@@ -11,6 +11,7 @@ import {
   Printer,
   ArrowLeft,
   AlertCircle,
+  FileText,
 } from "lucide-react";
 import UserLayout from "./UserLayout.jsx";
 import * as bookingService from "../../services/bookingService.js";
@@ -151,7 +152,7 @@ export default function BookingConfirmationPage() {
           <div className="min-h-screen flex items-center justify-center p-4">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600">
                 Loading booking details...
               </p>
             </div>
@@ -163,12 +164,14 @@ export default function BookingConfirmationPage() {
     return (
       <UserLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md">
-            <div className="text-6xl mb-4">📋</div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md border border-slate-100">
+            <div className="mb-4">
+              <FileText size={60} className="text-emerald-500 mx-auto" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">
               Booking not found
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600 mb-6">
               The booking details are not available. This may happen if the page
               was refreshed or the session expired.
             </p>
@@ -181,7 +184,7 @@ export default function BookingConfirmationPage() {
               </button>
               <button
                 onClick={() => navigate("/")}
-                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition font-semibold"
+                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition font-semibold"
               >
                 Back to Home
               </button>
@@ -228,65 +231,55 @@ export default function BookingConfirmationPage() {
       confirmed: {
         title: "Booking Confirmed",
         icon: CheckCircle,
-        bgColor:
-          "from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20",
-        borderColor: "border-green-200 dark:border-green-700",
+        bgColor: "from-green-50 to-emerald-50",
+        borderColor: "border-green-200",
         badgeColor: "bg-green-600",
-        textColor: "text-green-900 dark:text-green-100",
+        textColor: "text-green-900",
         badgeText: "text-white",
-        emoji: "✅",
         message: "Your ride is confirmed and ready!",
         iconColor: "text-white",
       },
       completed: {
         title: "Ride Completed",
         icon: CheckCircle,
-        bgColor:
-          "from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20",
-        borderColor: "border-blue-200 dark:border-blue-700",
-        badgeColor: "bg-blue-600",
-        textColor: "text-blue-900 dark:text-blue-100",
+        bgColor: "from-emerald-50 to-teal-50",
+        borderColor: "border-emerald-200",
+        badgeColor: "bg-emerald-600",
+        textColor: "text-emerald-900",
         badgeText: "text-white",
-        emoji: "🎉",
         message: "Thank you for riding with us!",
         iconColor: "text-white",
       },
       cancelled: {
         title: "Booking Cancelled",
         icon: XCircle,
-        bgColor:
-          "from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20",
-        borderColor: "border-red-200 dark:border-red-700",
+        bgColor: "from-red-50 to-rose-50",
+        borderColor: "border-red-200",
         badgeColor: "bg-red-600",
-        textColor: "text-red-900 dark:text-red-100",
+        textColor: "text-red-900",
         badgeText: "text-white",
-        emoji: "❌",
         message: "This booking has been cancelled.",
         iconColor: "text-white",
       },
       pending: {
         title: "Booking Pending",
         icon: Clock,
-        bgColor:
-          "from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20",
-        borderColor: "border-yellow-200 dark:border-yellow-700",
+        bgColor: "from-yellow-50 to-amber-50",
+        borderColor: "border-yellow-200",
         badgeColor: "bg-yellow-600",
-        textColor: "text-yellow-900 dark:text-yellow-100",
+        textColor: "text-yellow-900",
         badgeText: "text-white",
-        emoji: "⏳",
         message: "Your booking is awaiting confirmation.",
         iconColor: "text-white",
       },
       ongoing: {
         title: "Ride in Progress",
         icon: AlertCircle,
-        bgColor:
-          "from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20",
-        borderColor: "border-purple-200 dark:border-purple-700",
+        bgColor: "from-purple-50 to-indigo-50",
+        borderColor: "border-purple-200",
         badgeColor: "bg-purple-600",
-        textColor: "text-purple-900 dark:text-purple-100",
+        textColor: "text-purple-900",
         badgeText: "text-white",
-        emoji: "🚗",
         message: "Your ride is currently on the way!",
         iconColor: "text-white",
       },
@@ -302,7 +295,7 @@ export default function BookingConfirmationPage() {
     const status = booking.status?.toLowerCase() || "pending";
     const colors = {
       confirmed: "from-green-600 to-emerald-600",
-      completed: "from-blue-600 to-cyan-600",
+      completed: "from-emerald-600 to-teal-600",
       cancelled: "from-red-600 to-rose-600",
       pending: "from-yellow-600 to-amber-600",
       ongoing: "from-purple-600 to-indigo-600",
@@ -314,16 +307,11 @@ export default function BookingConfirmationPage() {
   const getFareRowColor = () => {
     const status = booking.status?.toLowerCase() || "pending";
     const colors = {
-      confirmed:
-        "bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50",
-      completed:
-        "bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50",
-      cancelled:
-        "bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50",
-      pending:
-        "bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50",
-      ongoing:
-        "bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50",
+      confirmed: "bg-green-50 hover:bg-green-100",
+      completed: "bg-emerald-50 hover:bg-emerald-100",
+      cancelled: "bg-red-50 hover:bg-red-100",
+      pending: "bg-yellow-50 hover:bg-yellow-100",
+      ongoing: "bg-purple-50 hover:bg-purple-100",
     };
     return colors[status] || colors.pending;
   };
@@ -332,11 +320,11 @@ export default function BookingConfirmationPage() {
   const getFareTextColor = () => {
     const status = booking.status?.toLowerCase() || "pending";
     const colors = {
-      confirmed: "text-green-600 dark:text-green-400",
-      completed: "text-blue-600 dark:text-blue-400",
-      cancelled: "text-red-600 dark:text-red-400",
-      pending: "text-yellow-600 dark:text-yellow-400",
-      ongoing: "text-purple-600 dark:text-purple-400",
+      confirmed: "text-green-600",
+      completed: "text-emerald-600",
+      cancelled: "text-red-600",
+      pending: "text-yellow-600",
+      ongoing: "text-purple-600",
     };
     return colors[status] || colors.pending;
   };
@@ -350,8 +338,8 @@ export default function BookingConfirmationPage() {
           message?.includes("Redirecting") && (
             <div
               className={`mb-6 p-4 rounded-lg border-2 ${booking.status?.toLowerCase() === "cancelled"
-                  ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300"
-                  : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300"
+                  ? "bg-red-50 border-red-200 text-red-700"
+                  : "bg-emerald-50 border-emerald-200 text-emerald-700"
                 }`}
             >
               <div className="flex items-center gap-3">
@@ -366,7 +354,7 @@ export default function BookingConfirmationPage() {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 mb-6 px-4 py-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition font-medium"
+          className="flex items-center gap-2 mb-6 px-4 py-2 text-green-600 hover:bg-green-50 rounded-lg transition font-medium"
         >
           <ArrowLeft size={20} />
           Go Back
@@ -391,7 +379,7 @@ export default function BookingConfirmationPage() {
           <h1
             className={`text-4xl font-bold ${statusConfig.textColor} mt-6 mb-2`}
           >
-            {statusConfig.emoji} {statusConfig.title}
+            {statusConfig.title}
           </h1>
           <p className={`text-lg ${statusConfig.textColor}`}>
             {statusConfig.message}
@@ -405,7 +393,7 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Main Table Container */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
           {/* Booking Details Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -419,32 +407,32 @@ export default function BookingConfirmationPage() {
                   <th className="px-6 py-4 text-left font-semibold">Details</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-gray-200">
                 {/* Booking Status Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     Booking Status
                   </td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${booking.status?.toLowerCase() === "confirmed"
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                          ? "bg-green-100 text-green-700"
                           : booking.status?.toLowerCase() === "completed"
-                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                            ? "bg-blue-100 text-blue-700"
                             : booking.status?.toLowerCase() === "cancelled"
-                              ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
+                              ? "bg-red-100 text-red-700"
                               : booking.status?.toLowerCase() === "pending"
-                                ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
+                                ? "bg-yellow-100 text-yellow-700"
                                 : booking.status?.toLowerCase() === "ongoing"
-                                  ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
-                                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                  ? "bg-purple-100 text-purple-700"
+                                  : "bg-gray-100 text-gray-700"
                         }`}
                     >
-                      {booking.status?.toLowerCase() === "confirmed" && "✅"}
-                      {booking.status?.toLowerCase() === "completed" && "🎉"}
-                      {booking.status?.toLowerCase() === "cancelled" && "❌"}
-                      {booking.status?.toLowerCase() === "pending" && "⏳"}
-                      {booking.status?.toLowerCase() === "ongoing" && "🚗"}
+                      {booking.status?.toLowerCase() === "confirmed" && "●"}
+                      {booking.status?.toLowerCase() === "completed" && "●"}
+                      {booking.status?.toLowerCase() === "cancelled" && "●"}
+                      {booking.status?.toLowerCase() === "pending" && "●"}
+                      {booking.status?.toLowerCase() === "ongoing" && "●"}
                       {![
                         "confirmed",
                         "completed",
@@ -458,28 +446,28 @@ export default function BookingConfirmationPage() {
                 </tr>
 
                 {/* Payment Status Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     Payment Status
                   </td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${booking.paymentStatus?.toLowerCase() === "paid"
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                          : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
                         }`}
                     >
-                      💳 {booking.paymentStatus?.toUpperCase() || "PENDING"}
+                      {booking.paymentStatus?.toUpperCase() || "PENDING"}
                     </span>
                   </td>
                 </tr>
 
                 {/* Pickup Location Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     Pickup Location
                   </td>
-                  <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
+                  <td className="px-6 py-4 text-gray-700">
                     {booking.pickupLocation?.address || "N/A"}
                   </td>
                 </tr>
@@ -495,11 +483,11 @@ export default function BookingConfirmationPage() {
                 </tr>
 
                 {/* Distance Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                    Distance
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
+                    Total Distance
                   </td>
-                  <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
+                  <td className="px-6 py-4 text-gray-700">
                     <span className="font-bold text-lg">
                       {booking.distance || 0} km
                     </span>
@@ -507,32 +495,32 @@ export default function BookingConfirmationPage() {
                 </tr>
 
                 {/* Ride Type Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     Ride Type
                   </td>
-                  <td className="px-6 py-4 text-gray-700 dark:text-gray-300 capitalize">
+                  <td className="px-6 py-4 text-gray-700 capitalize">
                     {booking.rideType || "Local"}
                   </td>
                 </tr>
 
                 {/* Vehicle Type Row */}
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <tr className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     Vehicle Type
                   </td>
-                  <td className="px-6 py-4 text-gray-700 dark:text-gray-300 capitalize">
+                  <td className="px-6 py-4 text-gray-700 capitalize">
                     {booking.cabType || "Sedan"}
                   </td>
                 </tr>
 
                 {/* Scheduled Date Row */}
                 {booking.scheduledDate && (
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  <tr className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-semibold text-gray-900">
                       Scheduled Date
                     </td>
-                    <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
+                    <td className="px-6 py-4 text-gray-700">
                       {new Date(booking.scheduledDate).toLocaleDateString(
                         "en-IN",
                         {
@@ -548,11 +536,11 @@ export default function BookingConfirmationPage() {
 
                 {/* Scheduled Time Row */}
                 {booking.scheduledTime && (
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  <tr className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-semibold text-gray-900">
                       Scheduled Time
                     </td>
-                    <td className="px-6 py-4 text-gray-700 dark:text-gray-300 font-semibold">
+                    <td className="px-6 py-4 text-gray-700 font-semibold">
                       {booking.scheduledTime}
                     </td>
                   </tr>
@@ -563,16 +551,16 @@ export default function BookingConfirmationPage() {
                   <>
                     {/* Airport Ride: Fixed Charge */}
                     {booking.pricing?.fixedCharge !== undefined && (
-                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                        <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                      <tr className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 font-semibold text-gray-900">
                           Fixed Charge
                           <br />
-                          <span className="text-xs text-gray-600 dark:text-gray-400 font-normal">
+                          <span className="text-xs text-gray-600 font-normal">
                             (Airport {booking.airportType || 'pickup'})
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
-                          <span className="font-bold text-green-600 dark:text-green-400">
+                        <td className="px-6 py-4 text-gray-700">
+                          <span className="font-bold text-green-600">
                             ₹{booking.pricing.fixedCharge.toFixed(2)}
                           </span>
                         </td>
@@ -584,8 +572,8 @@ export default function BookingConfirmationPage() {
                         <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                           Parking Charge
                         </td>
-                        <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
-                          <span className="font-bold text-green-600 dark:text-green-400">
+                        <td className="px-6 py-4 text-gray-700">
+                          <span className="font-bold text-green-600">
                             ₹{booking.pricing.parkingCharge.toFixed(2)}
                           </span>
                         </td>
@@ -599,8 +587,8 @@ export default function BookingConfirmationPage() {
                       <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                         Package Price
                       </td>
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
-                        <span className="font-bold text-green-600 dark:text-green-400">
+                      <td className="px-6 py-4 text-gray-700">
+                        <span className="font-bold text-green-600">
                           ₹{booking.pricing?.totalFare?.toFixed(2) || '0.00'}
                         </span>
                       </td>
@@ -617,13 +605,13 @@ export default function BookingConfirmationPage() {
                             <br />
                           )}
                           {booking.pricing?.perKmRate && (
-                            <span className="text-xs text-gray-600 dark:text-gray-400 font-normal">
+                            <span className="text-xs text-gray-600 font-normal">
                               ({booking.distance} km × ₹{booking.pricing.perKmRate}/km)
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
-                          <span className="font-bold text-green-600 dark:text-green-400">
+                        <td className="px-6 py-4 text-gray-700">
+                          <span className="font-bold text-green-600">
                             ₹{booking.pricing.distanceCharge.toFixed(2)}
                           </span>
                         </td>
@@ -634,7 +622,7 @@ export default function BookingConfirmationPage() {
 
                 {/* Total Fare Row - Highlighted with dynamic color */}
                 <tr className={`${getFareRowColor()} transition`}>
-                  <td className="px-6 py-4 font-bold text-gray-900 dark:text-white text-lg">
+                  <td className="px-6 py-4 font-bold text-gray-900 text-lg">
                     {booking.rideType?.toLowerCase() === 'airport' ? 'Total Airport Fare' : booking.rideType?.toLowerCase() === 'tour' ? 'Package Total' : 'Total Estimated Fare'}
                   </td>
                   <td className="px-6 py-4">
@@ -647,11 +635,11 @@ export default function BookingConfirmationPage() {
                 </tr>
 
                 {/* Amount Paid Row */}
-                <tr className="bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 transition font-semibold">
-                  <td className="px-6 py-4 text-gray-900 dark:text-white">
+                <tr className="bg-green-50 hover:bg-green-100 transition font-semibold">
+                  <td className="px-6 py-4 text-gray-900">
                     Amount Paid
                     <br />
-                    <span className="text-xs text-green-600 dark:text-green-400 font-normal">
+                    <span className="text-xs text-green-600 font-normal">
                       (20% Advance)
                     </span>
                   </td>
@@ -664,11 +652,11 @@ export default function BookingConfirmationPage() {
 
                 {/* Amount Remaining Row */}
                 {booking.pricing?.totalFare && (
-                  <tr className="bg-orange-50 dark:bg-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition font-semibold">
-                    <td className="px-6 py-4 text-gray-900 dark:text-white">
+                  <tr className="bg-orange-50 hover:bg-orange-100 transition font-semibold">
+                    <td className="px-6 py-4 text-gray-900">
                       Amount Remaining
                       <br />
-                      <span className="text-xs text-orange-600 dark:text-orange-400 font-normal">
+                      <span className="text-xs text-orange-600 font-normal">
                         (80% on Completion)
                       </span>
                     </td>
@@ -684,12 +672,12 @@ export default function BookingConfirmationPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-6 bg-gray-50 border-t border-gray-200">
             {/* Share button - only show if not cancelled */}
             {booking.status?.toLowerCase() !== "cancelled" && (
               <button
                 onClick={handleShare}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-semibold"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition font-semibold"
               >
                 <Share2 size={18} />
                 Share Booking
@@ -703,7 +691,7 @@ export default function BookingConfirmationPage() {
             </button>
             <button
               onClick={() => navigate("/")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition font-semibold"
+              className="px-6 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-100 transition font-semibold"
             >
               Back to Home
             </button>
@@ -711,7 +699,7 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Footer Info */}
-        <div className="mt-8 text-center text-gray-600 dark:text-gray-400 text-sm">
+        <div className="mt-8 text-center text-gray-600 text-sm">
           <p>Need help? Contact support at support@goelectriq.com</p>
           <p className="mt-2">
             Booking confirmation has been sent to your email

@@ -70,12 +70,14 @@ export const registerDriverPartner = async (req, res) => {
     // Handle document upload
     let licenseDocPath = null;
     if (req.file) {
-      const ext = path.extname(req.file.originalname);
-      const filename = `license-${Date.now()}${ext}`;
-      const filepath = path.join(uploadDir, filename);
-      
-      fs.writeFileSync(filepath, req.file.buffer);
-      licenseDocPath = `/uploads/documents/${filename}`;
+      try {
+        const { uploadFile } = await import('../utils/uploader.js');
+        const uploadResult = await uploadFile(req.file, 'documents');
+        licenseDocPath = uploadResult.url;
+      } catch (uploadErr) {
+        console.error('⚠️ License upload failed:', uploadErr.message);
+        // Continue without document if upload fails, or handle as error
+      }
     }
 
     // Create basic driver registration (waiting for approval)
@@ -162,20 +164,20 @@ export const registerCabPartner = async (req, res) => {
     let insuranceDocPath = null;
 
     if (req.files) {
+      const { uploadFile } = await import('../utils/uploader.js');
+      
       if (req.files.rcDocument) {
-        const ext = path.extname(req.files.rcDocument[0].originalname);
-        const filename = `rc-${Date.now()}${ext}`;
-        const filepath = path.join(uploadDir, filename);
-        fs.writeFileSync(filepath, req.files.rcDocument[0].buffer);
-        rcDocPath = `/uploads/documents/${filename}`;
+        try {
+          const res = await uploadFile(req.files.rcDocument[0], 'documents');
+          rcDocPath = res.url;
+        } catch (e) { console.error('RC upload failed:', e); }
       }
 
       if (req.files.insuranceDocument) {
-        const ext = path.extname(req.files.insuranceDocument[0].originalname);
-        const filename = `insurance-${Date.now()}${ext}`;
-        const filepath = path.join(uploadDir, filename);
-        fs.writeFileSync(filepath, req.files.insuranceDocument[0].buffer);
-        insuranceDocPath = `/uploads/documents/${filename}`;
+        try {
+          const res = await uploadFile(req.files.insuranceDocument[0], 'documents');
+          insuranceDocPath = res.url;
+        } catch (e) { console.error('Insurance upload failed:', e); }
       }
     }
 
@@ -289,11 +291,13 @@ export const registerChargingStation = async (req, res) => {
     // Handle file upload
     let businessDocPath = null;
     if (req.file) {
-      const ext = path.extname(req.file.originalname);
-      const filename = `business-doc-${Date.now()}${ext}`;
-      const filepath = path.join(uploadDir, filename);
-      fs.writeFileSync(filepath, req.file.buffer);
-      businessDocPath = `/uploads/documents/${filename}`;
+      try {
+        const { uploadFile } = await import('../utils/uploader.js');
+        const uploadResult = await uploadFile(req.file, 'documents');
+        businessDocPath = uploadResult.url;
+      } catch (uploadErr) {
+        console.error('⚠️ Business doc upload failed:', uploadErr.message);
+      }
     }
 
     const stationData = {

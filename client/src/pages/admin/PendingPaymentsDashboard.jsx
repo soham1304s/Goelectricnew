@@ -286,9 +286,9 @@ const PendingPaymentsDashboard = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="partial">✅ 20% Paid Only (Ready to Collect)</option>
-            <option value="pending">⏳ No Payment Yet</option>
-            <option value="all">📊 All Payments</option>
+            <option value="partial">20% Paid Only (Ready to Collect)</option>
+            <option value="pending">No Payment Yet</option>
+            <option value="all">All Payments</option>
           </select>
 
           <button
@@ -312,7 +312,7 @@ const PendingPaymentsDashboard = () => {
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              All payments collected! 🎉
+              All payments collected!
             </p>
             <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
               No pending payments to collect.
@@ -410,7 +410,7 @@ const PendingPaymentsDashboard = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Left Column - Ride Details */}
                             <div className="space-y-4">
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">📍 Ride Details</h3>
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Ride Details</h3>
                               
                               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                                 <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Car Type Selected</p>
@@ -480,10 +480,10 @@ const PendingPaymentsDashboard = () => {
 
                             {/* Right Column - Payment & User Details */}
                             <div className="space-y-4">
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">💳 Payment & User Details</h3>
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Payment & User Details</h3>
                               
                               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 p-4 rounded-lg border-2 border-blue-300 dark:border-blue-600">
-                                <p className="text-xs text-blue-600 dark:text-blue-300 font-bold uppercase mb-3">💰 Actual Total Fare</p>
+                                <p className="text-xs text-blue-600 dark:text-blue-300 font-bold uppercase mb-3">Actual Total Fare</p>
                                 <div className="space-y-2">
                                   <div className="flex justify-between items-center">
                                     <span className="text-sm text-blue-700 dark:text-blue-200">Car Type:</span>
@@ -512,7 +512,7 @@ const PendingPaymentsDashboard = () => {
                                     <span className="font-bold text-gray-900 dark:text-white">₹{booking.totalFare?.toFixed(2) || 0}</span>
                                   </div>
                                   <div className="flex justify-between bg-green-50 dark:bg-green-900/20 p-2 rounded">
-                                    <span className="text-sm text-green-700 dark:text-green-300 font-semibold">✅ 20% Advance (Paid):</span>
+                                    <span className="text-sm text-green-700 dark:text-green-300 font-semibold">20% Advance (Paid):</span>
                                     <span className="font-bold text-green-600 dark:text-green-400">₹{(booking.totalFare * 0.2)?.toFixed(2) || 0}</span>
                                   </div>
                                   <div className="flex justify-between">
@@ -520,7 +520,7 @@ const PendingPaymentsDashboard = () => {
                                     <span className="font-bold text-green-600 dark:text-green-400">₹{booking.paidAmount?.toFixed(2) || 0}</span>
                                   </div>
                                   <div className="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between bg-red-50 dark:bg-red-900/20 p-2 rounded">
-                                    <span className="text-sm font-bold text-red-700 dark:text-red-300">⏳ 80% Balance Due Now:</span>
+                                    <span className="text-sm font-bold text-red-700 dark:text-red-300">80% Balance Due Now:</span>
                                     <span className="font-bold text-xl text-red-600 dark:text-red-400">₹{booking.remainingAmount?.toFixed(2) || 0}</span>
                                   </div>
                                 </div>
@@ -673,10 +673,10 @@ const PendingPaymentsDashboard = () => {
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="cash">💵 Cash</option>
-                  <option value="upi">📱 UPI</option>
-                  <option value="wallet">💳 Wallet</option>
-                  <option value="razorpay">🔒 Razorpay</option>
+                  <option value="cash">Cash</option>
+                  <option value="upi">UPI</option>
+                  <option value="wallet">Wallet</option>
+                  <option value="razorpay">Razorpay</option>
                 </select>
               </div>
 
@@ -697,7 +697,7 @@ const PendingPaymentsDashboard = () => {
               {/* Auto-Complete Info */}
               <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
                 <p className="text-sm text-blue-800 dark:text-blue-200 font-semibold mb-2">
-                  ⚡ Auto-Complete Enabled
+                  <Zap size={14} className="inline mr-1" /> Auto-Complete Enabled
                 </p>
                 <p className="text-xs text-blue-700 dark:text-blue-300">
                   When you confirm this payment, the ride will <strong>automatically be marked as COMPLETED</strong> and the user's account will be updated instantly.

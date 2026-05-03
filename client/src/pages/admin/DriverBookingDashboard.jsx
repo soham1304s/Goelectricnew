@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Trash2, Edit2, RefreshCw, AlertCircle, Loader, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Trash2, Edit2, RefreshCw, AlertCircle, Loader, CheckCircle, XCircle, Clock, Check, X } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import apiConfig from '../../config/api.config.json';
 
@@ -296,13 +296,13 @@ const DriverBookingDashboard = () => {
                               onClick={() => handleUpdateStatus(driver._id, newStatus)}
                               className="px-2 py-1 text-xs md:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition"
                             >
-                              ✓
+                              <Check size={14} />
                             </button>
                             <button
                               onClick={() => setEditingId(null)}
                               className="px-2 py-1 text-xs md:text-sm bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-medium transition"
                             >
-                              ✕
+                              <X size={14} />
                             </button>
                           </div>
                         ) : (

@@ -196,11 +196,11 @@ export default function IntercityRidePage() {
   // Ensure we have a fallback distance for intercity (usually longer, e.g. 100km) if locations are entered but distance is 0
   const displayDistance = (displayCities.from && displayCities.to && (!calculatedDistance || calculatedDistance === 0)) ? 100 : calculatedDistance;
   const estimatedDistance = displayDistance || 0;
-  
+
   // Intercity ride pricing: baseRate is per-km rate. Minimum fare is ₹1500 for intercity.
   const distanceFare = selectedCarData ? selectedCarData.additionalCharge * estimatedDistance : 0;
   const baseFare = Math.max(distanceFare, 1500); // Minimum fare ₹1500 for Intercity
-  
+
   const totalAmount = baseFare;
   const advancePayment = Math.round(totalAmount * 0.2); // 20% advance
   const remainingAmount = totalAmount - advancePayment;

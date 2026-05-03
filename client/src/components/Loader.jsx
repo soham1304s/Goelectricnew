@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import logo from '../assets/main2.png';
 import '../styles/Loader.css';
 
 export default function Loader() {
@@ -34,7 +35,7 @@ export default function Loader() {
         <div className="loader-content">
           {/* Logo Image */}
           <img 
-            src="/Logo_black.jpeg" 
+            src={logo} 
             alt="GoElectriQ Logo" 
             className="loader-logo"
           />

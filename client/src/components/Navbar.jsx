@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import logo from "../assets/logo-bull.png";
+import logo from "../assets/main2.png";
 
 const Navbar = () => {
   const navigate = useNavigate();

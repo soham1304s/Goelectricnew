@@ -98,7 +98,7 @@ export default function RidesPage() {
       }
     } catch (error) {
       const errorMsg = error.message || 'An error occurred while fetching bookings';
-      setError(`⚠️ ${errorMsg}. Make sure backend server is running on ${API_BASE_URL}`);
+      setError(`${errorMsg}. Make sure backend server is running on ${API_BASE_URL}`);
       console.error('❌ Error fetching bookings:', error);
       setBookings([]);
     } finally {
@@ -213,17 +213,17 @@ export default function RidesPage() {
     const notesLower = notes.toLowerCase();
     if (notesLower.includes('cash')) {
       return {
-        label: '💵 Cash Payment',
+        label: 'Cash Payment',
         color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
       };
     } else if (notesLower.includes('upi') || notesLower.includes('online')) {
       return {
-        label: '💻 Online Payment',
+        label: 'Online Payment',
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
       };
     } else if (notesLower.includes('bank') || notesLower.includes('transfer')) {
       return {
-        label: '🏦 Bank Transfer',
+        label: 'Bank Transfer',
         color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200'
       };
     }
@@ -407,10 +407,10 @@ export default function RidesPage() {
                       <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-bold">User Payment</p>
                         <p className="font-semibold text-green-600 text-sm">
-                          ✅ Paid: ₹{booking.paidAmount || '0'}
+                          Paid: ₹{booking.paidAmount || '0'}
                         </p>
                         <p className="text-xs text-red-600 font-bold mt-1">
-                          ⏳ Remaining: ₹{(
+                          Remaining: ₹{(
                             (parseFloat(booking.pricing?.fixedCharge || 0) + parseFloat(booking.pricing?.parkingCharge || 0)) -
                             parseFloat(booking.paidAmount || 0)
                           ).toFixed(2)}
@@ -477,7 +477,7 @@ export default function RidesPage() {
                   <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 rounded-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-green-900 dark:text-green-200 mb-2">✅ Payment Completed</p>
+                        <p className="text-sm font-semibold text-green-900 dark:text-green-200 mb-2">Payment Completed</p>
                         <p className="text-sm text-green-800 dark:text-green-300 mb-3">{booking.rideCompletion.completionNotes}</p>
                         {getPaymentMethodBadge(booking.rideCompletion.completionNotes) && (
                           <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getPaymentMethodBadge(booking.rideCompletion.completionNotes).color}`}>
@@ -502,8 +502,8 @@ export default function RidesPage() {
                             : 'text-yellow-900 dark:text-yellow-200'
                           }`}>
                           {booking.cancellation.cancelledBy === 'admin'
-                            ? '🛑 Admin Cancelled'
-                            : `📌 Cancelled by ${booking.cancellation.cancelledBy?.toUpperCase()}`}
+                            ? 'Admin Cancelled'
+                            : `Cancelled by ${booking.cancellation.cancelledBy?.toUpperCase()}`}
                         </p>
                         <div className={`space-y-2 text-sm ${booking.cancellation.cancelledBy === 'admin'
                             ? 'text-red-800 dark:text-red-300'
@@ -529,7 +529,7 @@ export default function RidesPage() {
                   <div className="mb-4 p-4 bg-orange-50 dark:bg-orange-900/30 border-l-4 border-orange-500 rounded-lg">
                     <div className="flex items-start justify-between gap-3">
                       <div className="w-full">
-                        <p className="text-sm font-semibold text-orange-900 dark:text-orange-200 mb-3">⚠️ Admin Rejection</p>
+                        <p className="text-sm font-semibold text-orange-900 dark:text-orange-200 mb-3">Admin Rejection</p>
                         <div className="space-y-2 text-sm text-orange-800 dark:text-orange-300">
                           {booking.adminApproval?.reason && (
                             <p><strong>Rejection Reason:</strong> {booking.adminApproval.reason}</p>
@@ -750,11 +750,11 @@ export default function RidesPage() {
                   </label>
                   <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="">Select payment method</option>
-                    <option value="cash">💵 Cash</option>
-                    <option value="bank_transfer">🏦 Bank Transfer</option>
-                    <option value="upi">📱 UPI</option>
-                    <option value="check">✓ Cheque</option>
-                    <option value="other">📋 Other</option>
+                    <option value="cash">Cash</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="upi">UPI</option>
+                    <option value="check">Cheque</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -774,7 +774,7 @@ export default function RidesPage() {
 
                 <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-3 mb-4">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    ⚠️ This will mark ride as completed with manual payment status. Ensure payment verification before confirmation.
+                    This will mark ride as completed with manual payment status. Ensure payment verification before confirmation.
                   </p>
                 </div>
                 <div className="flex gap-3">

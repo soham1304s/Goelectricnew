@@ -303,6 +303,8 @@ bookingSchema.index({ user: 1, createdAt: -1 });
 bookingSchema.index({ driver: 1, createdAt: -1 });
 bookingSchema.index({ status: 1 });
 bookingSchema.index({ scheduledDate: 1 });
+bookingSchema.index({ bookingId: 1 }, { unique: true });
+bookingSchema.index({ createdAt: -1 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

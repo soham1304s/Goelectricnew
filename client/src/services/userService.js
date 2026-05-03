@@ -10,6 +10,15 @@ export async function updateProfile(updates) {
   return data;
 }
 
+export async function updateProfileImage(formData) {
+  const { data } = await api.post('/users/profile/image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return data;
+}
+
 export async function getSettings() {
   const { data } = await api.get('/users/settings');
   return data;

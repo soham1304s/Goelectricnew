@@ -291,10 +291,10 @@ export const createRidePaymentOrder = async (req, res) => {
 
     // Validate required fields
     if (!bookingId || !amount) {
-      console.warn('⚠️ Missing bookingId or amount:', { 
-        bookingId: !!bookingId, 
+      console.warn('⚠️ Missing bookingId or amount:', {
+        bookingId: !!bookingId,
         amount: !!amount,
-        amountValue: amount 
+        amountValue: amount
       });
       return res.status(400).json({
         success: false,
@@ -418,12 +418,12 @@ export const verifyRidePayment = async (req, res) => {
     // Update payment record with Razorpay info
     payment.razorpayPaymentId = razorpay_payment_id;
     payment.razorpaySignature = razorpay_signature;
-    
+
     try {
       // Fetch details to be 100% sure and get customer info
       const paymentDetails = await fetchPaymentDetails(razorpay_payment_id);
       payment.status = (paymentDetails.status === 'captured' || paymentDetails.status === 'authorized') ? 'success' : 'failed';
-      
+
       const methodMap = {
         'upi': 'upi',
         'netbanking': 'razorpay',
@@ -443,7 +443,7 @@ export const verifyRidePayment = async (req, res) => {
     } catch (fetchError) {
       console.warn('⚠️ Could not fetch payment details, proceeding with signature-only verification:', fetchError.message);
       // If signature is valid, we can still trust it, but status is unknown
-      payment.status = 'success'; 
+      payment.status = 'success';
       payment.paidAt = new Date();
     }
 
@@ -458,7 +458,7 @@ export const verifyRidePayment = async (req, res) => {
         if (booking) {
           const totalFare = booking.pricing?.totalFare || 0;
           const advanceAmount = Math.round(totalFare * 0.2);
-          
+
           // Calculate total paid across all successful payments for this booking
           const allPayments = await Payment.find({
             booking: booking._id,
@@ -469,7 +469,7 @@ export const verifyRidePayment = async (req, res) => {
           console.log('💰 Payment Progress:', { totalFare, totalPaid, advanceAmount });
 
           booking.paidAmount = totalPaid;
-          
+
           if (totalPaid >= totalFare) {
             booking.paymentStatus = 'paid';
             if (booking.status === 'pending') booking.status = 'confirmed';
@@ -488,6 +488,14 @@ export const verifyRidePayment = async (req, res) => {
           try {
             await booking.populate('user', 'firstName lastName email phone');
             await sendRidePaymentSuccessWhatsApp(booking, booking.user, payment._id);
+
+            // Send Email confirmation for successful payment
+            try {
+              const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
+              await sendBookingConfirmationEmail(booking, booking.user);
+            } catch (emailErr) {
+              console.error('⚠️ Ride Payment Email notification failed:', emailErr.message);
+            }
           } catch (whatsappError) {
             console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
           }
@@ -638,11 +646,11 @@ export const verifyTourPayment = async (req, res) => {
     // Update payment record
     payment.razorpayPaymentId = razorpay_payment_id;
     payment.razorpaySignature = razorpay_signature;
-    
+
     try {
       const paymentDetails = await fetchPaymentDetails(razorpay_payment_id);
       payment.status = (paymentDetails.status === 'captured' || paymentDetails.status === 'authorized') ? 'success' : 'failed';
-      
+
       const methodMap = {
         'upi': 'upi',
         'netbanking': 'razorpay',
@@ -698,6 +706,14 @@ export const verifyTourPayment = async (req, res) => {
           try {
             await booking.populate('user', 'firstName lastName email phone');
             await sendTourPaymentSuccessWhatsApp(booking, booking.user, payment._id);
+
+            // Send Email confirmation for successful payment
+            try {
+              const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
+              await sendBookingConfirmationEmail(booking, booking.user);
+            } catch (emailErr) {
+              console.error('⚠️ Tour Payment Email notification failed:', emailErr.message);
+            }
           } catch (whatsappError) {
             console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
           }
@@ -748,15 +764,15 @@ export const handleRazorpayWebhook = async (req, res) => {
     try {
       // Find the internal payment record by Razorpay Order ID
       const payment = await Payment.findOne({ razorpayOrderId: orderId });
-      
+
       if (payment && payment.status !== 'success') {
         payment.status = 'success';
         payment.razorpayPaymentId = paymentId;
         payment.paidAt = new Date();
         await payment.save();
-        
+
         console.log('✅ Payment marked as SUCCESS via Webhook:', paymentId);
-        
+
         // Trigger booking update logic here if needed (similar to verifyRidePayment)
         // For simplicity, we assume the frontend verify call handles it, 
         // but the webhook is here as a fallback.

@@ -122,7 +122,7 @@ const OfferBanner = () => {
               >
                 {/* Background Accent Gradients */}
                 <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/20 blur-[60px] rounded-full -translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full translate-x-1/2 translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full translate-x-1/2 translate-y-1/2" />
 
                 {/* Header */}
                 <div className="relative h-32 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center overflow-hidden">
@@ -173,7 +173,7 @@ const OfferBanner = () => {
                     </div>
                     
                     <div className={`p-4 rounded-2xl flex flex-col justify-center ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
-                      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Valid On</span>
+                      <span className="text-[10px] font-bold text-teal-500 uppercase tracking-wider mb-1">Valid On</span>
                       <div className={`text-xs font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
                         {offer.applicableOn?.[0] === 'both' ? 'Rides & Tours' : offer.applicableOn?.[0] || 'All Services'}
                       </div>
@@ -301,7 +301,7 @@ const OfferBanner = () => {
                           transition={{ delay: 0.15 }}
                         >
                           <label className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                            <Mail size={16} className="text-blue-500" />
+                            <Mail size={16} className="text-emerald-500" />
                             Email Address
                           </label>
                           <input
@@ -312,8 +312,8 @@ const OfferBanner = () => {
                             placeholder="john@example.com"
                             className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all ${
                               isDark 
-                                ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20' 
-                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                                ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20' 
+                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
                             } outline-none`}
                           />
                         </motion.div>

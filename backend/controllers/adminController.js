@@ -177,6 +177,13 @@ export const getAnalytics = async (req, res) => {
       });
     }
 
+    // Get 5 most recent bookings for activity feed
+    const recentBookings = await Booking.find()
+      .populate('user', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
     res.status(200).json({
       success: true,
       data: {
@@ -190,6 +197,7 @@ export const getAnalytics = async (req, res) => {
         activeDrivers,
         totalRevenue,
         revenueData,
+        recentBookings,
       },
     });
   } catch (error) {

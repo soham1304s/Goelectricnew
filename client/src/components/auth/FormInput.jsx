@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 
 export default function FormInput({
   label,
@@ -60,7 +61,7 @@ export default function FormInput({
           animate={{ opacity: 1, y: 0 }}
           className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
         >
-          ⚠️ {error}
+          <AlertCircle size={14} /> {error}
         </motion.p>
       )}
     </motion.div>

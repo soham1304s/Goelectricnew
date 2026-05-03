@@ -1,5 +1,6 @@
 import { Check, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../../components/SEO';
 
 const plans = [
   {
@@ -36,6 +37,11 @@ export default function PublicPricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <SEO 
+        title="Pricing & Packages" 
+        description="Transparent and affordable pricing for electric cab rides. Check our local, airport and intercity fare details with no hidden charges."
+        url="/pricing"
+      />
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="text-center max-w-3xl mx-auto">
           <p className="inline-flex items-center gap-2 px-4 py-1 rounded-full text-xs sm:text-sm font-semibold bg-white/90 text-emerald-700 border border-emerald-200">

@@ -46,17 +46,17 @@ export const ridePaymentService = {
   async getPaymentHistory(page = 1, limit = 10) {
     try {
       const response = await api.get('/payments/history', { params: { page, limit } });
-      return { 
-        success: true, 
+      return {
+        success: true,
         data: response.data?.payments || response.data || [],
         pagination: response.data?.pagination
       };
     } catch (error) {
       console.error('Error fetching payment history:', error);
-      return { 
-        success: false, 
-        data: [], 
-        message: error.response?.data?.message || 'Failed to fetch payment history' 
+      return {
+        success: false,
+        data: [],
+        message: error.response?.data?.message || 'Failed to fetch payment history'
       };
     }
   },
@@ -97,7 +97,7 @@ export const ridePaymentService = {
             razorpay_signature: response.razorpay_signature,
             paymentId: orderData.paymentId
           };
-          
+
           if (onSuccess) {
             onSuccess(paymentData);
           }

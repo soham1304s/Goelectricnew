@@ -19,6 +19,7 @@ import {
   Zap,
   ChevronDown,
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext.jsx';
 import logoDark from '../../assets/main1.png';
 
 const AdminLayout = ({ children }) => {
@@ -28,6 +29,7 @@ const AdminLayout = ({ children }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Responsive
   useEffect(() => {
@@ -57,10 +59,9 @@ const AdminLayout = ({ children }) => {
 
   const isActive = (path) => location.pathname === path;
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   // 🔥 GROUPED NAV ITEMS
@@ -140,7 +141,7 @@ const AdminLayout = ({ children }) => {
             to="/admin"
             onClick={() => isMobile && setSidebarOpen(false)}
             className={`flex items-center px-4 py-3 rounded-lg transition font-medium ${isActive('/admin')
-                ? 'bg-blue-600 text-white shadow-lg'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}
           >
@@ -184,7 +185,7 @@ const AdminLayout = ({ children }) => {
                       to={item.path}
                       onClick={() => isMobile && setSidebarOpen(false)}
                       className={`flex items-center ml-2 px-4 py-2 rounded-lg transition text-sm ${isActive(item.path)
-                          ? 'bg-blue-600 text-white shadow-lg'
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
                           : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                         }`}
                     >

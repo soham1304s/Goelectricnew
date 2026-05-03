@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Smartphone, 
-  Monitor, 
-  Shield, 
-  Zap, 
-  Clock, 
-  MapPin, 
-  Check, 
-  Plane, 
-  Navigation, 
+import {
+  Smartphone,
+  Monitor,
+  Shield,
+  Zap,
+  Clock,
+  MapPin,
+  Check,
+  Plane,
+  Navigation,
   Landmark,
   ChevronRight,
   Star,
   Search,
   LocateFixed,
-  Calendar
+  Calendar,
+  Car
 } from 'lucide-react';
 import LocationPickerComponent from '../LocationPickerComponent.jsx';
 
@@ -86,7 +87,7 @@ const MacBookShowcase = ({ darkMode }) => {
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <div className="text-center mb-16 md:mb-24">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -94,7 +95,7 @@ const MacBookShowcase = ({ darkMode }) => {
           >
             Digital Ecosystem
           </motion.div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -104,7 +105,7 @@ const MacBookShowcase = ({ darkMode }) => {
             Manage Your Journey <br />
             On <span className="text-emerald-600">Any Device.</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -116,7 +117,7 @@ const MacBookShowcase = ({ darkMode }) => {
         </div>
 
         {/* Device Showcase Container */}
-        <motion.div 
+        <motion.div
           style={{ rotateX, scale, opacity }}
           className="relative perspective-2000"
         >
@@ -156,11 +157,10 @@ const MacBookShowcase = ({ darkMode }) => {
                       <button
                         key={type}
                         onClick={() => setActiveTab(type === 'Intercity Ride' ? 'Intercity' : type)}
-                        className={`flex-1 py-2.5 rounded-xl text-[11px] font-black transition-all ${
-                          (activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
+                        className={`flex-1 py-2.5 rounded-xl text-[11px] font-black transition-all ${(activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
                             ? 'bg-gradient-to-r from-emerald-500 to-blue-600 text-white shadow-lg scale-105'
                             : 'text-slate-500 hover:text-slate-700 hover:scale-105'
-                        }`}
+                          }`}
                       >
                         {type}
                       </button>
@@ -191,8 +191,8 @@ const MacBookShowcase = ({ darkMode }) => {
                   <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-all ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-100 shadow-sm'}`}>
                       <Calendar size={18} className="text-purple-500" />
-                      <input 
-                        type="date" 
+                      <input
+                        type="date"
                         value={bookingDate}
                         onChange={(e) => setBookingDate(e.target.value)}
                         className="bg-transparent border-none outline-none text-xs font-bold text-slate-900 dark:text-white w-full cursor-pointer [color-scheme:light]"
@@ -201,8 +201,8 @@ const MacBookShowcase = ({ darkMode }) => {
                     </div>
                     <div className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-all ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-100 shadow-sm'}`}>
                       <Clock size={18} className="text-blue-500" />
-                      <input 
-                        type="time" 
+                      <input
+                        type="time"
                         value={bookingTime}
                         onChange={(e) => setBookingTime(e.target.value)}
                         className="bg-transparent border-none outline-none text-xs font-bold text-slate-900 dark:text-white w-full cursor-pointer [color-scheme:light]"
@@ -214,7 +214,7 @@ const MacBookShowcase = ({ darkMode }) => {
                   </div>
 
                   {/* Action Button */}
-                  <button 
+                  <button
                     onClick={handleSearch}
                     disabled={isSearching}
                     className="w-full py-5 rounded-[1.5rem] bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-sm shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
@@ -226,7 +226,7 @@ const MacBookShowcase = ({ darkMode }) => {
                       </div>
                     ) : (
                       <>
-                        <span className="text-xl">🚗</span> Search Rides Now
+                        <Car size={18} /> Search Rides Now
                       </>
                     )}
                   </button>
@@ -241,7 +241,7 @@ const MacBookShowcase = ({ darkMode }) => {
           </div>
 
           {/* Floating iPhone Frame - Mobile Only */}
-          <motion.div 
+          <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -250,7 +250,7 @@ const MacBookShowcase = ({ darkMode }) => {
             <div className={`relative rounded-[2.5rem] p-2 shadow-2xl border-[6px] ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-slate-800'}`}>
               {/* Speaker / Notch */}
               <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-4 bg-slate-900 rounded-full z-30" />
-              
+
               {/* Screen Content */}
               <div className="aspect-[9/19.5] rounded-[2rem] overflow-hidden bg-white relative">
                 {/* Mobile UI - Full Smart Booking Form */}
@@ -278,11 +278,10 @@ const MacBookShowcase = ({ darkMode }) => {
                       <button
                         key={type}
                         onClick={() => setActiveTab(type === 'Intercity' ? 'Intercity' : type)}
-                        className={`flex-1 py-2 rounded-lg text-[9px] font-black transition-all ${
-                          (activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
+                        className={`flex-1 py-2 rounded-lg text-[9px] font-black transition-all ${(activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
                             ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md scale-105'
                             : 'text-slate-500 hover:scale-105'
-                        }`}
+                          }`}
                       >
                         {type}
                       </button>
@@ -311,8 +310,8 @@ const MacBookShowcase = ({ darkMode }) => {
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
                       <Calendar size={14} className="text-purple-500" />
-                      <input 
-                        type="date" 
+                      <input
+                        type="date"
                         value={bookingDate}
                         onChange={(e) => setBookingDate(e.target.value)}
                         className="bg-transparent border-none outline-none text-[9px] font-bold text-slate-900 w-full [color-scheme:light]"
@@ -320,8 +319,8 @@ const MacBookShowcase = ({ darkMode }) => {
                     </div>
                     <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
                       <Clock size={14} className="text-blue-500" />
-                      <input 
-                        type="time" 
+                      <input
+                        type="time"
                         value={bookingTime}
                         onChange={(e) => setBookingTime(e.target.value)}
                         className="bg-transparent border-none outline-none text-[9px] font-bold text-slate-900 w-full [color-scheme:light]"
@@ -330,7 +329,7 @@ const MacBookShowcase = ({ darkMode }) => {
                   </div>
 
                   {/* Action Button */}
-                  <button 
+                  <button
                     onClick={handleSearch}
                     disabled={isSearching}
                     className="w-full mt-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-2xl font-black text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70"
@@ -357,11 +356,10 @@ const MacBookShowcase = ({ darkMode }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className={`p-8 rounded-[2rem] border transition-all hover:-translate-y-2 ${
-                darkMode 
-                  ? 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800' 
+              className={`p-8 rounded-[2rem] border transition-all hover:-translate-y-2 ${darkMode
+                  ? 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800'
                   : 'bg-white border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-emerald-200/20'
-              }`}
+                }`}
             >
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
                 {feature.icon}

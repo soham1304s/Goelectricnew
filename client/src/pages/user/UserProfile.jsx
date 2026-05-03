@@ -138,7 +138,7 @@ export default function UserProfile() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Loading profile...</p>
+            <p className="text-gray-600">Loading profile...</p>
           </div>
         </div>
       </UserLayout>
@@ -153,24 +153,24 @@ export default function UserProfile() {
       <div className="space-y-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">My Profile</h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your personal information</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+          <p className="text-sm sm:text-base text-gray-600">Manage your personal information</p>
         </div>
 
         {/* Messages */}
         {error && (
-          <div className="mb-6 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg text-sm sm:text-base">
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm sm:text-base">
             {error}
           </div>
         )}
         {successMessage && (
-          <div className="mb-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 rounded-lg text-sm sm:text-base">
+          <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm sm:text-base">
             {successMessage}
           </div>
         )}
 
         {/* Profile Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
           {/* Profile Image Section */}
           <div className="mb-8 flex flex-col items-center">
             <div className="relative mb-4">
@@ -202,7 +202,7 @@ export default function UserProfile() {
             {isEditing && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs sm:text-sm text-green-600 dark:text-green-400 hover:underline"
+                className="text-xs sm:text-sm text-green-600 hover:underline"
               >
                 Change Profile Picture
               </button>
@@ -213,7 +213,7 @@ export default function UserProfile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
             {/* First Name */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <User size={14} className="sm:w-4 sm:h-4 inline mr-2" />
                 First Name
               </label>
@@ -223,16 +223,16 @@ export default function UserProfile() {
                   name="firstName"
                   value={formData.firstName || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 />
               ) : (
-                <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">{user?.firstName}</p>
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.firstName}</p>
               )}
             </div>
 
             {/* Last Name */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Last Name
               </label>
               {isEditing ? (
@@ -241,26 +241,26 @@ export default function UserProfile() {
                   name="lastName"
                   value={formData.lastName || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 />
               ) : (
-                <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">{user?.lastName}</p>
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.lastName}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <Mail size={14} className="sm:w-4 sm:h-4 inline mr-2" />
                 Email
               </label>
-              <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base break-all">{user?.email}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+              <p className="text-gray-900 font-semibold text-sm sm:text-base break-all">{user?.email}</p>
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <Phone size={14} className="sm:w-4 sm:h-4 inline mr-2" />
                 Phone Number
               </label>
@@ -270,16 +270,16 @@ export default function UserProfile() {
                   name="phone"
                   value={formData.phone || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 />
               ) : (
-                <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">{user?.phone || 'Not provided'}</p>
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.phone || 'Not provided'}</p>
               )}
             </div>
 
             {/* Date of Birth */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 <Calendar size={14} className="sm:w-4 sm:h-4 inline mr-2" />
                 Date of Birth
               </label>
@@ -289,10 +289,10 @@ export default function UserProfile() {
                   name="dateOfBirth"
                   value={formData.dateOfBirth?.split('T')[0] || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 />
               ) : (
-                <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">
                   {user?.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : 'Not provided'}
                 </p>
               )}
@@ -300,7 +300,7 @@ export default function UserProfile() {
 
             {/* Gender */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Gender
               </label>
               {isEditing ? (
@@ -308,7 +308,7 @@ export default function UserProfile() {
                   name="gender"
                   value={formData.gender || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -316,63 +316,63 @@ export default function UserProfile() {
                   <option value="Other">Other</option>
                 </select>
               ) : (
-                <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">{user?.gender || 'Not provided'}</p>
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.gender || 'Not provided'}</p>
               )}
             </div>
 
             {/* Account Created */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Member Since
               </label>
-              <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">
+              <p className="text-gray-900 font-semibold text-sm sm:text-base">
                 {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
               </p>
             </div>
           </div>
 
           {/* Address */}
-          <div className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-8 pb-8 border-b border-gray-200">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               <MapPin size={14} className="sm:w-4 sm:h-4 inline mr-2" />
               Address
             </label>
             {isEditing ? (
-              <textarea
-                name="address"
-                value={formData.address || ''}
-                onChange={handleInputChange}
-                rows="3"
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-              />
-            ) : (
-              <p className="text-gray-900 dark:text-white font-semibold text-sm sm:text-base">{user?.address || 'Not provided'}</p>
-            )}
-          </div>
+                <textarea
+                  name="address"
+                  value={formData.address || ''}
+                  onChange={handleInputChange}
+                  rows="3"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                />
+              ) : (
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.address || 'Not provided'}</p>
+              )}
+            </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            {isEditing ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
-                >
-                  <Save size={16} className="sm:w-[18px] sm:h-[18px]" />
-                  Save Changes
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition font-semibold text-sm sm:text-base"
-                >
-                  <X size={16} className="sm:w-[18px] sm:h-[18px]" />
-                  Cancel
-                </button>
-              </>
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
+                  >
+                    <Save size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition font-semibold text-sm sm:text-base"
+                  >
+                    <X size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    Cancel
+                  </button>
+                </>
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
               >
                 <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                 Edit Profile

@@ -148,11 +148,11 @@ export default function LocalRidePage() {
   // Ensure we have at least 5km for display/calculation if locations are entered but distance is 0
   const displayDistance = (pickupLocation && dropLocation && (!calculatedDistance || calculatedDistance === 0)) ? 5 : calculatedDistance;
   const estimatedDistance = displayDistance || 0;
-  
+
   // Local ride pricing: baseRate is per-km rate. Minimum fare is ₹50.
   const distanceFare = selectedCarData ? selectedCarData.additionalCharge * estimatedDistance : 0;
   const baseFare = Math.max(distanceFare, 50); // Minimum fare ₹50
-  
+
   const totalAmount = baseFare;
   const advancePayment = Math.round(totalAmount * 0.2); // 20% advance
   const remainingAmount = totalAmount - advancePayment;

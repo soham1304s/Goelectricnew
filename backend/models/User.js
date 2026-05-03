@@ -158,6 +158,11 @@ userSchema.virtual('bookings', {
   justOne: false,
 });
 
+// Indices for faster lookups
+userSchema.index({ role: 1 });
+userSchema.index({ isActive: 1 });
+userSchema.index({ googleId: 1 }, { sparse: true });
+
 const User = mongoose.model('User', userSchema);
 
 export default User;

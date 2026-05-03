@@ -110,7 +110,7 @@ export default function LoginPage() {
 
         {/* Right Side */}
         <div className="auth-right" ref={rightRef}>
-          <div className="auth-logo-text">GoElectriQ</div>
+          <img src="/src/assets/main2.png" alt="GoElectriQ Logo" className="h-12 w-auto mb-6 object-contain" />
           <h1 className="auth-title">Welcome to GoElectriQ</h1>
 
           {error && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-red-50 text-red-500 border border-red-100 text-center">{error}</div>}

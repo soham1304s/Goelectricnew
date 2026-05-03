@@ -130,7 +130,7 @@ export default function RegisterPage() {
 
         {/* Right Side */}
         <div className="auth-right">
-          <div className="auth-logo-text">GoElectriQ</div>
+          <img src="/src/assets/main2.png" alt="GoElectriQ Logo" className="h-12 w-auto mb-6 object-contain" />
           <h1 className="auth-title">Join GoElectriQ Today</h1>
 
           {error && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-red-50 text-red-500 border border-red-100 text-center">{error}</div>}

@@ -56,8 +56,8 @@ const POPULAR_LOCATIONS = [
 
 export default function LocationPickerComponent({
   value = '',
-  onChange = () => {},
-  onSelectLocation = () => {},
+  onChange = () => { },
+  onSelectLocation = () => { },
   placeholder = 'Search location...',
   showMap = false,
   searchOptions = DEFAULT_SEARCH_OPTIONS,
@@ -89,7 +89,7 @@ export default function LocationPickerComponent({
     }
 
     setIsLoading(true);
-    
+
     // Try Native Service First
     if (autocompleteServiceRef.current) {
       const request = {
@@ -135,7 +135,7 @@ export default function LocationPickerComponent({
 
   useEffect(() => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    
+
     debounceTimerRef.current = setTimeout(() => {
       if (value && value.length >= 2 && !fetchingDetails) {
         fetchPredictions(value);
@@ -183,10 +183,10 @@ export default function LocationPickerComponent({
     setShowSuggestions(false);
     setFetchingDetails(true);
     setSelectedIndex(-1);
-    
+
     try {
       const details = await getPlaceDetails(suggestion.placeId);
-      
+
       if (details && details.lat && details.lng) {
         onSelectLocation({
           address: details.address || suggestion.description,
@@ -224,11 +224,10 @@ export default function LocationPickerComponent({
   return (
     <div className="w-full" ref={searchRef}>
       <div className="relative">
-        <div className={`group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 ${
-          darkMode 
-            ? 'bg-zinc-900/50 border-zinc-800 focus-within:border-emerald-500/50 focus-within:ring-4 focus-within:ring-emerald-500/10' 
+        <div className={`group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 ${darkMode
+            ? 'bg-zinc-900/50 border-zinc-800 focus-within:border-emerald-500/50 focus-within:ring-4 focus-within:ring-emerald-500/10'
             : 'bg-white border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/5 shadow-sm'
-        } ${fetchingDetails ? 'opacity-70 grayscale' : ''}`}>
+          } ${fetchingDetails ? 'opacity-70 grayscale' : ''}`}>
           <Search size={18} className={darkMode ? 'text-zinc-500' : 'text-slate-400'} />
           <input
             type="text"
@@ -238,9 +237,8 @@ export default function LocationPickerComponent({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             disabled={fetchingDetails}
-            className={`flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:font-medium ${
-              darkMode ? 'text-white placeholder:text-zinc-600' : 'text-slate-900 placeholder:text-slate-400'
-            } ${inputClassName}`}
+            className={`flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:font-medium ${darkMode ? 'text-white placeholder:text-zinc-600' : 'text-slate-900 placeholder:text-slate-400'
+              } ${inputClassName}`}
           />
           {isLoading || fetchingDetails ? (
             <Loader2 size={18} className="text-emerald-500 animate-spin" />
@@ -255,9 +253,8 @@ export default function LocationPickerComponent({
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
-              className={`absolute top-full left-0 right-0 mt-3 p-2 rounded-2xl border shadow-2xl z-[100] backdrop-blur-xl ${
-                darkMode ? 'bg-zinc-900/95 border-zinc-800' : 'bg-white/95 border-slate-100'
-              }`}
+              className={`absolute top-full left-0 right-0 mt-3 p-2 rounded-2xl border shadow-2xl z-[100] backdrop-blur-xl ${darkMode ? 'bg-zinc-900/95 border-zinc-800' : 'bg-white/95 border-slate-100'
+                }`}
             >
               {!value && (
                 <div className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
@@ -270,11 +267,10 @@ export default function LocationPickerComponent({
                   key={s.placeId}
                   onClick={() => handleSelectSuggestion(s)}
                   onMouseEnter={() => setSelectedIndex(i)}
-                  className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-start gap-3 mb-1 last:mb-0 ${
-                    selectedIndex === i
+                  className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-start gap-3 mb-1 last:mb-0 ${selectedIndex === i
                       ? darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
                       : darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
+                    }`}
                 >
                   <div className={`mt-1 p-1.5 rounded-lg ${selectedIndex === i ? 'bg-emerald-500/20' : darkMode ? 'bg-zinc-800' : 'bg-slate-100'}`}>
                     {s.isPopular && !value ? <Star size={14} className="text-amber-500 fill-amber-500" /> : <MapPin size={14} className={selectedIndex === i ? 'text-emerald-500' : 'text-slate-400'} />}

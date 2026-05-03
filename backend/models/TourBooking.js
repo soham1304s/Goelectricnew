@@ -90,6 +90,8 @@ tourBookingSchema.pre('save', async function () {
 tourBookingSchema.index({ user: 1, createdAt: -1 });
 tourBookingSchema.index({ status: 1 });
 tourBookingSchema.index({ scheduledDate: 1 });
+tourBookingSchema.index({ bookingId: 1 }, { unique: true });
+tourBookingSchema.index({ createdAt: -1 });
 
 const TourBooking = mongoose.model('TourBooking', tourBookingSchema);
 export default TourBooking;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Calendar, Clock, MapPin, AlertCircle, CheckCircle, Info, Loader2 } from 'lucide-react';
+import { X, Calendar, Clock, MapPin, AlertCircle, CheckCircle, Info, Loader2, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
 import { ridePaymentService } from '../services/ridePaymentService.js';
@@ -161,12 +161,12 @@ export default function RideBookingModal({
 
     if (!validation.isComplete) {
       const errorMsg = validation.errors.join('\n');
-      setError(`⚠️ ${errorMsg}`);
+      setError(`${errorMsg}`);
       return;
     }
 
     if (calculatedDistance === 0) {
-      setError('❌ Distance is 0 km. Please check locations.');
+      setError('Distance is 0 km. Please check locations.');
       return;
     }
 
@@ -210,7 +210,7 @@ export default function RideBookingModal({
           }),
         },
         cabType: selectedCar,
-        rideType: normalizeRideType(rideType), // ✅ FIXED: Normalize to lowercase enum value
+        rideType: normalizeRideType(rideType), // FIXED: Normalize to lowercase enum value
         scheduledDate: scheduledDateTime.toISOString(),
         scheduledTime: selectedTime,
         distance: frozenDistance,
@@ -289,7 +289,7 @@ export default function RideBookingModal({
                     advanceAmount: advancePayment,
                     remainingAmount: remainingAmount,
                     totalFare: totalFare,
-                    message: `✅ Ride booked! 20% advance (₹${advancePayment.toLocaleString('en-IN')}) paid. Balance ₹${remainingAmount.toLocaleString('en-IN')} due after ride.`,
+                    message: `Ride booked! 20% advance (₹${advancePayment.toLocaleString('en-IN')}) paid. Balance ₹${remainingAmount.toLocaleString('en-IN')} due after ride.`,
                   },
                 });
               } else {
@@ -350,9 +350,9 @@ export default function RideBookingModal({
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Route Summary */}
-          <div className="bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-4 space-y-3">
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-4 space-y-3">
             <div className="flex gap-3">
-              <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-400">Pickup</p>
                 <p className="font-semibold text-gray-900 dark:text-white">{pickupLocation}</p>
@@ -381,7 +381,7 @@ export default function RideBookingModal({
           <div className="grid grid-cols-2 gap-4">
             <div className={`rounded-lg p-4 border-2 transition-all ${calculatedDistance > 0
               ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-              : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+              : 'bg-teal-50 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700'
               }`}>
               <div className="flex items-start justify-between">
                 <div>
@@ -398,7 +398,7 @@ export default function RideBookingModal({
 
             <div className={`rounded-lg p-4 border-2 transition-all ${calculatedDuration > 0
               ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-              : 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+              : 'bg-teal-50 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700'
               }`}>
               <div className="flex items-start justify-between">
                 <div>
@@ -441,9 +441,10 @@ export default function RideBookingModal({
                 })}
               </div>
             ) : (
-              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
-                <p className="text-sm text-blue-800 dark:text-blue-400">
-                  ⏳ Loading car types... Please wait.
+              <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 rounded-lg p-4 flex items-center gap-3">
+                <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
+                <p className="text-sm text-emerald-800 dark:text-emerald-400">
+                  Loading car types... Please wait.
                 </p>
               </div>
             )}
@@ -548,7 +549,7 @@ export default function RideBookingModal({
               {submitting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
               ) : (
-                '✓ Pay 20% Advance'
+                <><Check size={18} /> Pay 20% Advance</>
               )}
             </button>
           </div>

@@ -106,6 +106,13 @@ export const createTourBooking = async (req, res) => {
     // Send WhatsApp notification to user and admin
     try {
       await sendTourBookingNotification(populated, populated.user);
+      // Also send email confirmation
+      try {
+        const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
+        await sendBookingConfirmationEmail(populated, populated.user);
+      } catch (emailErr) {
+        console.error('⚠️ Tour Email notification failed:', emailErr.message);
+      }
     } catch (whatsappError) {
       console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
       // Don't fail the booking if WhatsApp fails - just log it

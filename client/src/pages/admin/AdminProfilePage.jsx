@@ -75,18 +75,24 @@ export default function AdminProfilePage() {
     };
   }, []);
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result ?? '';
-        setProfileImage(dataUrl);
-        userService.updateProfile({ profileImage: dataUrl })
-          .then(() => setSuccess('Photo updated'))
-          .catch(() => setError('Update failed'));
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      setProfileLoading(true);
+      try {
+        const res = await userService.updateProfileImage(formData);
+        if (res.success) {
+          setProfileImage(res.data.profileImage);
+          setSuccess('Profile photo updated successfully');
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update photo');
+      } finally {
+        setProfileLoading(false);
+      }
     }
   };
 
@@ -195,7 +201,7 @@ export default function AdminProfilePage() {
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             {/* Header Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-900 dark:to-blue-800 p-6 md:p-8">
+            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 dark:from-emerald-900 dark:to-emerald-800 p-6 md:p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 {/* Profile Image */}
                 <div className="relative group">
@@ -218,7 +224,7 @@ export default function AdminProfilePage() {
                         <h1 className="text-3xl md:text-4xl font-bold">{name || 'Admin'}</h1>
                         <button
                           onClick={() => setIsEditingName(true)}
-                          className="p-2 hover:bg-blue-500 rounded-lg transition-colors"
+                          className="p-2 hover:bg-emerald-500 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
@@ -229,7 +235,7 @@ export default function AdminProfilePage() {
                           type="text"
                           value={tempName}
                           onChange={(e) => setTempName(e.target.value)}
-                          className="text-3xl font-bold bg-blue-500 text-white rounded px-3 py-1 focus:outline-none"
+                          className="text-3xl font-bold bg-emerald-500 text-white rounded px-3 py-1 focus:outline-none"
                           autoFocus
                         />
                         <button onClick={handleSaveName} className="p-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors">
@@ -241,11 +247,11 @@ export default function AdminProfilePage() {
                       </div>
                     )}
                   </div>
-                  <p className="text-blue-100 flex items-center gap-2">
+                  <p className="text-emerald-100 flex items-center gap-2">
                     <Mail className="w-4 h-4" />
                     {email}
                   </p>
-                  <p className="text-blue-100 mt-2 font-semibold">Admin User</p>
+                  <p className="text-emerald-100 mt-2 font-semibold">Admin User</p>
                 </div>
               </div>
             </div>
@@ -267,7 +273,7 @@ export default function AdminProfilePage() {
                       </div>
                       <button
                         onClick={() => setIsEditingPhone(true)}
-                        className="flex items-center gap-1 px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                        className="flex items-center gap-1 px-4 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-600 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" /> Edit
                       </button>
@@ -278,7 +284,7 @@ export default function AdminProfilePage() {
                         type="tel"
                         value={tempPhone}
                         onChange={(e) => setTempPhone(e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         autoFocus
                       />
                       <button
@@ -317,7 +323,7 @@ export default function AdminProfilePage() {
                   {!isChangingPassword ? (
                     <button
                       onClick={() => setIsChangingPassword(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
                     >
                       <Lock className="w-4 h-4" /> Change Password
                     </button>
@@ -343,7 +349,7 @@ export default function AdminProfilePage() {
                           type="password"
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                           placeholder="Enter new password"
                         />
                       </div>
@@ -355,7 +361,7 @@ export default function AdminProfilePage() {
                           type="password"
                           value={passwordData.confirmPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                           placeholder="Confirm new password"
                         />
                       </div>

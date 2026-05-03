@@ -6,6 +6,7 @@ import { calculateDistanceWithGoogleMaps } from '../utils/distanceCalculator.js'
 import { calculateFare } from '../utils/fareCalculator.js';
 import { generateInvoicePDF } from '../utils/pdfGenerator.js';
 import { sendRideBookingNotification } from '../services/whatsappService.js';
+import { sendBookingConfirmationEmail } from '../services/emailService.js';
 
 /**
  * @desc    Create new booking
@@ -299,12 +300,13 @@ export const createBooking = async (req, res) => {
     // Populate user details
     await booking.populate('user', 'firstName lastName email phone');
 
-    // Send WhatsApp notification to user and admin
+    // Send notifications to user and admin
     try {
       await sendRideBookingNotification(booking, booking.user);
-    } catch (whatsappError) {
-      console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
-      // Don't fail the booking if WhatsApp fails - just log it
+      await sendBookingConfirmationEmail(booking, booking.user);
+    } catch (notifyError) {
+      console.error('⚠️ Notifications failed:', notifyError.message);
+      // Don't fail the booking if notifications fail - just log it
     }
 
     res.status(201).json({

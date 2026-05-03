@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Edit2, Check, X, Plane, ParkingCircle, Save, AlertCircle, MapPin, BookOpen, Calendar, User, Phone, MapPinIcon } from 'lucide-react';
+import { Edit2, Check, X, Plane, ParkingCircle, Save, AlertCircle, MapPin, BookOpen, Calendar, User, Phone, MapPinIcon, BarChart3, Home, ClipboardList, Car, Settings, Banknote, AlertTriangle } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { useTheme } from '../../context/ThemeContext';
 import { fetchCarRates } from '../../services/rateService';
@@ -185,7 +185,7 @@ const AirportRidesPage = () => {
                 </div>
                 <div className="flex-1">
                   <h1 className={`text-2xl md:text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    ✈️ Airport Charges
+                    Airport Charges
                   </h1>
                   <p className={`text-xs md:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     JAI - Fixed Rate Pricing
@@ -201,8 +201,8 @@ const AirportRidesPage = () => {
                     : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-blue-400/50'
                 }`}
               >
-                <BookOpen className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm md:text-base">📋 Bookings</span>
+                <ClipboardList className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm md:text-base">Bookings</span>
               </button>
             </div>
           </div>
@@ -255,7 +255,7 @@ const AirportRidesPage = () => {
           {/* Current Pricing Info */}
           <div className={`mb-8 rounded-2xl p-6 border-2 shadow-xl ${isDark ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/20 to-blue-800/10 backdrop-blur-sm' : 'border-blue-300 bg-gradient-to-br from-blue-50 to-blue-100 backdrop-blur-sm'}`}>
             <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-blue-300' : 'text-blue-900'}`}>
-              📊 {rideType === 'pickup' ? '✈️ Pickup' : '🏠 Drop'} Pricing Breakdown
+              <BarChart3 className="h-6 w-6 text-blue-500" /> {rideType === 'pickup' ? 'Pickup' : 'Drop'} Pricing Breakdown
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {carRates.map((rate) => {
@@ -270,7 +270,7 @@ const AirportRidesPage = () => {
                 return (
                   <div key={rate.id} className={`p-5 rounded-xl border-2 backdrop-blur-sm transition-all hover:shadow-lg ${isDark ? 'border-gray-700 bg-gray-800/80 hover:bg-gray-700/80' : 'border-gray-200 bg-white/80 hover:bg-white'}`}>
                     <h4 className={`font-bold mb-4 text-xl flex items-center gap-2 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                      {rate.id === 'economy' ? '🚗' : '🅿️'} {rate.name}
+                      {rate.id === 'economy' ? <Car className="h-5 w-5" /> : <ParkingCircle className="h-5 w-5" />} {rate.name}
                       <span className={`text-sm px-2 py-1 rounded-lg ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
                         {rate.id}
                       </span>
@@ -308,12 +308,12 @@ const AirportRidesPage = () => {
           <div className={`rounded-2xl border-2 overflow-hidden shadow-xl ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
             <div className={`px-6 py-4 ${isDark ? 'bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-700' : 'bg-gradient-to-r from-gray-100 to-gray-50 border-b border-gray-200'}`}>
               <p className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                ✏️ Editing <span className={`text-base px-3 py-1 rounded-lg font-bold ${
+                Editing <span className={`text-base px-3 py-1 rounded-lg font-bold ${
                   rideType === 'pickup'
                     ? isDark ? 'text-emerald-400 bg-emerald-900/30' : 'text-emerald-600 bg-emerald-100'
                     : isDark ? 'text-purple-400 bg-purple-900/30' : 'text-purple-600 bg-purple-100'
                 }`}>
-                  {rideType === 'pickup' ? '✈️ Pickup Charges' : '🏠 Drop Charges'}
+                  {rideType === 'pickup' ? 'Pickup Charges' : 'Drop Charges'}
                 </span>
               </p>
             </div>
@@ -321,7 +321,7 @@ const AirportRidesPage = () => {
               <thead>
                 <tr className={`border-b-2 ${isDark ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
                   <th className={`px-6 py-4 text-left text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-900'}`}>
-                    🚗 Car Type
+                    Car Type
                   </th>
                   <th className={`px-6 py-4 text-left text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-900'}`}>
                     👥 Capacity
@@ -333,7 +333,7 @@ const AirportRidesPage = () => {
                     🅿️ Parking
                   </th>
                   <th className={`px-6 py-4 text-center text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-900'}`}>
-                    ⚙️ Actions
+                    <Settings className="h-4 w-4 inline mr-1" /> Actions
                   </th>
                 </tr>
               </thead>
@@ -530,7 +530,7 @@ const AirportRidesPage = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <h2 className={`text-3xl font-bold bg-gradient-to-r ${isDark ? 'from-blue-300 via-blue-400 to-blue-300 bg-clip-text text-transparent' : 'from-blue-600 via-blue-700 to-blue-600 bg-clip-text text-transparent'}`}>
-                    ✈️ Airport Ride Bookings
+                    Airport Ride Bookings
                   </h2>
                   <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     Track all airport ride reservations
@@ -589,7 +589,7 @@ const AirportRidesPage = () => {
                               ? isDark ? 'bg-emerald-600/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'
                               : isDark ? 'bg-purple-600/20 text-purple-400' : 'bg-purple-100 text-purple-700'
                           }`}>
-                            {booking.rideType === 'pickup' ? '✈️ Pickup' : '🏠 Drop'}
+                            {booking.rideType === 'pickup' ? 'Pickup' : 'Drop'}
                           </div>
                           <div className={`px-3 py-1 rounded-lg font-bold text-sm ${
                             booking.paymentStatus === 'completed'
@@ -638,7 +638,7 @@ const AirportRidesPage = () => {
                         {/* Car Type */}
                         <div className={`p-3 rounded-lg ${isDark ? 'bg-gray-900/50' : 'bg-gray-100/50'}`}>
                           <p className={`text-xs font-bold uppercase mb-1 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
-                            \ud83d\ude97 Car Type
+                            <Car className="h-3 w-3 inline mr-1" /> Car Type
                           </p>
                           <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             {booking.carType || 'N/A'}
@@ -648,10 +648,10 @@ const AirportRidesPage = () => {
                         {/* Total Fare */}
                         <div className={`p-3 rounded-lg ${isDark ? 'bg-emerald-900/20 border border-emerald-600/30' : 'bg-emerald-50 border border-emerald-300'}`}>
                           <p className={`text-xs font-bold uppercase mb-1 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
-                            \ud83d\udcb5 Total Fare
+                            <Banknote className="h-3 w-3 inline mr-1" /> Total Fare
                           </p>
                           <p className={`text-lg font-bold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>
-                            \u20b9{booking.totalFare || 0}
+                            ₹{booking.totalFare || 0}
                           </p>
                         </div>
 
@@ -661,17 +661,17 @@ const AirportRidesPage = () => {
                             ✅ Paid Amount
                           </p>
                           <p className={`text-lg font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>
-                            \u20b9{booking.paidAmount || 0}
+                            ₹{booking.paidAmount || 0}
                           </p>
                         </div>
 
                         {/* Remaining */}
                         <div className={`p-3 rounded-lg ${isDark ? 'bg-orange-900/20 border border-orange-600/30' : 'bg-orange-50 border border-orange-300'}`}>
                           <p className={`text-xs font-bold uppercase mb-1 ${isDark ? 'text-orange-400' : 'text-orange-700'}`}>
-                            \u26a0\ufe0f Remaining
+                            <AlertTriangle className="h-3 w-3 inline mr-1" /> Remaining
                           </p>
                           <p className={`text-lg font-bold ${isDark ? 'text-orange-300' : 'text-orange-700'}`}>
-                            \u20b9{(booking.totalFare || 0) - (booking.paidAmount || 0)}
+                            ₹{(booking.totalFare || 0) - (booking.paidAmount || 0)}
                           </p>
                         </div>
                       </div>

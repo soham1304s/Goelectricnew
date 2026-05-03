@@ -88,12 +88,12 @@ const PricingPage = () => {
       rate.id === id ? { ...editingData } : rate
     );
     
-    console.log('💾 Sending updated rates to backend:', updatedRates);
+    console.log('Saving updated rates to backend:', updatedRates);
     
     try {
       // Save all rates to backend through rateService
       const saveResponse = await saveCarRates(updatedRates);
-      console.log('✅ Backend response:', saveResponse);
+      console.log('Backend response:', saveResponse);
       
       // Clear cache immediately
       clearRateCache();
@@ -103,17 +103,17 @@ const PricingPage = () => {
       
       // Refetch rates from backend to ensure sync
       const refreshedRates = await fetchCarRates(true);
-      console.log('🔄 Refreshed rates from backend:', refreshedRates);
+      console.log('Refreshed rates from backend:', refreshedRates);
       
       // Filter to show only economy and premium
       const filteredRates = refreshedRates.filter(rate => 
         rate.id === 'economy' || rate.id === 'premium'
       );
       setCarRates(filteredRates);
-      setSuccessMessage('✅ Rates updated and broadcast to all pages!');
-      console.log('🔄 Rate cache cleared - all pages will fetch updated rates');
+      setSuccessMessage('Rates updated and broadcast to all pages!');
+      console.log('Rate cache cleared - all pages will fetch updated rates');
     } catch (error) {
-      setErrorMessage('❌ Failed to update rates: ' + error.message);
+      setErrorMessage('Failed to update rates: ' + error.message);
       console.error('Error details:', error);
       // Revert changes on error
       await fetchRates();

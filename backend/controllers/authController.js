@@ -2,9 +2,8 @@ import User from '../models/User.js';
 import Driver from '../models/Driver.js';
 import { generateToken } from '../middleware/auth.js';
 import { OAuth2Client } from 'google-auth-library';
-// TODO: enable when email/WhatsApp needed
-// import { sendWelcomeEmail } from '../services/emailService.js';
-// import { sendWelcomeWhatsApp } from '../services/whatsappService.js';
+import { sendWelcomeEmail } from '../services/emailService.js';
+import { sendWelcomeWhatsApp } from '../services/whatsappService.js';
 import crypto from 'crypto';
 
 const getGoogleClient = () => new OAuth2Client(
@@ -88,6 +87,14 @@ export const registerUser = async (req, res) => {
       throw new Error('JWT_SECRET is not configured. Add it to your .env file.');
     }
     const token = generateToken(user._id, user.role);
+
+    // Send welcome notifications
+    try {
+      await sendWelcomeEmail(user);
+      await sendWelcomeWhatsApp(user);
+    } catch (notifyError) {
+      console.error('⚠️ Welcome notifications failed:', notifyError.message);
+    }
 
     res.status(201).json({
       success: true,

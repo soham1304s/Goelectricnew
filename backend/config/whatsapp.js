@@ -1,4 +1,5 @@
 import axios from 'axios';
+import twilio from 'twilio';
 
 /**
  * WhatsApp Cloud API Configuration
@@ -30,7 +31,12 @@ const validateWhatsAppConfig = () => {
  */
 export const sendWhatsAppMessage = async (to, message) => {
   try {
-    // Validate configuration - if missing, just warn and return gracefully
+    // 1. Try Twilio first if credentials exist
+    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+      return await sendWhatsAppViaTwilio(to, message);
+    }
+
+    // 2. Fallback to Meta Cloud API if configured
     if (!validateWhatsAppConfig()) {
       console.info('ℹ️ WhatsApp not configured - skipping message to', to);
       return { success: false, reason: 'WhatsApp not configured' };
@@ -60,7 +66,7 @@ export const sendWhatsAppMessage = async (to, message) => {
       },
     });
 
-    console.log(`✅ WhatsApp message sent to ${formattedNumber}`);
+    console.log(`✅ WhatsApp message sent to ${formattedNumber} (Meta Cloud API)`);
     return response.data;
   } catch (error) {
     // Log error but don't throw - allow booking to proceed
@@ -123,31 +129,41 @@ export const sendWhatsAppTemplate = async (to, templateName, parameters) => {
 };
 
 /**
- * Alternative: Send WhatsApp using Twilio
+ * Send WhatsApp using Twilio
  */
 export const sendWhatsAppViaTwilio = async (to, message) => {
   try {
-    // This is for Twilio WhatsApp API (alternative implementation)
-    // Uncomment and use if you prefer Twilio over Meta Cloud API
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const from = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
     
-    // const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    // const authToken = process.env.TWILIO_AUTH_TOKEN;
-    // const client = require('twilio')(accountSid, authToken);
-    
-    // const twilioMessage = await client.messages.create({
-    //   body: message,
-    //   from: process.env.TWILIO_WHATSAPP_NUMBER,
-    //   to: `whatsapp:+91${to}`,
-    // });
-    
-    // console.log(`✅ WhatsApp sent via Twilio: ${twilioMessage.sid}`);
-    // return twilioMessage;
+    if (!accountSid || !authToken) {
+      console.warn('⚠️ Twilio credentials missing. Skipping message.');
+      return null;
+    }
 
-    console.log('Twilio WhatsApp not configured. Using Meta Cloud API instead.');
-    return null;
+    const client = twilio(accountSid, authToken);
+    
+    // Ensure "to" number is in E.164 format and starts with whatsapp:
+    // Assuming Indian numbers if no + prefix
+    let formattedTo = to.replace(/\D/g, '');
+    if (!to.startsWith('+')) {
+      formattedTo = `+91${formattedTo.slice(-10)}`;
+    } else {
+      formattedTo = to;
+    }
+
+    const twilioMessage = await client.messages.create({
+      body: message,
+      from: from,
+      to: `whatsapp:${formattedTo}`,
+    });
+    
+    console.log(`✅ WhatsApp sent via Twilio to ${formattedTo}: ${twilioMessage.sid}`);
+    return twilioMessage;
   } catch (error) {
-    console.error('❌ Twilio WhatsApp error:', error);
-    throw new Error('Failed to send WhatsApp via Twilio');
+    console.error('❌ Twilio WhatsApp error:', error.message);
+    return null; // Return null instead of throwing to avoid breaking main flow
   }
 };
 

@@ -27,6 +27,13 @@ import {
   Building,
   Navigation,
   Landmark,
+  Car,
+  Users,
+  Sparkles,
+  FileText,
+  Map,
+  XCircle,
+  CheckCircle,
 } from "lucide-react"; import { useTheme } from "../../context/ThemeContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { getPackages } from "../../services/packageService.js";
@@ -41,6 +48,7 @@ import Footer from "../Footer.jsx";
 import { estimateDistance, formatDistance, formatDuration, calculateFare } from "../../services/googleMapsService.js";
 import OfferBanner from "../OfferBanner.jsx";
 import MacBookShowcase from "./MacBookShowcase.jsx";
+import SEO from "../SEO.jsx";
 
 
 const DEFAULT_AVATAR = '/review/image.png';
@@ -62,7 +70,7 @@ const ReviewAvatar = ({ profileImage, name, darkMode }) => {
           }}
         />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-blue-600 flex items-center justify-center border-2 border-emerald-200 dark:border-emerald-400/30 overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center border-2 border-emerald-200 dark:border-emerald-400/30 overflow-hidden">
           <img
             src={DEFAULT_AVATAR}
             alt="default"
@@ -823,7 +831,7 @@ const GoelectriqLanding = () => {
           },
           (error) => {
             // Payment failure callback
-            console.error("❌ Payment failed:", error);
+            console.error("Payment failed:", error);
             setAirportBookingError("Payment failed: " + error);
             setAirportPaymentLoading(false);
           }
@@ -969,7 +977,7 @@ const GoelectriqLanding = () => {
             <Clock size={10} />
             {typeof tour.duration === "object" ? `${tour.duration.days || 1}d` : "4h"}
           </span>
-          <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${darkMode ? "bg-blue-500/20 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
+          <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
             <Zap size={10} /> EV
           </span>
         </div>
@@ -1252,6 +1260,13 @@ const GoelectriqLanding = () => {
   `;
 
   return (
+    <>
+      <SEO 
+        title="Eco-Friendly Premium Electric Cab Service"
+        description="Book India's most reliable electric cab service for airport rides, local travel and intercity tours. Sustainable, quiet and premium travel experience."
+        keywords="electric cab, airport transfer, green travel, eco-friendly taxi, Jaipur electric taxi"
+        url="/"
+      />
     <div
       className={`min-h-screen ${darkMode ? "bg-[#020617] text-gray-100" : "bg-white text-slate-900"} transition-colors duration-300 font-sans`}
     >
@@ -1703,25 +1718,25 @@ const GoelectriqLanding = () => {
               <div className={`flex flex-wrap gap-3 text-sm font-semibold ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                 <span className={`${darkMode ? "bg-gray-800" : "bg-gray-100"} px-4 py-2 rounded-full flex items-center gap-2`}>
                   <Clock size={16} className="text-emerald-500" />
-                  ⏱️
+                  <Clock size={16} />
                   {typeof selectedTourDetails.duration === "object" && (selectedTourDetails.duration?.days !== undefined || selectedTourDetails.duration?.hours !== undefined)
                     ? `${selectedTourDetails.duration.days || 1}d ${selectedTourDetails.duration.hours || 0}h`
                     : typeof selectedTourDetails.duration === "string" ? selectedTourDetails.duration : "1 Day"}
                 </span>
                 <span className={`${darkMode ? "bg-gray-800" : "bg-gray-100"} px-4 py-2 rounded-full flex items-center gap-2`}>
                   <UserCheck size={16} className="text-blue-500" />
-                  {selectedTourDetails.tourCategory === "travel_tour" ? "👥 Group Tour" : "🚗 4 Seater"}
+                  {selectedTourDetails.tourCategory === "travel_tour" ? <><Users size={16} /> Group Tour</> : <><Car size={16} /> 4 Seater</>}
                 </span>
                 {selectedTourDetails.distance && (
                   <span className={`${darkMode ? "bg-gray-800" : "bg-gray-100"} px-4 py-2 rounded-full flex items-center gap-2`}>
                     <Navigation size={16} className="text-purple-500" />
-                    📍 {selectedTourDetails.distance} km
+                    <MapPin size={14} /> {selectedTourDetails.distance} km
                   </span>
                 )}
                 {selectedTourDetails.rating?.average > 0 && (
                   <span className={`${darkMode ? "bg-gray-800" : "bg-gray-100"} px-4 py-2 rounded-full flex items-center gap-2`}>
                     <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                    ⭐ {selectedTourDetails.rating.average.toFixed(1)} ({selectedTourDetails.rating.count} reviews)
+                    <Star size={14} className="fill-yellow-400 text-yellow-400" /> {selectedTourDetails.rating.average.toFixed(1)} ({selectedTourDetails.rating.count} reviews)
                   </span>
                 )}
               </div>
@@ -1730,13 +1745,13 @@ const GoelectriqLanding = () => {
               <div className={`p-3 rounded-lg border-2 ${darkMode ? "bg-gray-800/40 border-emerald-500/30" : "bg-emerald-50 border-emerald-200"}`}>
                 <div className="grid grid-cols-2 gap-2">
                   <div className={`text-center p-3 rounded-lg ${darkMode ? "bg-emerald-900/30" : "bg-white"} border ${darkMode ? "border-emerald-500/40" : "border-emerald-300"}`}>
-                    <p className={`text-xs font-semibold ${darkMode ? "text-emerald-300" : "text-emerald-700"} mb-1`}>🚗 Economy</p>
+                    <p className={`text-xs font-semibold ${darkMode ? "text-emerald-300" : "text-emerald-700"} mb-1 flex items-center gap-1`}><Car size={12} /> Economy</p>
                     <p className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">
                       ₹{selectedTourDetails.pricing?.economy || selectedTourDetails.basePrice || 0}
                     </p>
                   </div>
                   <div className={`text-center p-3 rounded-lg ${darkMode ? "bg-blue-900/30" : "bg-white"} border ${darkMode ? "border-blue-500/40" : "border-blue-300"}`}>
-                    <p className={`text-xs font-semibold ${darkMode ? "text-blue-300" : "text-blue-700"} mb-1`}>✨ Premium</p>
+                    <p className={`text-xs font-semibold ${darkMode ? "text-blue-300" : "text-blue-700"} mb-1 flex items-center gap-1`}><Sparkles size={12} /> Premium</p>
                     <p className="font-bold text-blue-600 dark:text-blue-400 text-lg">
                       ₹{selectedTourDetails.pricing?.premium || selectedTourDetails.basePrice || 0}
                     </p>
@@ -1747,7 +1762,7 @@ const GoelectriqLanding = () => {
               {/* Short Description */}
               {selectedTourDetails.shortDescription && (
                 <div className={`p-5 rounded-xl ${darkMode ? "bg-blue-900/20" : "bg-blue-50"}`}>
-                  <h4 className={`font-bold text-base mb-3 ${darkMode ? "text-blue-300" : "text-blue-700"}`}>✨ Overview</h4>
+                  <h4 className={`font-bold text-base mb-3 ${darkMode ? "text-blue-300" : "text-blue-700"} flex items-center gap-2`}><Sparkles size={18} /> Overview</h4>
                   <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed italic`}>
                     {selectedTourDetails.shortDescription}
                   </p>
@@ -1757,7 +1772,7 @@ const GoelectriqLanding = () => {
               {/* Full Description */}
               {selectedTourDetails.description && (
                 <div className={`p-5 rounded-xl ${darkMode ? "bg-gray-800/60" : "bg-gray-50"}`}>
-                  <h4 className={`font-bold text-base mb-3 ${darkMode ? "text-gray-200" : "text-gray-900"}`}>📋 Full Details</h4>
+                  <h4 className={`font-bold text-base mb-3 ${darkMode ? "text-gray-200" : "text-gray-900"} flex items-center gap-2`}><FileText size={18} /> Full Details</h4>
                   <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm md:text-base leading-relaxed whitespace-pre-wrap`}>
                     {selectedTourDetails.description}
                   </p>
@@ -1767,7 +1782,7 @@ const GoelectriqLanding = () => {
               {/* Destinations */}
               {selectedTourDetails.destinations && selectedTourDetails.destinations.length > 0 && (
                 <div className={`p-5 rounded-xl ${darkMode ? "bg-gray-800/60" : "bg-gray-50"}`}>
-                  <h4 className={`font-bold text-base mb-4 ${darkMode ? "text-gray-200" : "text-gray-900"}`}>🗺️ Destinations</h4>
+                  <h4 className={`font-bold text-base mb-4 ${darkMode ? "text-gray-200" : "text-gray-900"} flex items-center gap-2`}><Map size={18} /> Destinations</h4>
                   <div className="space-y-3">
                     {selectedTourDetails.destinations.map((dest, idx) => (
                       <div key={idx} className={`p-3 rounded-lg ${darkMode ? "bg-gray-700/50" : "bg-white"} border ${darkMode ? "border-gray-600" : "border-gray-300"}`}>
@@ -1788,7 +1803,7 @@ const GoelectriqLanding = () => {
               {/* Itinerary */}
               {selectedTourDetails.itinerary && selectedTourDetails.itinerary.length > 0 && (
                 <div className={`p-5 rounded-xl ${darkMode ? "bg-gray-800/60" : "bg-gray-50"}`}>
-                  <h4 className={`font-bold text-base mb-4 ${darkMode ? "text-gray-200" : "text-gray-900"}`}>📅 Day-by-Day Itinerary</h4>
+                  <h4 className={`font-bold text-base mb-4 ${darkMode ? "text-gray-200" : "text-gray-900"} flex items-center gap-2`}><Calendar size={18} /> Day-by-Day Itinerary</h4>
                   <div className="space-y-3">
                     {selectedTourDetails.itinerary.map((item, idx) => (
                       <div key={idx} className={`p-4 rounded-lg ${darkMode ? "bg-gray-700/50" : "bg-white"} border-l-4 border-emerald-500`}>
@@ -1817,7 +1832,7 @@ const GoelectriqLanding = () => {
               {/* Features */}
               {selectedTourDetails.features && selectedTourDetails.features.length > 0 && (
                 <div className={`p-5 rounded-xl ${darkMode ? "bg-purple-900/20" : "bg-purple-50"}`}>
-                  <h4 className={`font-bold text-base mb-4 text-purple-600 dark:text-purple-400`}>🌟 Special Features</h4>
+                  <h4 className={`font-bold text-base mb-4 text-purple-600 dark:text-purple-400 flex items-center gap-2`}><Star size={18} /> Special Features</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {selectedTourDetails.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center gap-2">
@@ -1833,7 +1848,7 @@ const GoelectriqLanding = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {selectedTourDetails.inclusions && selectedTourDetails.inclusions.length > 0 && (
                   <div className={`p-5 rounded-xl ${darkMode ? "bg-emerald-900/20" : "bg-emerald-50"}`}>
-                    <h4 className={`font-bold text-base mb-3 text-emerald-600 dark:text-emerald-400`}>✅ Inclusions</h4>
+                    <h4 className={`font-bold text-base mb-3 text-emerald-600 dark:text-emerald-400 flex items-center gap-2`}><CheckCircle size={18} /> Inclusions</h4>
                     <ul className="space-y-2">
                       {selectedTourDetails.inclusions.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2">
@@ -1846,7 +1861,7 @@ const GoelectriqLanding = () => {
                 )}
                 {selectedTourDetails.exclusions && selectedTourDetails.exclusions.length > 0 && (
                   <div className={`p-5 rounded-xl ${darkMode ? "bg-red-900/20" : "bg-red-50"}`}>
-                    <h4 className={`font-bold text-base mb-3 text-red-600 dark:text-red-400`}>❌ Exclusions</h4>
+                    <h4 className={`font-bold text-base mb-3 text-red-600 dark:text-red-400 flex items-center gap-2`}><XCircle size={18} /> Exclusions</h4>
                     <ul className="space-y-2">
                       {selectedTourDetails.exclusions.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2">
@@ -2020,7 +2035,7 @@ const GoelectriqLanding = () => {
               {/* Location Info */}
               <div className={`p-4 rounded-xl border ${darkMode ? "bg-slate-800/50 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
                 <p className={`text-sm font-semibold mb-2 ${darkMode ? "text-gray-300" : "text-slate-700"}`}>
-                  {airportRideType === "pickup" ? "📍 Pickup from Airport → Destination:" : "📍 Pickup Location → Airport:"}
+                  {airportRideType === "pickup" ? <><MapPin size={16} /> Pickup from Airport → Destination:</> : <><MapPin size={16} /> Pickup Location → Airport:</>}
                 </p>
                 <p className={`text-lg font-bold ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
                   {airportLocation}
@@ -2109,11 +2124,11 @@ const GoelectriqLanding = () => {
                           </div>
                           <div className="flex items-center gap-3 text-sm">
                             <span className={`flex items-center gap-1 ${selectedCarType === car.id ? (darkMode ? "text-emerald-300/80" : "text-emerald-600/80") : (darkMode ? "text-gray-400" : "text-slate-600")}`}>
-                              👥 {car.passengers} Passengers
+                              <Users size={16} /> {car.passengers} Passengers
                             </span>
                             {car.capacity && (
                               <span className={`flex items-center gap-1 ${selectedCarType === car.id ? (darkMode ? "text-emerald-300/80" : "text-emerald-600/80") : (darkMode ? "text-gray-400" : "text-slate-600")}`}>
-                                📦 {car.capacity}
+                                <Briefcase size={16} /> {car.capacity}
                               </span>
                             )}
                           </div>
@@ -2144,7 +2159,7 @@ const GoelectriqLanding = () => {
               {selectedCarType && airportPricing[selectedCarType] && (
                 <div className={`p-5 rounded-xl border ${darkMode ? "bg-slate-800/50 border-slate-700" : "bg-slate-50 border-slate-300"}`}>
                   <h3 className={`text-base font-bold mb-4 ${darkMode ? "text-emerald-300" : "text-emerald-700"}`}>
-                    💰 Fare Breakdown
+                    <Wallet size={18} /> Fare Breakdown
                   </h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
@@ -2367,6 +2382,7 @@ const GoelectriqLanding = () => {
 
       <Footer darkMode={darkMode} />
     </div>
+    </>
   );
 };
 export default GoelectriqLanding;

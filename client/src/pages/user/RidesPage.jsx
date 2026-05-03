@@ -142,7 +142,7 @@ export default function RidesPage() {
       case 'completed':
         return { color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle, label: 'Completed' };
       case 'ongoing':
-        return { color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: Clock, label: 'On Journey' };
+        return { color: 'text-teal-500', bg: 'bg-teal-500/10', icon: Clock, label: 'On Journey' };
       case 'cancelled':
         return { color: 'text-rose-500', bg: 'bg-rose-500/10', icon: X, label: 'Cancelled' };
       case 'confirmed':
@@ -196,7 +196,7 @@ export default function RidesPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"
+            className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full mb-4"
           />
           <p className="text-slate-500 font-medium animate-pulse">Synchronizing your journeys...</p>
         </div>
@@ -208,30 +208,30 @@ export default function RidesPage() {
     <UserLayout>
       <div className="max-w-7xl mx-auto space-y-10">
         {/* Premium Header Section */}
-        <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-slate-900 text-white p-8 md:p-12 shadow-2xl">
+        <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-white text-slate-900 p-8 md:p-12 shadow-xl border border-slate-100">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/20 to-transparent pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div>
               <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 My <span className="text-emerald-400">Journeys</span>
               </h1>
-              <p className="text-slate-400 text-lg max-w-md font-medium leading-relaxed">
+              <p className="text-slate-500 text-lg max-w-md font-medium leading-relaxed">
                 Track your carbon-neutral travels and manage your upcoming reservations.
               </p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center">
-                <p className="text-emerald-400 text-2xl font-black mb-1">{statsData.total}</p>
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Total Rides</p>
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.total}</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Total Rides</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center">
-                <p className="text-indigo-400 text-2xl font-black mb-1">{statsData.distance}km</p>
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Distance</p>
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.distance}km</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Distance</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 text-center hidden md:block">
-                <p className="text-rose-400 text-2xl font-black mb-1">{statsData.co2}kg</p>
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">CO2 Saved</p>
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm hidden md:block">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.co2}kg</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">CO2 Saved</p>
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function RidesPage() {
         )}
 
         {/* Controls Section */}
-        <div className="flex flex-col md:flex-row gap-6 mb-10 items-center justify-between bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row gap-6 mb-10 items-center justify-between bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
           <div className="flex flex-wrap gap-2">
             {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
               <button
@@ -257,8 +257,8 @@ export default function RidesPage() {
                 onClick={() => handleFilterChange(status)}
                 className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
                   filterStatus === status
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg scale-105'
-                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 scale-105'
+                    : 'text-slate-500 hover:bg-slate-100'
                 }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -267,13 +267,13 @@ export default function RidesPage() {
           </div>
 
           <div className="relative w-full md:w-80 group">
-            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
             <input
               type="text"
               placeholder="Search destinations..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-12 pr-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium transition-all"
+              className="w-full pl-12 pr-6 py-3 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 text-sm font-medium transition-all"
             />
           </div>
         </div>
@@ -304,18 +304,18 @@ export default function RidesPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="group bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+                    className="group bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
                   >
                     <div className="p-8">
                       <div className="flex justify-between items-start mb-8">
                         <div>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Booking ID</p>
-                          <p className="text-sm font-bold text-slate-900 dark:text-white font-mono">{ride.bookingId}</p>
+                          <p className="text-sm font-bold text-slate-900 font-mono">{ride.bookingId}</p>
                         </div>
                         <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
                           ride.status === 'completed' ? 'bg-emerald-100 text-emerald-600' :
                           ride.status === 'cancelled' ? 'bg-rose-100 text-rose-600' :
-                          'bg-indigo-100 text-indigo-600'
+                          'bg-emerald-100 text-emerald-600'
                         }`}>
                           {ride.status}
                         </div>
@@ -325,44 +325,44 @@ export default function RidesPage() {
                         <div className="flex gap-4">
                           <div className="flex flex-col items-center gap-1 pt-1">
                             <div className="w-2.5 h-2.5 rounded-full border-2 border-emerald-500" />
-                            <div className="w-0.5 h-10 bg-slate-100 dark:bg-slate-800" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/50" />
+                            <div className="w-0.5 h-10 bg-slate-100" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
                           </div>
                           <div className="flex-1 flex flex-col justify-between py-0.5">
                             <div className="line-clamp-1">
                               <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Pickup</p>
-                              <p className="text-sm font-bold text-slate-800 dark:text-white">{getLocationString(ride.pickupLocation)}</p>
+                              <p className="text-sm font-bold text-slate-800">{getLocationString(ride.pickupLocation)}</p>
                             </div>
                             <div className="line-clamp-1">
                               <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Destination</p>
-                              <p className="text-sm font-bold text-slate-800 dark:text-white">{getLocationString(ride.dropLocation)}</p>
+                              <p className="text-sm font-bold text-slate-800">{getLocationString(ride.dropLocation)}</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-3xl">
+                           <div className="bg-slate-50/80 p-4 rounded-3xl">
                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Date</p>
                             <div className="flex items-center gap-2">
-                              <Calendar size={12} className="text-indigo-500" />
-                              <p className="text-xs font-black text-slate-700 dark:text-slate-200">{formatDate(ride.scheduledDate || ride.createdAt)}</p>
+                              <Calendar size={12} className="text-emerald-500" />
+                              <p className="text-xs font-black text-slate-700">{formatDate(ride.scheduledDate || ride.createdAt)}</p>
                             </div>
                           </div>
-                          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-3xl text-right">
+                          <div className="bg-slate-50/80 p-4 rounded-3xl text-right">
                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Fare</p>
-                            <p className="text-sm font-black text-slate-900 dark:text-white">₹{ride.pricing?.totalFare || ride.totalFare || 0}</p>
+                            <p className="text-sm font-black text-slate-900">₹{ride.pricing?.totalFare || ride.totalFare || 0}</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-6">
+                       <div className="flex items-center justify-between border-t border-slate-100 pt-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
+                          <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                             <Car size={20} />
                           </div>
                           <div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Vehicle</p>
-                            <p className="text-xs font-black text-slate-700 dark:text-slate-200">{ride.cabType || 'Electric Sedan'}</p>
+                            <p className="text-xs font-black text-slate-700">{ride.cabType || 'Electric Sedan'}</p>
                           </div>
                         </div>
 
@@ -376,9 +376,9 @@ export default function RidesPage() {
                               Pay Now
                             </button>
                           ) : (
-                            <button
+                             <button
                               onClick={() => navigate(`/user/booking-confirmation?id=${ride._id}`)}
-                              className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-xl"
+                              className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-xl"
                             >
                               Details
                             </button>
@@ -409,27 +409,27 @@ export default function RidesPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"
+              className="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200"
             >
               <div className="p-10 text-center">
-                <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
                   <AlertCircle size={40} />
                 </div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Cancel Journey?</h2>
+                <h2 className="text-3xl font-black text-slate-900 mb-4">Cancel Journey?</h2>
                 <p className="text-slate-500 font-medium mb-8">This action cannot be undone. Please provide a reason for cancellation below.</p>
 
                 <textarea
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
                   placeholder="Reason for cancellation..."
-                  className="w-full p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none focus:ring-2 focus:ring-rose-500 text-sm font-medium mb-8"
+                  className="w-full p-6 bg-slate-50 rounded-3xl border-none focus:ring-2 focus:ring-rose-500 text-sm font-medium mb-8"
                   rows="3"
                 />
 
                 <div className="flex gap-4">
                   <button
                     onClick={() => setShowCancelModal(false)}
-                    className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
+                    className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
                   >
                     No, Go Back
                   </button>

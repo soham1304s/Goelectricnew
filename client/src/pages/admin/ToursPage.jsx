@@ -462,7 +462,7 @@ const ToursPage = () => {
 
                 {/* Vehicle & Passengers */}
               <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">🚗 Vehicle Information</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Vehicle Information</h3>
                 <div className="grid grid-cols-3 gap-3 text-sm">
                   <div>
                     <p className="text-gray-600 dark:text-gray-400 font-semibold">Car Type Selected</p>
@@ -502,7 +502,7 @@ const ToursPage = () => {
                         {/* Show Economy */}
                         {selectedTour.package?.pricing?.economy !== undefined && (
                           <div className={`p-2 rounded ${selectedTour.carType === 'economy' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-white dark:bg-blue-900/20'}`}>
-                            <span className="text-blue-800 dark:text-blue-300">🚗 Economy:</span>
+                            <span className="text-emerald-800 dark:text-emerald-300">Economy:</span>
                             <span className="font-bold text-blue-900 dark:text-blue-200 ml-2">₹{selectedTour.package?.pricing?.economy}</span>
                             {selectedTour.carType === 'economy' && <span className="ml-2 text-green-600 font-bold">✓ SELECTED</span>}
                           </div>
@@ -510,7 +510,7 @@ const ToursPage = () => {
                         {/* Show Premium */}
                         {selectedTour.package?.pricing?.premium !== undefined && (
                           <div className={`p-2 rounded ${selectedTour.carType === 'premium' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-white dark:bg-blue-900/20'}`}>
-                            <span className="text-blue-800 dark:text-blue-300">🚗 Premium:</span>
+                            <span className="text-emerald-800 dark:text-emerald-300">Premium:</span>
                             <span className="font-bold text-blue-900 dark:text-blue-200 ml-2">₹{selectedTour.package?.pricing?.premium}</span>
                             {selectedTour.carType === 'premium' && <span className="ml-2 text-green-600 font-bold">✓ SELECTED</span>}
                           </div>

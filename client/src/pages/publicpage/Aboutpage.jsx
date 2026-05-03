@@ -18,6 +18,7 @@ import {
   Award
 } from 'lucide-react';
 import Footer from '../../components/Footer.jsx';
+import SEO from '../../components/SEO.jsx';
 
 const AboutUsPage = () => {
   // We can use the dark mode class from the parent or just use tailwind's dark: prefix
@@ -59,6 +60,13 @@ const AboutUsPage = () => {
   };
 
   return (
+    <>
+      <SEO 
+        title="About Us - Leading the Electric Mobility Revolution"
+        description="Learn about GoElectric's mission to redefine urban transportation with a 100% electric fleet. Sustainable, silent, and premium mobility solutions."
+        keywords="about GoElectric, electric vehicle company, sustainable transport India, green mobility mission"
+        url="/about"
+      />
     <div className="pt-24 md:pt-32 overflow-hidden transition-colors duration-500 dark:bg-[#020617]">
       {/* Hero Section */}
       <section className="relative px-4 mb-24 md:mb-32">
@@ -278,6 +286,7 @@ const AboutUsPage = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

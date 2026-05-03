@@ -9,6 +9,7 @@ import bookingService from '../services/bookingService.js';
 import { fetchCarRates } from '../services/rateService.js';
 import { ridePaymentService } from '../services/ridePaymentService.js';
 import GoogleMapComponent from '../components/GoogleMapComponent.jsx';
+import SEO from '../components/SEO.jsx';
 
 const AIRPORT_LOCATION = {
   name: 'Jaipur International Airport (JAI)',
@@ -378,12 +379,12 @@ export default function AirportRidePage() {
               // Show success message first
               setBookingError(''); // Clear any previous errors
               const bookingId = verifyResponse.data?.bookingId || booking?._id;
-              
+
               // We keep the loading state true so user sees a spinner while we prepare to redirect
               // but we show a success message if you had a separate state for it.
               // For now, let's just navigate.
               console.log('✅ Payment verified, navigating to confirmation...');
-              
+
               setTimeout(() => {
                 setBookingLoading(false);
                 navigate(`/user/booking-confirmation/${bookingId}`, {
@@ -426,7 +427,7 @@ export default function AirportRidePage() {
       <div className={`min-h-screen flex items-center justify-center font-['Inter',sans-serif] ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
         <div className="text-center">
           <div className="h-16 w-16 border-4 rounded-full animate-spin mx-auto mb-6 border-slate-200 dark:border-zinc-800 border-t-emerald-600 dark:border-t-emerald-500"></div>
-          <p className={`text-lg font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-600'}`}>🛫 Loading airport rates...</p>
+          <p className={`text-lg font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-600'}`}>Loading airport rates...</p>
           <p className={`text-sm mt-2 ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>Please wait while we fetch the best rates for you</p>
         </div>
       </div>
@@ -434,329 +435,337 @@ export default function AirportRidePage() {
   }
 
   return (
-    <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
-      <div className="container mx-auto px-4 py-8 md:py-16">
-        <div className="mx-auto max-w-6xl">
-          {/* Header Section */}
-          <div className="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs mb-4">
-                <Plane size={14} />
-                <span>100% Electric Airport Transfers</span>
-              </div>
-              <h1 className={`text-4xl font-black tracking-tight md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Airport <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Transfers</span>
-              </h1>
-              <p className={`mt-3 text-base md:text-lg ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Premium, zero-emission rides to and from Jaipur International Airport.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-12">
-            {/* Left Column: Form */}
-            <div className={`rounded-3xl p-6 md:p-8 shadow-sm lg:col-span-8 ${isDark ? 'border border-zinc-800 bg-zinc-900/50' : 'border border-slate-200 bg-white'}`}>
-              {bookingError && (
-                <div className="mb-6 rounded-xl border border-red-400/50 bg-red-50 p-4 text-red-600 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                  <p className="text-sm font-medium">{bookingError}</p>
-                </div>
-              )}
-
-              {/* Ride Type Selection */}
-              <div className="mb-8">
-                <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>
-                  Choose Your Journey
-                </label>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => setRideType('pickup')}
-                    className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${rideType === 'pickup'
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 shadow-sm ring-1 ring-emerald-500'
-                      : isDark
-                        ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                  >
-                    {rideType === 'pickup' && (
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-bl-[100px] -z-0"></div>
-                    )}
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`p-2.5 rounded-xl ${rideType === 'pickup' ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
-                          <MapPin className="h-5 w-5" />
-                        </div>
-                        <span className={`font-bold text-base ${rideType === 'pickup' ? 'text-emerald-600 dark:text-emerald-400' : isDark ? 'text-white' : 'text-slate-900'}`}>
-                          From Airport
-                        </span>
-                      </div>
-                      <p className={`text-sm ${rideType === 'pickup' ? 'text-emerald-700 dark:text-emerald-500' : isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
-                        Travel from airport to your destination
-                      </p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setRideType('drop')}
-                    className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${rideType === 'drop'
-                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/10 shadow-sm ring-1 ring-teal-500'
-                      : isDark
-                        ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                  >
-                    {rideType === 'drop' && (
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-bl-[100px] -z-0"></div>
-                    )}
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`p-2.5 rounded-xl ${rideType === 'drop' ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
-                          <Plane className="h-5 w-5" />
-                        </div>
-                        <span className={`font-bold text-base ${rideType === 'drop' ? 'text-teal-600 dark:text-teal-400' : isDark ? 'text-white' : 'text-slate-900'}`}>
-                          To Airport
-                        </span>
-                      </div>
-                      <p className={`text-sm ${rideType === 'drop' ? 'text-teal-700 dark:text-teal-500' : isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
-                        Travel from your location to airport
-                      </p>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Location Inputs */}
-              {rideType === 'pickup' ? (
-                <div className="space-y-6 mb-8">
-                  <div>
-                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Where would you like to go?</label>
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-1">
-                        <LocationPickerComponent
-                          value={destinationCity}
-                          onChange={(value) => setDestinationCity(value)}
-                          onSelectLocation={(location) => {
-                            if (location && (location.lat || location.latitude)) {
-                              setDestinationCoordinates({
-                                latitude: location.lat || location.latitude,
-                                longitude: location.lng || location.longitude,
-                              });
-                            }
-                          }}
-                          placeholder="Search destination area..."
-                          showMap={false}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6 mb-8">
-                  <div>
-                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Where are you located?</label>
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-1">
-                        <LocationPickerComponent
-                          value={pickupLocation}
-                          onChange={(value) => setPickupLocation(value)}
-                          onSelectLocation={(location) => {
-                            if (location && (location.lat || location.latitude)) {
-                              setPickupCoordinates({
-                                latitude: location.lat || location.latitude,
-                                longitude: location.lng || location.longitude,
-                              });
-                            }
-                          }}
-                          placeholder="Search your location..."
-                          showMap={false}
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleFetchCurrentLocation}
-                        disabled={fetchingLocation}
-                        className={`rounded-xl p-3.5 flex-shrink-0 transition-all border ${fetchingLocation ? 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400' : isDark ? 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-teal-400' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-teal-600'}`}
-                        title="Use current location"
-                      >
-                        {fetchingLocation ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          <Navigation className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Time Section */}
-              <div className="mb-8 grid gap-6 md:grid-cols-2">
-                <div>
-                  <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Travel Date</label>
-                  <div className="relative group">
-                    <Calendar className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
-                    <input
-                      type="date"
-                      min={minDate}
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Departure Time</label>
-                  <div className="relative group">
-                    <Clock3 className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
-                    <input
-                      type="time"
-                      value={selectedTime}
-                      min={minTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Vehicle Selection */}
+    <>
+      <SEO
+        title="Eco-Friendly Airport Transfers in Jaipur"
+        description="Book zero-emission electric cab transfers to and from Jaipur International Airport (JAI). Punctual, silent, and sustainable airport rides."
+        keywords="Jaipur airport taxi, electric airport transfer, JAI airport cab, eco-friendly airport ride"
+        url="/airport"
+      />
+      <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
+        <div className="container mx-auto px-4 py-8 md:py-16">
+          <div className="mx-auto max-w-6xl">
+            {/* Header Section */}
+            <div className="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <label className={`mb-4 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Choose Vehicle</label>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {carTypes.map((car) => (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs mb-4">
+                  <Plane size={14} />
+                  <span>100% Electric Airport Transfers</span>
+                </div>
+                <h1 className={`text-4xl font-black tracking-tight md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Airport <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Transfers</span>
+                </h1>
+                <p className={`mt-3 text-base md:text-lg ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Premium, zero-emission rides to and from Jaipur International Airport.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-12">
+              {/* Left Column: Form */}
+              <div className={`rounded-3xl p-6 md:p-8 shadow-sm lg:col-span-8 ${isDark ? 'border border-zinc-800 bg-zinc-900/50' : 'border border-slate-200 bg-white'}`}>
+                {bookingError && (
+                  <div className="mb-6 rounded-xl border border-red-400/50 bg-red-50 p-4 text-red-600 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <p className="text-sm font-medium">{bookingError}</p>
+                  </div>
+                )}
+
+                {/* Ride Type Selection */}
+                <div className="mb-8">
+                  <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>
+                    Choose Your Journey
+                  </label>
+                  <div className="grid gap-4 md:grid-cols-2">
                     <button
-                      key={car.id}
                       type="button"
-                      onClick={() => setSelectedCar(car.id)}
-                      className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${selectedCar === car.id
+                      onClick={() => setRideType('pickup')}
+                      className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${rideType === 'pickup'
                         ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 shadow-sm ring-1 ring-emerald-500'
                         : isDark
                           ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
                           : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                         }`}
                     >
-                      {selectedCar === car.id && (
+                      {rideType === 'pickup' && (
                         <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-bl-[100px] -z-0"></div>
                       )}
-
                       <div className="relative z-10">
-                        <div className="mb-4 flex items-center justify-between">
-                          <div className={`p-2 rounded-xl ${selectedCar === car.id ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
-                            <CarTaxiFront className="h-6 w-6" />
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`p-2.5 rounded-xl ${rideType === 'pickup' ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
+                            <MapPin className="h-5 w-5" />
                           </div>
-                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedCar === car.id ? 'bg-emerald-600 text-white' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-600'}`}>
-                            {car.passengers} seats
+                          <span className={`font-bold text-base ${rideType === 'pickup' ? 'text-emerald-600 dark:text-emerald-400' : isDark ? 'text-white' : 'text-slate-900'}`}>
+                            From Airport
                           </span>
                         </div>
-                        <p className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{car.name}</p>
-                        <p className={`text-sm mt-1 ${selectedCar === car.id ? 'text-emerald-600 dark:text-emerald-400' : isDark ? 'text-zinc-500' : 'text-slate-500'}`}>
-                          Perfect for your journey
+                        <p className={`text-sm ${rideType === 'pickup' ? 'text-emerald-700 dark:text-emerald-500' : isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
+                          Travel from airport to your destination
                         </p>
                       </div>
                     </button>
-                  ))}
+
+                    <button
+                      type="button"
+                      onClick={() => setRideType('drop')}
+                      className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${rideType === 'drop'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/10 shadow-sm ring-1 ring-teal-500'
+                        : isDark
+                          ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                        }`}
+                    >
+                      {rideType === 'drop' && (
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-bl-[100px] -z-0"></div>
+                      )}
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`p-2.5 rounded-xl ${rideType === 'drop' ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
+                            <Plane className="h-5 w-5" />
+                          </div>
+                          <span className={`font-bold text-base ${rideType === 'drop' ? 'text-teal-600 dark:text-teal-400' : isDark ? 'text-white' : 'text-slate-900'}`}>
+                            To Airport
+                          </span>
+                        </div>
+                        <p className={`text-sm ${rideType === 'drop' ? 'text-teal-700 dark:text-teal-500' : isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
+                          Travel from your location to airport
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Location Inputs */}
+                {rideType === 'pickup' ? (
+                  <div className="space-y-6 mb-8">
+                    <div>
+                      <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Where would you like to go?</label>
+                      <div className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <LocationPickerComponent
+                            value={destinationCity}
+                            onChange={(value) => setDestinationCity(value)}
+                            onSelectLocation={(location) => {
+                              if (location && (location.lat || location.latitude)) {
+                                setDestinationCoordinates({
+                                  latitude: location.lat || location.latitude,
+                                  longitude: location.lng || location.longitude,
+                                });
+                              }
+                            }}
+                            placeholder="Search destination area..."
+                            showMap={false}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6 mb-8">
+                    <div>
+                      <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Where are you located?</label>
+                      <div className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <LocationPickerComponent
+                            value={pickupLocation}
+                            onChange={(value) => setPickupLocation(value)}
+                            onSelectLocation={(location) => {
+                              if (location && (location.lat || location.latitude)) {
+                                setPickupCoordinates({
+                                  latitude: location.lat || location.latitude,
+                                  longitude: location.lng || location.longitude,
+                                });
+                              }
+                            }}
+                            placeholder="Search your location..."
+                            showMap={false}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleFetchCurrentLocation}
+                          disabled={fetchingLocation}
+                          className={`rounded-xl p-3.5 flex-shrink-0 transition-all border ${fetchingLocation ? 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400' : isDark ? 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-teal-400' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-teal-600'}`}
+                          title="Use current location"
+                        >
+                          {fetchingLocation ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Navigation className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Time Section */}
+                <div className="mb-8 grid gap-6 md:grid-cols-2">
+                  <div>
+                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Travel Date</label>
+                    <div className="relative group">
+                      <Calendar className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
+                      <input
+                        type="date"
+                        min={minDate}
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Departure Time</label>
+                    <div className="relative group">
+                      <Clock3 className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-emerald-400' : 'text-slate-400 group-focus-within:text-emerald-600'}`} />
+                      <input
+                        type="time"
+                        value={selectedTime}
+                        min={minTime}
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                        className={`w-full rounded-xl border py-3.5 pl-12 pr-4 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${isDark ? 'border-zinc-700 bg-zinc-800/50 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vehicle Selection */}
+                <div>
+                  <label className={`mb-4 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Choose Vehicle</label>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {carTypes.map((car) => (
+                      <button
+                        key={car.id}
+                        type="button"
+                        onClick={() => setSelectedCar(car.id)}
+                        className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${selectedCar === car.id
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 shadow-sm ring-1 ring-emerald-500'
+                          : isDark
+                            ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
+                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                      >
+                        {selectedCar === car.id && (
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-bl-[100px] -z-0"></div>
+                        )}
+
+                        <div className="relative z-10">
+                          <div className="mb-4 flex items-center justify-between">
+                            <div className={`p-2 rounded-xl ${selectedCar === car.id ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-500'}`}>
+                              <CarTaxiFront className="h-6 w-6" />
+                            </div>
+                            <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedCar === car.id ? 'bg-emerald-600 text-white' : isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-slate-100 text-slate-600'}`}>
+                              {car.passengers} seats
+                            </span>
+                          </div>
+                          <p className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{car.name}</p>
+                          <p className={`text-sm mt-1 ${selectedCar === car.id ? 'text-emerald-600 dark:text-emerald-400' : isDark ? 'text-zinc-500' : 'text-slate-500'}`}>
+                            Perfect for your journey
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right Column: Summary */}
-            <div className="lg:col-span-4">
-              <div className="mb-6 h-[350px] rounded-3xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800">
-                <GoogleMapComponent
-                  pickupCoords={rideType === 'pickup' ? AIRPORT_LOCATION : pickupCoordinates}
-                  dropCoords={rideType === 'pickup' ? destinationCoordinates : AIRPORT_LOCATION}
-                  isDark={isDark}
-                />
-              </div>
-              <div className={`sticky top-24 rounded-3xl border p-6 md:p-8 shadow-sm ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-slate-200 bg-white'}`}>
-                <h2 className={`mb-6 text-xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
-
-                <div className="space-y-4 text-sm mb-6">
-                  <div className="flex items-center justify-between">
-                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Ride Type</span>
-                    <span className={`font-bold px-2 py-1 rounded-md text-xs ${rideType === 'pickup'
-                      ? isDark ? 'bg-emerald-900/30 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
-                      : isDark ? 'bg-teal-900/30 text-teal-300' : 'bg-teal-100 text-teal-700'
-                      }`}>
-                      {rideType === 'pickup' ? 'From Airport' : 'To Airport'}
-                    </span>
-                  </div>
-
-                  <div className="flex items-start justify-between gap-4">
-                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Route</span>
-                    <span className={`text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      {rideType === 'pickup'
-                        ? `JAI → ${destinationCity ? destinationCity : 'Dest.'}`
-                        : `${pickupLocation ? pickupLocation.split(',')[0] : 'Loc.'} → JAI`}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Service</span>
-                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Fixed Rate</span>
-                  </div>
+              {/* Right Column: Summary */}
+              <div className="lg:col-span-4">
+                <div className="mb-6 h-[350px] rounded-3xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800">
+                  <GoogleMapComponent
+                    pickupCoords={rideType === 'pickup' ? AIRPORT_LOCATION : pickupCoordinates}
+                    dropCoords={rideType === 'pickup' ? destinationCoordinates : AIRPORT_LOCATION}
+                    isDark={isDark}
+                  />
                 </div>
+                <div className={`sticky top-24 rounded-3xl border p-6 md:p-8 shadow-sm ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-slate-200 bg-white'}`}>
+                  <h2 className={`mb-6 text-xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
 
-                <div className={`my-6 p-4 rounded-xl ${isDark ? 'bg-zinc-800/50' : 'bg-slate-50'}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-sm font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Flat Rate</span>
-                    <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>
-                      {formatMoney(baseFare)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-sm font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Parking Fee</span>
-                    <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>
-                      {formatMoney(parkingCharge)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className={`my-6 h-px border-t border-dashed ${isDark ? 'border-zinc-700' : 'border-slate-200'}`} />
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-end justify-between">
-                    <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Total Fare</span>
-                    <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatMoney(totalAmount)}</span>
-                  </div>
-
-                  <div className={`p-4 rounded-xl ${isDark ? 'bg-emerald-900/10 border border-emerald-900/30' : 'bg-emerald-50 border border-emerald-100'}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                        <CheckCircle2 size={16} /> Pay Now (20%)
+                  <div className="space-y-4 text-sm mb-6">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Ride Type</span>
+                      <span className={`font-bold px-2 py-1 rounded-md text-xs ${rideType === 'pickup'
+                        ? isDark ? 'bg-emerald-900/30 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
+                        : isDark ? 'bg-teal-900/30 text-teal-300' : 'bg-teal-100 text-teal-700'
+                        }`}>
+                        {rideType === 'pickup' ? 'From Airport' : 'To Airport'}
                       </span>
-                      <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">{formatMoney(advancePayment)}</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
-                      <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>Balance (Due later)</span>
-                      <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>{formatMoney(totalAmount - advancePayment)}</span>
+
+                    <div className="flex items-start justify-between gap-4">
+                      <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Route</span>
+                      <span className={`text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {rideType === 'pickup'
+                          ? `JAI → ${destinationCity ? destinationCity : 'Dest.'}`
+                          : `${pickupLocation ? pickupLocation.split(',')[0] : 'Loc.'} → JAI`}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Service</span>
+                      <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Fixed Rate</span>
                     </div>
                   </div>
+
+                  <div className={`my-6 p-4 rounded-xl ${isDark ? 'bg-zinc-800/50' : 'bg-slate-50'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-sm font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Flat Rate</span>
+                      <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>
+                        {formatMoney(baseFare)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-semibold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Parking Fee</span>
+                      <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>
+                        {formatMoney(parkingCharge)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={`my-6 h-px border-t border-dashed ${isDark ? 'border-zinc-700' : 'border-slate-200'}`} />
+
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-end justify-between">
+                      <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Total Fare</span>
+                      <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatMoney(totalAmount)}</span>
+                    </div>
+
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-emerald-900/10 border border-emerald-900/30' : 'bg-emerald-50 border border-emerald-100'}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                          <CheckCircle2 size={16} /> Pay Now (20%)
+                        </span>
+                        <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">{formatMoney(advancePayment)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
+                        <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>Balance (Due later)</span>
+                        <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>{formatMoney(totalAmount - advancePayment)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleBooking}
+                    disabled={bookingLoading}
+                    className={`w-full rounded-xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2 shadow-sm ${bookingLoading
+                      ? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 shadow-none'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-500/25 hover:shadow-lg active:scale-[0.98]'
+                      }`}
+                  >
+                    {bookingLoading && <Loader2 className="h-5 w-5 animate-spin" />}
+                    {bookingLoading ? 'Processing Booking...' : 'Book Ride Now'}
+                  </button>
+
+                  <p className={`mt-4 text-center text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
+                    Instant confirmation • Secure payment
+                  </p>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleBooking}
-                  disabled={bookingLoading}
-                  className={`w-full rounded-xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2 shadow-sm ${bookingLoading
-                    ? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 shadow-none'
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-500/25 hover:shadow-lg active:scale-[0.98]'
-                    }`}
-                >
-                  {bookingLoading && <Loader2 className="h-5 w-5 animate-spin" />}
-                  {bookingLoading ? 'Processing Booking...' : 'Book Ride Now'}
-                </button>
-
-                <p className={`mt-4 text-center text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
-                  Instant confirmation • Secure payment
-                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Lock, Shield } from 'lucide-react';
 
 export default function AdminAuthLayout({ children }) {
   return (
@@ -56,14 +57,14 @@ export default function AdminAuthLayout({ children }) {
           animate={{ y: [0, -20, 0] }}
           transition={{ duration: 6, repeat: Infinity }}
         >
-          🔐
+          <Lock size={64} />
         </motion.div>
         <motion.div
           className="absolute bottom-1/4 right-10 text-slate-700 opacity-10 text-6xl"
           animate={{ y: [0, 20, 0] }}
           transition={{ duration: 8, repeat: Infinity }}
         >
-          🛡️
+          <Shield size={64} />
         </motion.div>
       </div>
 
@@ -129,7 +130,7 @@ export default function AdminAuthLayout({ children }) {
 
           {/* Lock Icon */}
           <div className="flex justify-center">
-            <div className="text-slate-600">🔒</div>
+            <div className="text-slate-600"><Lock size={16} /></div>
           </div>
         </motion.div>
       </motion.div>

@@ -6,6 +6,9 @@ import {
   AlertCircle,
   Moon,
   Sun,
+  Zap,
+  Shield,
+  Banknote,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -180,22 +183,22 @@ const ChangeoverPage = () => {
 
   const features = [
     {
-      icon: "⚡",
+      icon: <Zap size={32} className="text-yellow-500" />,
       title: "Quick Installation",
       desc: "Expert technicians complete work in 2-3 hours",
     },
     {
-      icon: "🛡️",
+      icon: <Shield size={32} className="text-emerald-500" />,
       title: "Safety Certified",
       desc: "100% safe installation with proper grounding",
     },
     {
-      icon: "💰",
+      icon: <Banknote size={32} className="text-blue-500" />,
       title: "Best Prices",
       desc: "Transparent pricing with no hidden charges",
     },
     {
-      icon: "✅",
+      icon: <CheckCircle size={32} className="text-emerald-600" />,
       title: "2-Year Warranty",
       desc: "Complete warranty on installation & parts",
     },
@@ -249,7 +252,7 @@ const ChangeoverPage = () => {
               key={idx}
               className={`${isDarkMode ? "bg-slate-800 border-slate-700 hover:border-blue-500" : "bg-white border-slate-100 hover:border-blue-200"} p-6 rounded-2xl shadow-md border hover:shadow-xl transition-all`}
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
+              <div className="mb-4">{feature.icon}</div>
               <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
               <p className={isDarkMode ? "text-slate-400" : "text-slate-600"}>
                 {feature.desc}

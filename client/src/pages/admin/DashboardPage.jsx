@@ -80,9 +80,9 @@ const DashboardPage = () => {
       subtitle: `${analytics?.activeUsers || 0} active`,
       icon: Users,
       link: '/admin/users',
-      color: 'from-blue-500 to-blue-600',
-      bgLight: 'bg-blue-50',
-      textLight: 'text-blue-500',
+      color: 'from-emerald-500 to-emerald-600',
+      bgLight: 'bg-emerald-50',
+      textLight: 'text-emerald-500',
       trend: '+12% this month',
     },
     {
@@ -90,9 +90,9 @@ const DashboardPage = () => {
       value: analytics?.activeDrivers || 0,
       icon: Car,
       link: '/admin/driver-bookings',
-      color: 'from-green-500 to-green-600',
-      bgLight: 'bg-green-50',
-      textLight: 'text-green-500',
+      color: 'from-cyan-500 to-cyan-600',
+      bgLight: 'bg-cyan-50',
+      textLight: 'text-cyan-500',
       trend: '+8% this month',
     },
     {
@@ -100,9 +100,9 @@ const DashboardPage = () => {
       value: analytics?.totalBookings || 0,
       icon: Calendar,
       link: '/admin/rides',
-      color: 'from-purple-500 to-purple-600',
-      bgLight: 'bg-purple-50',
-      textLight: 'text-purple-500',
+      color: 'from-teal-500 to-teal-600',
+      bgLight: 'bg-teal-50',
+      textLight: 'text-teal-500',
       trend: '+23% this month',
     },
     {
@@ -110,9 +110,9 @@ const DashboardPage = () => {
       value: `₹${analytics?.totalRevenue || 0}`,
       icon: DollarSign,
       link: '/admin/payments',
-      color: 'from-amber-500 to-amber-600',
-      bgLight: 'bg-amber-50',
-      textLight: 'text-amber-500',
+      color: 'from-emerald-600 to-cyan-600',
+      bgLight: 'bg-emerald-50',
+      textLight: 'text-emerald-600',
       trend: '+15% this month',
     },
   ];
@@ -121,20 +121,20 @@ const DashboardPage = () => {
     <AdminLayout>
       <div className="space-y-6 md:space-y-8 pb-8">
         {/* Premium Header */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 md:p-8 text-white overflow-hidden relative">
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl shadow-xl p-6 md:p-8 text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-xl"></div>
           <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/10 rounded-full -ml-20 -mb-20 blur-xl"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
               <h1 className="text-3xl md:text-4xl font-bold drop-shadow-lg">
-                Welcome back, Admin! 👋
+                Welcome back, Admin!
               </h1>
               <p className="text-indigo-100 mt-3 text-sm md:text-base">
                 Manage your entire GoElectriQ ecosystem at a glance
                 {lastUpdated && (
                   <span className="block md:inline md:ml-2 text-xs text-indigo-200 mt-2 md:mt-0 font-medium">
-                    🔄 Last updated: {lastUpdated.toLocaleTimeString()}
+                    <RefreshCw size={12} className="inline mr-1" /> Last updated: {lastUpdated.toLocaleTimeString()}
                   </span>
                 )}
               </p>
@@ -226,8 +226,8 @@ const DashboardPage = () => {
                 <AreaChart data={analytics?.revenueData || []}>
                   <defs>
                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -251,7 +251,7 @@ const DashboardPage = () => {
                   <Area 
                     type="monotone" 
                     dataKey="revenue" 
-                    stroke="#8b5cf6" 
+                    stroke="#10b981" 
                     strokeWidth={3}
                     fillOpacity={1} 
                     fill="url(#colorRev)" 
@@ -287,8 +287,8 @@ const DashboardPage = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    <Cell fill="#6366f1" />
-                    <Cell fill="#ec4899" />
+                    <Cell fill="#10b981" />
+                    <Cell fill="#06b6d4" />
                   </Pie>
                   <Tooltip 
                     contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
@@ -303,14 +303,14 @@ const DashboardPage = () => {
             <div className="mt-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#6366f1]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#10b981]"></div>
                   <span className="text-gray-600 dark:text-gray-400 font-medium">Ride Bookings</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{analytics?.rideBookings || 0}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ec4899]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
                   <span className="text-gray-600 dark:text-gray-400 font-medium">Tour Bookings</span>
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">{analytics?.tourBookings || 0}</span>
@@ -354,10 +354,10 @@ const DashboardPage = () => {
 
             <Link
               to="/admin/rides"
-              className="group p-5 md:p-6 border-2 border-purple-200 dark:border-purple-900 rounded-xl hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
+              className="group p-5 md:p-6 border-2 border-teal-200 dark:border-teal-900 rounded-xl hover:border-teal-500 dark:hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
             >
-              <div className="bg-purple-100 dark:bg-purple-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-purple-200 transition-all">
-                <Calendar size={24} className="text-purple-600 dark:text-purple-400" />
+              <div className="bg-teal-100 dark:bg-teal-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-teal-200 transition-all">
+                <Calendar size={24} className="text-teal-600 dark:text-teal-400" />
               </div>
               <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Ride Bookings</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Active bookings</p>
@@ -365,10 +365,10 @@ const DashboardPage = () => {
 
             <Link
               to="/admin/tours"
-              className="group p-5 md:p-6 border-2 border-amber-200 dark:border-amber-900 rounded-xl hover:border-amber-500 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
+              className="group p-5 md:p-6 border-2 border-cyan-200 dark:border-cyan-900 rounded-xl hover:border-cyan-500 dark:hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
             >
-              <div className="bg-amber-100 dark:bg-amber-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-amber-200 transition-all">
-                <Package size={24} className="text-amber-600 dark:text-amber-400" />
+              <div className="bg-cyan-100 dark:bg-cyan-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-cyan-200 transition-all">
+                <Package size={24} className="text-cyan-600 dark:text-cyan-400" />
               </div>
               <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Tour Bookings</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tour packages</p>
@@ -387,14 +387,87 @@ const DashboardPage = () => {
 
             <Link
               to="/admin/payments"
-              className="group p-5 md:p-6 border-2 border-indigo-200 dark:border-indigo-900 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
+              className="group p-5 md:p-6 border-2 border-emerald-200 dark:border-emerald-900 rounded-xl hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
             >
-              <div className="bg-indigo-100 dark:bg-indigo-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-all">
-                <BarChart3 size={24} className="text-indigo-600 dark:text-indigo-400" />
+              <div className="bg-emerald-100 dark:bg-emerald-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-all">
+                <BarChart3 size={24} className="text-emerald-600 dark:text-emerald-400" />
               </div>
               <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Payments</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenue & Payments</p>
             </Link>
+          </div>
+        </div>
+
+        {/* Recent Activity Table */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-8 bg-emerald-500 rounded-full"></div>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                Recent Ride Activity
+              </h2>
+            </div>
+            <Link to="/admin/rides" className="text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline">
+              View All Rides
+            </Link>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-900/50">
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">ID</th>
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Customer</th>
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Type</th>
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                {analytics?.recentBookings?.length > 0 ? (
+                  analytics.recentBookings.map((ride) => (
+                    <tr key={ride._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white">#{ride.bookingId.slice(-6)}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{ride.user?.firstName} {ride.user?.lastName}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{ride.cabType}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                          ride.rideType === 'airport' ? 'bg-blue-100 text-blue-600' : 
+                          ride.rideType === 'intercity' ? 'bg-purple-100 text-purple-600' : 'bg-green-100 text-green-600'
+                        }`}>
+                          {ride.rideType}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`flex items-center gap-1.5 text-xs font-bold ${
+                          ride.status === 'completed' ? 'text-green-500' : 
+                          ride.status === 'cancelled' ? 'text-red-500' : 'text-amber-500'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            ride.status === 'completed' ? 'bg-green-500' : 
+                            ride.status === 'cancelled' ? 'bg-red-500' : 'bg-amber-500'
+                          }`}></div>
+                          {ride.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-black text-gray-900 dark:text-white">
+                        ₹{ride.pricing?.totalFare || 0}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                      No recent ride activity found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
-import React from 'react';
 import { ArrowRight, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const tourPackages = [
   {
@@ -34,6 +34,11 @@ export default function ToursPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-black transition-colors duration-300">
+      <SEO 
+        title="Eco-Friendly Tour Packages" 
+        description="Explore the city with our premium electric cab tour packages. Heritage tours, nature trails, and night skyline drives available."
+        url="/tours"
+      />
       {/* Hero Section */}
       <div className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0">

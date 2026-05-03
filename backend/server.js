@@ -16,9 +16,8 @@ dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '.
 
 // Import configurations
 import connectDB from './config/database.js';
-// TODO: enable when email/WhatsApp needed
-// import { verifyEmailConfig } from './config/nodemailer.js';
-// import { verifyWhatsAppConfig } from './config/whatsapp.js';
+import { verifyEmailConfig } from './config/nodemailer.js';
+import { verifyWhatsAppConfig } from './config/whatsapp.js';
 
 // Import middleware
 import errorHandler, { notFound } from './middleware/errorHandler.js';
@@ -51,9 +50,8 @@ const app = express();
 // Connect to database
 connectDB();
 
-// TODO: enable when email/WhatsApp needed
-// verifyEmailConfig();
-// verifyWhatsAppConfig();
+verifyEmailConfig();
+verifyWhatsAppConfig();
 
 // Middleware
 

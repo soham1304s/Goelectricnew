@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { HelmetProvider } from 'react-helmet-async'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID'
 
@@ -59,9 +60,11 @@ if (googleClientId === 'YOUR_GOOGLE_CLIENT_ID') {
 }
 
 const AppWithProviders = () => (
-  <AuthProvider>
-    <App />
-  </AuthProvider>
+  <HelmetProvider>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </HelmetProvider>
 )
 
 // Disable StrictMode in development to prevent double-invoke of effects

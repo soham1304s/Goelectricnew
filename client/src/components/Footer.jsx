@@ -1,9 +1,9 @@
 import React from 'react';
-import { Facebook, Instagram, Send } from 'lucide-react';
+import { Facebook, Instagram, Send, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.jsx';
-import logoDark from '../assets/logo-bull.png';
-import logoLight from '../assets/logo-bull.png';
+import logoDark from '../assets/main2.png';
+import logoLight from '../assets/main2.png';
 
 const Footer = ({ darkMode }) => {
   const { theme } = useTheme();
@@ -19,7 +19,7 @@ const Footer = ({ darkMode }) => {
       }`}
     >
       {/* Glow Background */}
-      <div className="absolute inset-0 -z-10 opacity-20 blur-3xl bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500"></div>
+      <div className="absolute inset-0 -z-10 opacity-20 blur-3xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400"></div>
 
       <div className="max-w-7xl mx-auto">
         {/* Grid */}
@@ -51,7 +51,7 @@ const Footer = ({ darkMode }) => {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-blue-500/10 backdrop-blur-md border border-white/10 hover:scale-110 transition"
+                  className="p-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-md border border-white/10 hover:scale-110 transition"
                 >
                   <item.Icon className="text-lg text-emerald-400" />
                 </a>
@@ -88,7 +88,7 @@ const Footer = ({ darkMode }) => {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold text-lg mb-5 text-blue-400">
+            <h4 className="font-semibold text-lg mb-5 text-emerald-400">
               Quick Links
             </h4>
 
@@ -101,7 +101,7 @@ const Footer = ({ darkMode }) => {
                 { name: 'Privacy Policy', path: '/privacy-policy' },
                 { name: 'Terms of Service', path: '/terms-and-conditions' },
               ].map((item, i) => (
-                <li key={i} className="hover:text-blue-400 transition hover:translate-x-1">
+                <li key={i} className="hover:text-emerald-400 transition hover:translate-x-1">
                   <Link to={item.path}>
                     {item.name}
                   </Link>
@@ -112,7 +112,7 @@ const Footer = ({ darkMode }) => {
 
           {/* Contact + Newsletter */}
           <div>
-            <h4 className="font-semibold text-lg mb-5 text-purple-400">
+            <h4 className="font-semibold text-lg mb-5 text-emerald-400">
               Stay Connected
             </h4>
 
@@ -145,7 +145,7 @@ const Footer = ({ darkMode }) => {
                 placeholder="Enter email"
                 className="flex-1 px-3 py-2 bg-transparent outline-none text-sm"
               />
-              <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 hover:opacity-90 transition">
+              <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 transition">
                 <Send size={16} />
               </button>
             </div>
@@ -162,7 +162,7 @@ const Footer = ({ darkMode }) => {
           </p>
 
           <p className={`${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-            Made with ⚡ for Jaipur
+            Made with <Zap size={14} className="inline-block text-emerald-400 mx-1" /> for Jaipur
           </p>
 
           <div className="flex gap-4">

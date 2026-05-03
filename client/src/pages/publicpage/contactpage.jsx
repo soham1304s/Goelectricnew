@@ -14,6 +14,7 @@ import {
   Headset
 } from 'lucide-react';
 import Footer from '../../components/Footer.jsx';
+import SEO from '../../components/SEO.jsx';
 
 const ContactPage = () => {
   const [openFaq, setOpenFaq] = useState(null);
@@ -79,6 +80,13 @@ const ContactPage = () => {
   };
 
   return (
+    <>
+      <SEO 
+        title="Contact Us - 24/7 Support for Your Electric Rides"
+        description="Get in touch with GoElectric for ride support, corporate inquiries, or feedback. Our team is available 24/7 to ensure a smooth travel experience."
+        keywords="contact GoElectric, ride support, electric cab help, customer service taxi"
+        url="/contact"
+      />
     <div className="pt-24 md:pt-32 transition-colors duration-500 dark:bg-[#020617]">
       {/* Header */}
       <section className="max-w-7xl mx-auto px-4 mb-20 md:mb-32">
@@ -271,6 +279,7 @@ const ContactPage = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 
