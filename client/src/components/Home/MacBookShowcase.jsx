@@ -18,7 +18,8 @@ import {
   Calendar,
   Car,
   MessageSquare,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from 'lucide-react';
 import LocationPickerComponent from '../LocationPickerComponent.jsx';
 
