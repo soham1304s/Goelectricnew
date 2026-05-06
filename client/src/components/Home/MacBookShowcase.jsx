@@ -293,9 +293,9 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                     </div>
                     <div className="absolute top-0 -right-4 w-32 sm:w-40 pointer-events-none">
                       <img 
-                        src="/home/soham/.gemini/antigravity/brain/94ad1ff4-63b5-4ef6-b669-35a29e49fc2a/ev_car_illustration_1778074769708.png" 
+                        src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=400&auto=format&fit=crop" 
                         alt="EV Car" 
-                        className="w-full h-auto drop-shadow-2xl"
+                        className="w-full h-auto drop-shadow-2xl rounded-2xl"
                       />
                     </div>
                   </div>
@@ -343,7 +343,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                             placeholder="Enter pickup location"
                             darkMode={false}
                             compact={true}
-                            inputClassName="!p-0 !h-auto !bg-transparent !text-[10px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
+                            naked={true}
+                            inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
                           />
                         </div>
                         <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
@@ -367,7 +368,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                             placeholder="Enter destination"
                             darkMode={false}
                             compact={true}
-                            inputClassName="!p-0 !h-auto !bg-transparent !text-[10px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
+                            naked={true}
+                            inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
                           />
                         </div>
                         <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
