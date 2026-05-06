@@ -36,14 +36,25 @@ export function AuthProvider({ children }) {
     }
     
     try {
+      // Add timeout to prevent infinite loading
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const res = await authService.getMe();
+      clearTimeout(timeoutId);
+      
       if (res.success && res.data) {
         setUser(res.data);
         setIsSessionValid(true);
       } else {
         clearSession();
       }
-    } catch (_) {
+    } catch (error) {
+      console.error('[Auth] Failed to load user:', error.message || error);
+      // Log API URL for debugging deployment issues
+      if (typeof window !== 'undefined') {
+        console.debug('[Auth] API URL:', import.meta.env.VITE_API_URL || 'DEFAULT (production.up.railway.app)');
+      }
       clearSession();
     } finally {
       setLoading(false);
