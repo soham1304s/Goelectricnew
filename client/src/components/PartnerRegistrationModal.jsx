@@ -356,53 +356,101 @@ export default function PartnerRegistrationModal({ isOpen, onClose, partnerType 
 
           {/* Step 2: Payment */}
           {step === 2 && (
-            <div className="text-center">
-              <div className="mb-6">
-                <CreditCard className="w-16 h-16 text-[#00FF00] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-[#212121] mb-2">Complete Payment</h3>
-                <p className="text-gray-600">Registration fee for {partnerType} partner</p>
+            <div className="text-center py-6">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+                  <CreditCard size={32} />
+                </div>
+                <h3 className="text-2xl font-bold text-[#212121] mb-2">Registration Payment</h3>
+                <p className="text-gray-500">Secure your spot as a GoElectriQ {partnerType.replace('-', ' ')} partner</p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Registration Fee:</span>
-                  <span className="text-xl font-bold text-[#008000]">₹{registrationFees[partnerType]?.amount}</span>
+              <div className="max-w-sm mx-auto bg-gray-50 rounded-[2rem] p-8 border border-gray-100 shadow-sm mb-8">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 font-medium">Application Fee</span>
+                    <span className="text-gray-900 font-bold">₹{registrationFees[partnerType]?.amount}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 font-medium">Processing Fee</span>
+                    <span className="text-emerald-600 font-bold uppercase tracking-tighter">Included</span>
+                  </div>
+                  <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
+                    <span className="text-[#212121] font-black uppercase tracking-tight">Total Amount</span>
+                    <span className="text-3xl font-black text-emerald-600">₹{registrationFees[partnerType]?.amount}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4 max-w-sm mx-auto">
                 <button
                   onClick={handlePayment}
                   disabled={loading}
-                  className="w-full bg-[#FFFF00] text-[#212121] py-3 rounded-lg font-semibold hover:bg-[#FFFF00]/90 transition-colors disabled:opacity-50"
+                  className="w-full bg-[#212121] text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  {loading ? 'Processing...' : `Pay ₹${registrationFees[partnerType]?.amount} Now`}
+                  {loading ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                  ) : (
+                    <>Pay ₹{registrationFees[partnerType]?.amount} Securely</>
+                  )}
                 </button>
                 <button
                   onClick={() => setStep(1)}
-                  className="w-full text-gray-600 hover:text-gray-800 transition-colors"
+                  className="w-full py-2 text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors"
                 >
-                  Back to Details
+                  Go back to details
                 </button>
+              </div>
+
+              <div className="mt-8 flex items-center justify-center gap-4 text-gray-400">
+                <div className="flex items-center gap-1.5 grayscale opacity-50">
+                  <ShieldCheck size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">SSL Encrypted</span>
+                </div>
+                <div className="w-px h-4 bg-gray-200" />
+                <div className="flex items-center gap-1.5 grayscale opacity-50">
+                  <CreditCard size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Razorpay Secured</span>
+                </div>
               </div>
             </div>
           )}
 
           {/* Step 3: Success */}
           {step === 3 && (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#00FF00] rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
+            <div className="text-center py-8">
+              <div className="relative inline-block mb-8">
+                <div className="absolute inset-0 bg-[#00FF00] blur-2xl opacity-20 animate-pulse"></div>
+                <div className="relative w-20 h-20 bg-gradient-to-br from-[#00FF00] to-[#008000] rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-[#00FF00]/20">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-[#212121] mb-2">Registration Successful!</h3>
-              <p className="text-gray-600 mb-4">
-                Your partner registration is complete. You will receive a confirmation email shortly.
-              </p>
-              <p className="text-sm text-gray-500">
-                Your application will be reviewed within 24-48 hours.
-              </p>
+              
+              <h3 className="text-3xl font-extrabold text-[#212121] mb-3 tracking-tight">
+                Registration Successful!
+              </h3>
+              
+              <div className="max-w-md mx-auto space-y-4">
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Welcome to the <span className="font-bold text-[#008000]">GoElectriQ</span> family. Your application has been received and your payment is verified.
+                </p>
+                
+                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex items-center gap-4 text-left">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
+                    <Clock size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-emerald-900">Review in Progress</p>
+                    <p className="text-xs text-emerald-700">Our team will verify your documents within 24-48 hours.</p>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-400 pt-4">
+                  A confirmation receipt has been sent to <span className="font-medium text-gray-600">{formData.email}</span>
+                </p>
+              </div>
             </div>
           )}
         </div>

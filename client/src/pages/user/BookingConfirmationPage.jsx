@@ -12,6 +12,10 @@ import {
   ArrowLeft,
   AlertCircle,
   FileText,
+  Download,
+  ShieldCheck,
+  MapPin,
+  Calendar,
 } from "lucide-react";
 import UserLayout from "./UserLayout.jsx";
 import * as bookingService from "../../services/bookingService.js";
@@ -217,6 +221,10 @@ export default function BookingConfirmationPage() {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const fallbackShare = () => {
     const text = `I just booked a ${booking.rideType} ride with GoElectriQ! Booking ID: ${booking.bookingId}`;
     navigator.clipboard.writeText(text);
@@ -360,36 +368,86 @@ export default function BookingConfirmationPage() {
           Go Back
         </button>
 
-        {/* Success Header - Dynamic based on booking status */}
-        <div
-          className={`text-center mb-8 bg-gradient-to-br ${statusConfig.bgColor} p-8 rounded-2xl border-2 ${statusConfig.borderColor}`}
-        >
-          <div
-            className={`inline-block p-4 ${statusConfig.badgeColor} rounded-full`}
-          >
-            {(() => {
-              const IconComponent = statusConfig.icon;
-              return (
-                <IconComponent
-                  className={`w-16 h-16 ${statusConfig.iconColor}`}
-                />
-              );
-            })()}
+        {/* Success Header - Professional Invoice Style */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden mb-8 print:shadow-none print:border-gray-200">
+          <div className={`h-2 bg-gradient-to-r ${getTableHeaderColor()}`} />
+          
+          <div className="p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div className="flex items-center gap-5">
+                <div className={`p-4 ${statusConfig.badgeColor} rounded-2xl shadow-lg shadow-emerald-100`}>
+                  {(() => {
+                    const IconComponent = statusConfig.icon;
+                    return <IconComponent className="w-10 h-10 text-white" />;
+                  })()}
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                    {statusConfig.title}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1 text-gray-500">
+                    <span className="text-sm font-medium">Booking ID:</span>
+                    <span className="text-sm font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                      {booking.bookingId}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <button
+                  onClick={handlePrint}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 transition-all font-semibold print:hidden"
+                >
+                  <Printer size={18} />
+                  Print Receipt
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all font-semibold shadow-lg shadow-emerald-100 print:hidden"
+                >
+                  <Share2 size={18} />
+                  Share
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Payment Status</p>
+                  <p className={`text-sm font-bold ${booking.paymentStatus?.toLowerCase() === 'paid' ? 'text-emerald-600' : 'text-orange-600'}`}>
+                    {booking.paymentStatus?.toUpperCase() || 'PENDING'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                  <Calendar size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Date & Time</p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {booking.scheduledTime}, {new Date(booking.scheduledDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                  <MapPin size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Vehicle</p>
+                  <p className="text-sm font-bold text-gray-900 capitalize">
+                    {booking.cabType || 'Standard'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1
-            className={`text-4xl font-bold ${statusConfig.textColor} mt-6 mb-2`}
-          >
-            {statusConfig.title}
-          </h1>
-          <p className={`text-lg ${statusConfig.textColor}`}>
-            {statusConfig.message}
-          </p>
-          <p className={`text-lg mt-3`}>
-            Booking ID:{" "}
-            <span className={`font-bold ${statusConfig.textColor}`}>
-              {booking.bookingId}
-            </span>
-          </p>
         </div>
 
         {/* Main Table Container */}

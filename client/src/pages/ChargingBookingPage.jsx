@@ -1,16 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Star,
   ChevronDown,
   CheckCircle,
   AlertCircle,
-  Moon,
-  Sun,
   Zap,
   Shield,
   Banknote,
+  ArrowRight,
+  Sparkles,
+  Search,
+  MapPin,
+  Clock,
+  ShieldCheck,
+  Building2,
+  Home as HomeIcon,
+  HardHat,
+  Send
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import Footer from '../components/Footer.jsx';
+import SEO from '../components/SEO.jsx';
 
 const ChargingBookingPage = () => {
   const { theme } = useTheme();
@@ -27,9 +38,9 @@ const ChargingBookingPage = () => {
     enquiryType: "installation",
   });
   const [errors, setErrors] = useState({});
+  const [expandedFAQ, setExpandedFAQ] = useState(null);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-  const [expandedFAQ, setExpandedFAQ] = useState(null);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -59,8 +70,6 @@ const ChargingBookingPage = () => {
 
     try {
       setLoading(true);
-
-      // Prepare data for API
       const enquiryData = {
         name: formData.name.trim(),
         phone: formData.phone,
@@ -71,12 +80,7 @@ const ChargingBookingPage = () => {
         status: 'pending'
       };
 
-      console.log('📤 Sending enquiry to backend:', enquiryData);
-
-      // Get token from localStorage
       const token = localStorage.getItem('token');
-
-      // Send to backend - using guest token or allowing unauthenticated requests
       const response = await fetch(`${API_BASE_URL}/api/charging-enquiries`, {
         method: 'POST',
         headers: {
@@ -87,15 +91,9 @@ const ChargingBookingPage = () => {
       });
 
       const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Failed to submit enquiry');
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to submit enquiry');
-      }
-
-      console.log('✅ Enquiry submitted successfully:', result);
       alert('✅ Thank you! Your EV Charging enquiry has been received. Our team will contact you within 1 hour.');
-      
-      // Reset form
       setFormData({
         name: "",
         phone: "",
@@ -106,8 +104,7 @@ const ChargingBookingPage = () => {
       });
       setIsModalOpen(false);
     } catch (error) {
-      console.error('❌ Error submitting enquiry:', error);
-      alert('Error: ' + error.message + '. Please try again or call us directly.');
+      alert('Error: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -116,503 +113,350 @@ const ChargingBookingPage = () => {
   const services = [
     {
       id: "home-charging",
-      name: "Home Charging Setup",
+      name: "Home Charging Protocol",
       price: "₹15,000",
-      desc: "Smart 7.2kW AC charger installation for your home",
+      desc: "Smart 7.2kW AC infrastructure designed for residential seamless integration.",
       time: "4-6 hours",
+      icon: HomeIcon,
+      features: ["Smart Load Balancing", "App Integration", "Safety Fuse System"]
     },
     {
       id: "commercial",
-      name: "Commercial Charging",
+      name: "Commercial Infrastructure",
       price: "₹85,000",
-      desc: "Dual-gun DC fast charging for businesses",
+      desc: "High-capacity DC fast charging systems for enterprise and business fleets.",
       time: "2-3 days",
+      icon: Building2,
+      features: ["Dual-Gun Charging", "CMS Integration", "Revenue Management"]
     },
     {
       id: "maintenance",
-      name: "Annual Maintenance",
+      name: "Protocol Maintenance",
       price: "₹4,999",
-      desc: "Regular health checks and software updates",
+      desc: "Continuous health monitoring and regular preventative software updates.",
       time: "Per Year",
+      icon: ShieldCheck,
+      features: ["24/7 Monitoring", "Remote Diagnostics", "Hardware Health Checks"]
     },
   ];
 
-  const faqs = [
-    {
-      q: "What type of EV chargers do you install?",
-      a: "We install AC Slow Chargers (3.3kW to 7.2kW) for homes and DC Fast Chargers (15kW to 120kW) for commercial spaces, supporting all major EV brands in India.",
-    },
-    {
-      q: "Is my home electrical setup compatible?",
-      a: "Our technicians perform a feasibility study of your existing load. We may suggest a load upgrade if you're installing a fast charger.",
-    },
-    {
-      q: "How long does installation take?",
-      a: "Home installations are typically completed within 4-6 hours. Commercial setups may take 2-3 days depending on civil work required.",
-    },
-    {
-      q: "Do you provide government subsidy assistance?",
-      a: "Yes, we help our customers with documentation required for state and central EV subsidies where applicable.",
-    },
-    {
-      q: "Are the chargers weatherproof?",
-      a: "Yes, all chargers we install are IP65/IP66 rated, making them safe for outdoor installation in all weather conditions.",
-    },
+  const processSteps = [
+    { step: "01", title: "Site Audit", desc: "Technical load evaluation and feasibility study.", icon: MapPin },
+    { step: "02", title: "Custom Quote", desc: "Hardware selection and infrastructure planning.", icon: Banknote },
+    { step: "03", title: "Deployment", desc: "Expert installation by certified EV engineers.", icon: HardHat },
+    { step: "04", title: "Activation", desc: "Protocol testing, handover, and training.", icon: Zap },
   ];
 
-  const testimonials = [
-    {
-      name: "Vikram Mehta",
-      rating: 5,
-      text: "GoElectric made my home charging setup so easy. The installation was neat and the app integration is seamless.",
-      location: "Jaipur",
-    },
-    {
-      name: "Sunita Rao",
-      rating: 5,
-      text: "We installed two chargers at our apartment complex. The team handled everything from wiring to society approvals.",
-      location: "Delhi NCR",
-    },
-    {
-      name: "Rahul Sharma",
-      rating: 5,
-      text: "Top-notch service for my hotel's guest charging station. Reliable hardware and great support.",
-      location: "Udaipur",
-    },
-  ];
-
-  const features = [
-    {
-      icon: <Zap size={32} className="text-yellow-500" />,
-      title: "Fast Charging",
-      desc: "Cutting-edge technology for minimum charging time",
-    },
-    {
-      icon: <Shield size={32} className="text-emerald-500" />,
-      title: "Certified Safety",
-      desc: "Standard-compliant installations with surge protection",
-    },
-    {
-      icon: <Banknote size={32} className="text-blue-500" />,
-      title: "Transparent Pricing",
-      desc: "No hidden costs. Detailed quotes provided upfront",
-    },
-    {
-      icon: <CheckCircle size={32} className="text-emerald-600" />,
-      title: "3-Year Warranty",
-      desc: "Extended warranty on hardware and installation",
-    },
-  ];
+  const fadeIn = {
+    initial: { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 }
+  };
 
   return (
-    <div
-      className={`${isDarkMode ? "bg-gradient-to-b from-slate-900 to-slate-800" : "bg-gradient-to-b from-slate-50 to-white"} font-sans ${isDarkMode ? "text-slate-100" : "text-slate-900"} transition-colors duration-300`}
-    >
-      {/* Hero Section */}
-      <header
-        className={`relative py-20 px-6 overflow-hidden ${isDarkMode ? "bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900" : "bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700"}`}
-      >
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <span
-            className={`${isDarkMode ? "bg-emerald-900/60 text-emerald-200" : "bg-white/40 text-slate-900"} px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider inline-block`}
-          >
-            Sustainable Energy Solutions
-          </span>
-          <h1 className="mt-8 text-5xl md:text-6xl font-extrabold text-white leading-tight">
-            Powering Your <br />Electric Journey
-          </h1>
-          <p
-            className={`mt-6 text-xl max-w-2xl mx-auto leading-relaxed ${isDarkMode ? "text-emerald-200" : "text-emerald-100"}`}
-          >
-            Expert EV charging infrastructure for homes, societies, and businesses. 
-            Join the green revolution with Jaipur's most trusted EV partner.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={toggleModal}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all"
-            >
-              Get Free Consultation
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-white hover:bg-opacity-10 transition-all">
-              View Solutions
-            </button>
-          </div>
-        </div>
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-white opacity-5 rounded-full -ml-36 -mb-36"></div>
-      </header>
-
-      {/* Features Section */}
-      <section className="py-16 px-6 max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-6">
-          {features.map((feature, idx) => (
-            <div
-              key={idx}
-              className={`${isDarkMode ? "bg-slate-800 border-slate-700 hover:border-emerald-500" : "bg-white border-slate-100 hover:border-emerald-200"} p-6 rounded-2xl shadow-md border hover:shadow-xl transition-all`}
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-              <p className={isDarkMode ? "text-slate-400" : "text-slate-600"}>
-                {feature.desc}
-              </p>
+    <>
+      <SEO 
+        title="EV Charging Infrastructure - GoElectriQ Power Hub"
+        description="Jaipur's leading EV charging installation service. Professional AC/DC charger setup for homes, societies, and businesses."
+        keywords="EV charger installation Jaipur, electric vehicle charging station, home EV charger, commercial charging infrastructure"
+        url="/charging"
+      />
+      <div className="min-h-screen bg-[#fafafa] dark:bg-[#020617] pt-24 md:pt-32 font-['Inter',sans-serif] overflow-hidden">
+        
+        {/* Hero Section */}
+        <section className="max-w-7xl mx-auto px-4 mb-24 md:mb-32">
+          <div className="relative rounded-[3rem] md:rounded-[4rem] overflow-hidden bg-slate-900 p-8 md:p-20 text-center text-white">
+            <div className="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none">
+              <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/30 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+              <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* How It Works */}
-      <section
-        className={`py-20 px-6 ${isDarkMode ? "bg-slate-700" : "bg-slate-100"}`}
-      >
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">Our Installation Process</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              {
-                step: "1",
-                title: "Site Audit",
-                desc: "Technical evaluation of your electrical load",
-              },
-              {
-                step: "2",
-                title: "Quotation",
-                desc: "Custom plan based on your vehicle & needs",
-              },
-              {
-                step: "3",
-                title: "Setup",
-                desc: "Professional installation by certified experts",
-              },
-              {
-                step: "4",
-                title: "Handover",
-                desc: "Testing, training & support documentation",
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="text-center">
-                <div className="bg-emerald-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                  {item.step}
-                </div>
-                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                <p className={isDarkMode ? "text-slate-300" : "text-slate-600"}>
-                  {item.desc}
-                </p>
+            <div className="relative z-10 max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-emerald-500/20"
+              >
+                <Sparkles size={14} /> Power Infrastructure
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl md:text-7xl font-black mb-8 tracking-tight leading-tight"
+              >
+                Electrifying the <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">Future of Energy.</span>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-2xl mx-auto mb-12"
+              >
+                Comprehensive EV charging solutions for residential and commercial spaces. Engineered for performance, safety, and reliability.
+              </motion.p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button
+                  onClick={toggleModal}
+                  className="px-10 py-5 bg-emerald-600 text-white rounded-2xl font-black text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-emerald-500/20 flex items-center gap-3"
+                >
+                  Request Consultation <ArrowRight size={20} />
+                </button>
+                <a href="#services" className="px-10 py-5 bg-white/10 text-white rounded-2xl font-black text-lg transition-all hover:bg-white/20">
+                  Explore Solutions
+                </a>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Deployment Process */}
+        <section className="max-w-7xl mx-auto px-4 mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {processSteps.map((s, i) => (
+              <motion.div
+                key={i}
+                {...fadeIn}
+                transition={{ delay: i * 0.1 }}
+                className="p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative group"
+              >
+                <div className="text-4xl font-black text-slate-100 dark:text-slate-800 absolute right-8 top-8 transition-colors group-hover:text-emerald-500/10">
+                  {s.step}
+                </div>
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-8 transition-transform group-hover:scale-110">
+                  <s.icon size={28} />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{s.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{s.desc}</p>
+              </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Solutions & Pricing */}
-      <section id="services" className="py-20 px-6 max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-16">Tailored Charging Solutions</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {services.map((service) => (
-            <div
-              key={service.id}
-              className={`${isDarkMode ? "bg-slate-800 border-slate-600 hover:border-emerald-400" : "bg-white border-slate-200 hover:border-emerald-500"} border-2 rounded-2xl p-8 hover:shadow-xl transition-all`}
-            >
-              <h3 className="text-2xl font-bold mb-2">{service.name}</h3>
-              <p className={isDarkMode ? "text-slate-400" : "text-slate-600"}>
-                {service.desc}
-              </p>
-              <div
-                className={`flex justify-between items-center py-4 border-y ${isDarkMode ? "border-slate-700" : "border-slate-200"} mb-4`}
-              >
-                <span
-                  className={isDarkMode ? "text-slate-400" : "text-slate-600"}
-                >
-                  Typical Time:
-                </span>
-                <span className="font-bold">{service.time}</span>
-              </div>
-              <p className="text-3xl font-bold text-emerald-600 mb-6">
-                Starting {service.price}
-              </p>
-              <button
-                onClick={toggleModal}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all"
-              >
-                Inquire Now
-              </button>
-            </div>
-          ))}
-        </div>
-        <div
-          className={`mt-12 ${isDarkMode ? "bg-emerald-900/30 border-emerald-700" : "bg-emerald-50 border-emerald-200"} border-2 rounded-2xl p-8`}
-        >
-          <div className="flex items-start gap-4">
-            <AlertCircle
-              className={isDarkMode ? "text-emerald-400" : "text-emerald-600"}
-              size={24}
-            />
-            <div>
-              <h3 className="font-bold text-lg mb-2">
-                Why Professional Installation Matters?
-              </h3>
-              <p className={isDarkMode ? "text-slate-300" : "text-slate-700"}>
-                EV charging involves high electrical loads. Improper wiring can lead to fire hazards or battery damage. Our certified technicians ensure 100% safety and compliance with international standards.
-              </p>
-            </div>
+        {/* Solutions Grid */}
+        <section id="services" className="max-w-7xl mx-auto px-4 mb-32">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Deployment Protocols</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto">Standardized infrastructure packages tailored for every environment.</p>
           </div>
-        </div>
-      </section>
 
-      {/* Testimonials */}
-      <section
-        id="testimonials"
-        className={`py-20 px-6 ${isDarkMode ? "bg-gradient-to-br from-slate-800 to-slate-700" : "bg-gradient-to-br from-emerald-50 to-slate-50"}`}
-      >
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">
-            Trusted by EV Owners
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, idx) => (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {services.map((s, i) => (
+              <motion.div
+                key={s.id}
+                {...fadeIn}
+                transition={{ delay: i * 0.1 }}
+                className="group p-8 md:p-12 rounded-[3rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/5 flex flex-col h-full"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-10 group-hover:scale-110 transition-transform">
+                  <s.icon size={32} />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">{s.name}</h3>
+                <p className="text-slate-500 dark:text-slate-400 font-medium mb-10 leading-relaxed">{s.desc}</p>
+                
+                <ul className="space-y-4 mb-12 flex-grow">
+                  {s.features.map(f => (
+                    <li key={f} className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                      <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <CheckCircle size={12} strokeWidth={3} />
+                      </div>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Cost</span>
+                    <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{s.price}</span>
+                  </div>
+                  <button
+                    onClick={toggleModal}
+                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  >
+                    Initiate Setup
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Safety Protocol Info */}
+        <section className="max-w-5xl mx-auto px-4 mb-32">
+          <motion.div 
+            {...fadeIn}
+            className="p-8 md:p-12 rounded-[2.5rem] bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-500/20 flex flex-col md:flex-row gap-8 items-center"
+          >
+            <div className="w-20 h-20 rounded-3xl bg-emerald-600 text-white flex items-center justify-center shadow-xl shadow-emerald-500/20 shrink-0">
+              <Shield size={40} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">The Safety Standard</h3>
+              <p className="text-slate-600 dark:text-emerald-200/60 font-medium leading-relaxed">
+                Professional installation is non-negotiable for high-load EV systems. Our certified engineers ensure every deployment meets IP66 standards with integrated surge protection and dedicated grounding protocols.
+              </p>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto px-4 mb-32">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Technical Intelligence</h2>
+            <p className="text-slate-500 font-medium">Common queries regarding our power infrastructure.</p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { q: "Standard deployment time?", a: "Residential setups are completed within 4-6 hours. Enterprise/Society deployments typically range from 48-72 hours based on civil requirements." },
+              { q: "Hardware Compatibility?", a: "Our protocols support all major CCS2 and Type 2 vehicles including Tata, MG, BYD, and Hyundai fleets." },
+              { q: "Weatherproof Standards?", a: "All GoElectriQ infrastructure is IP66 rated for complete outdoor resilience against rain and dust." },
+              { q: "Post-Deployment Support?", a: "We provide 24/7 remote diagnostics and 24-hour on-site resolution guarantees for all maintenance protocol subscribers." }
+            ].map((faq, idx) => (
               <div
                 key={idx}
-                className={`${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-100"} rounded-2xl p-8 shadow-md border`}
+                className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all hover:border-emerald-500/30"
               >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={20}
-                      className="fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <p
-                  className={`mb-4 italic ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}
+                <button
+                  onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-6 text-left"
                 >
-                  "{testimonial.text}"
-                </p>
-                <div
-                  className={`border-t ${isDarkMode ? "border-slate-700" : "border-slate-200"} pt-4`}
-                >
-                  <p className="font-bold">{testimonial.name}</p>
-                  <p
-                    className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
-                  >
-                    {testimonial.location}
-                  </p>
-                </div>
+                  <span className="font-bold text-slate-900 dark:text-white">{faq.q}</span>
+                  <ChevronDown
+                    size={20}
+                    className={`text-slate-400 transition-transform duration-300 ${expandedFAQ === idx ? "rotate-180" : ""}`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {expandedFAQ === idx && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="px-6 pb-6 text-slate-500 dark:text-slate-400 font-medium leading-relaxed border-t border-slate-50 dark:border-slate-800 pt-4"
+                    >
+                      {faq.a}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FAQ Section */}
-      <section
-        id="faq"
-        className={`py-20 px-6 max-w-4xl mx-auto ${isDarkMode ? "bg-slate-800" : ""}`}
-      >
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Common Questions
-        </h2>
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => (
-            <div
-              key={idx}
-              className={`${isDarkMode ? "bg-slate-700 border-slate-600 hover:border-emerald-400" : "bg-white border-slate-200 hover:border-emerald-300"} border rounded-xl overflow-hidden transition-all`}
-            >
-              <button
-                onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                className={`w-full flex items-center justify-between p-6 hover:${isDarkMode ? "bg-slate-600" : "bg-slate-50"} transition-all`}
+        {/* Modal / Request Form */}
+        <AnimatePresence>
+          {isModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                onClick={toggleModal}
+              ></motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[3rem] shadow-2xl relative z-10 overflow-hidden"
               >
-                <span className="font-bold text-lg text-left">{faq.q}</span>
-                <ChevronDown
-                  size={24}
-                  className={`text-emerald-600 flex-shrink-0 transition-transform ${expandedFAQ === idx ? "rotate-180" : ""}`}
-                />
-              </button>
-              {expandedFAQ === idx && (
-                <div
-                  className={`px-6 pb-6 ${isDarkMode ? "text-slate-300 border-slate-600" : "text-slate-600 border-slate-200"} border-t`}
-                >
-                  {faq.a}
+                <div className="bg-slate-900 p-8 md:p-10 text-white relative">
+                  <div className="absolute top-0 right-0 p-4">
+                    <button onClick={toggleModal} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                      <ChevronDown size={24} className="rotate-90" />
+                    </button>
+                  </div>
+                  <h2 className="text-3xl font-black mb-2 tracking-tight">Initiate Inquiry</h2>
+                  <p className="text-slate-400 font-medium">An EV expert will contact you within 60 minutes.</p>
                 </div>
-              )}
+
+                <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="John Doe"
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white"
+                      />
+                      {errors.name && <p className="text-rose-500 text-[10px] font-bold ml-1">{errors.name}</p>}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone</label>
+                        <input
+                          type="tel"
+                          id="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="9876543210"
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
+                        <input
+                          type="text"
+                          id="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          placeholder="Jaipur"
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Protocol Type</label>
+                      <select
+                        id="enquiryType"
+                        value={formData.enquiryType}
+                        onChange={handleChange}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white appearance-none"
+                      >
+                        <option value="installation">Home Installation</option>
+                        <option value="commercial">Commercial/Enterprise</option>
+                        <option value="maintenance">Maintenance Service</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Requirement Details</label>
+                      <textarea
+                        id="address"
+                        rows="3"
+                        value={formData.address}
+                        onChange={handleChange}
+                        placeholder="Tell us about your property type and vehicle..."
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white resize-none"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-black text-lg uppercase tracking-widest shadow-2xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                  >
+                    {loading ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" /> : <>Submit Protocol <Send size={18} /></>}
+                  </button>
+                </form>
+              </motion.div>
             </div>
-          ))}
-        </div>
-      </section>
+          )}
+        </AnimatePresence>
 
-      {/* Final CTA */}
-      <section
-        className={`py-16 px-6 ${isDarkMode ? "bg-gradient-to-r from-emerald-900 to-emerald-800" : "bg-gradient-to-r from-emerald-600 to-emerald-700"}`}
-      >
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Electrify Your Space?
-          </h2>
-          <p className={isDarkMode ? "text-emerald-200" : "text-emerald-100"}>
-            Get a customized EV charging plan for your property. 
-            Professional service, high-quality hardware, and 24/7 support.
-          </p>
-          <button
-            onClick={toggleModal}
-            className="mt-8 bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl text-xl font-bold shadow-lg hover:shadow-2xl transition-all"
-          >
-            Start Your EV Journey
-          </button>
-        </div>
-      </section>
-
-      {/* Modal / Popup Form */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-            onClick={toggleModal}
-          ></div>
-          <div
-            className={`${isDarkMode ? "bg-slate-800" : "bg-white"} w-full max-w-lg rounded-3xl shadow-2xl relative z-10 overflow-hidden transform transition-all`}
-          >
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-8 text-white">
-              <h2 className="text-3xl font-bold">Request a Quote</h2>
-              <p className="opacity-90 mt-2">
-                Our EV expert will contact you within 1 hour
-              </p>
-            </div>
-
-            <form
-              onSubmit={handleSubmit}
-              className={`${isDarkMode ? "bg-slate-800" : "bg-white"} p-8 space-y-5`}
-            >
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.name ? "border-red-500" : ""}`}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Your 10-digit number"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.phone ? "border-red-500" : ""}`}
-                />
-                {errors.phone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your.email@example.com"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.email ? "border-red-500" : ""}`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  City *
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  required
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="Your city"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.city ? "border-red-500" : ""}`}
-                />
-                {errors.city && (
-                  <p className="text-red-500 text-sm mt-1">{errors.city}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Enquiry Type
-                </label>
-                <select
-                  id="enquiryType"
-                  value={formData.enquiryType}
-                  onChange={handleChange}
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition`}
-                >
-                  <option value="installation">Home Installation</option>
-                  <option value="commercial">Commercial/Society</option>
-                  <option value="maintenance">Maintenance</option>
-                  <option value="pricing">Pricing Query</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Requirement Details *
-                </label>
-                <textarea
-                  id="address"
-                  rows="3"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Tell us about your vehicle model and property type"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.address ? "border-red-500" : ""}`}
-                ></textarea>
-                {errors.address && (
-                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-95"
-              >
-                {loading ? "Submitting..." : "Send Request"}
-              </button>
-              <p
-                className={`text-center text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
-              >
-                Zero-commitment consultation. We respect your privacy.
-              </p>
-            </form>
-            <button
-              onClick={toggleModal}
-              className="absolute top-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white w-10 h-10 rounded-full flex items-center justify-center transition"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

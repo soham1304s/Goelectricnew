@@ -301,6 +301,12 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
 
                   {/* Inputs */}
                   <div className="space-y-3 mb-5 relative z-[60]">
+                    <LocationPickerComponent
+                      value={pickup.address}
+                      onChange={(val) => setPickup({ ...pickup, address: val })}
+                      onSelectLocation={(loc) => setPickup(loc)}
+                      placeholder="Pickup Location"
+                      darkMode={false}
                       inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[10px] !font-bold"
                     />
                     <LocationPickerComponent

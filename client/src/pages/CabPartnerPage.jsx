@@ -1,7 +1,42 @@
 import React, { useState } from 'react';
-import { Upload, Zap, Phone, User, FileText, Car, DollarSign, Clock, Shield, TrendingUp, ChevronDown } from 'lucide-react';
+import { 
+  Upload, 
+  Zap, 
+  Phone, 
+  User, 
+  FileText, 
+  Car, 
+  DollarSign, 
+  Clock, 
+  Shield, 
+  TrendingUp, 
+  ChevronRight,
+  ShieldCheck,
+  Globe,
+  Briefcase,
+  AlertCircle,
+  X,
+  Plus,
+  Mail,
+  Box
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import apiConfig from '../config/api.config.json';
+
+const StatusBadge = ({ children, type = 'emerald' }) => {
+  const colors = {
+    emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+    blue: 'bg-blue-50 text-blue-600 border-blue-100',
+    violet: 'bg-violet-50 text-violet-600 border-violet-100',
+    amber: 'bg-amber-50 text-amber-600 border-amber-100',
+  };
+  return (
+    <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${colors[type]}`}>
+      {children}
+    </div>
+  );
+};
 
 export default function CabPartnerPage() {
   const [formData, setFormData] = useState({
@@ -22,68 +57,38 @@ export default function CabPartnerPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileUpload = (e, fileType) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
-        ...prev,
-        [fileType === 'rc' ? 'rcUpload' : 'insuranceUpload']: file
-      }));
-      // Preview
+      setFormData(prev => ({ ...prev, [fileType === 'rc' ? 'rcUpload' : 'insuranceUpload']: file }));
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreview(prev => ({
-          ...prev,
-          [fileType]: reader.result
-        }));
-      };
+      reader.onloadend = () => setFilePreview(prev => ({ ...prev, [fileType]: reader.result }));
       reader.readAsDataURL(file);
     }
   };
 
   const validateForm = () => {
-    if (!formData.ownerName.trim()) {
-      setMessage({ type: 'error', text: 'Owner name is required' });
-      return false;
-    }
-    if (!formData.phone.trim()) {
-      setMessage({ type: 'error', text: 'Phone number is required' });
-      return false;
-    }
+    if (!formData.ownerName.trim()) return { ok: false, text: 'Fleet owner identity required.' };
+    if (!formData.phone.trim()) return { ok: false, text: 'Contact matrix required.' };
     const phoneRegex = new RegExp(`^[${apiConfig.cab.phoneStartDigits.join('')}]\\d{${apiConfig.cab.maxPhoneLength - 1}}$`);
-    if (!phoneRegex.test(formData.phone)) {
-      setMessage({ type: 'error', text: 'Please enter a valid 10-digit phone number' });
-      return false;
-    }
-    if (!formData.vehicleModel.trim()) {
-      setMessage({ type: 'error', text: 'Vehicle model is required' });
-      return false;
-    }
-    if (!formData.evType) {
-      setMessage({ type: 'error', text: 'EV type is required' });
-      return false;
-    }
-    if (!formData.rcUpload) {
-      setMessage({ type: 'error', text: 'RC document upload is required' });
-      return false;
-    }
-    if (!formData.insuranceUpload) {
-      setMessage({ type: 'error', text: 'Insurance document upload is required' });
-      return false;
-    }
-    return true;
+    if (!phoneRegex.test(formData.phone)) return { ok: false, text: 'Invalid communication channel.' };
+    if (!formData.vehicleModel.trim()) return { ok: false, text: 'Vehicle telemetry required.' };
+    if (!formData.evType) return { ok: false, text: 'EV node type required.' };
+    if (!formData.rcUpload) return { ok: false, text: 'RC authorization document required.' };
+    if (!formData.insuranceUpload) return { ok: false, text: 'Insurance verification required.' };
+    return { ok: true };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
+    const validation = validateForm();
+    if (!validation.ok) {
+      setMessage({ type: 'error', text: validation.text });
+      return;
+    }
 
     setLoading(true);
     setMessage({ type: '', text: '' });
@@ -97,30 +102,21 @@ export default function CabPartnerPage() {
       formDataToSend.append('rcDocument', formData.rcUpload);
       formDataToSend.append('insuranceDocument', formData.insuranceUpload);
 
-      const response = await api.post(
-        apiConfig.endpoints.cab.register,
-        formDataToSend
-      );
+      const response = await api.post(apiConfig.endpoints.cab.register, formDataToSend);
 
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'Registration successful! We will verify your vehicle details and contact you soon.' });
-        // Reset form
+        setMessage({ type: 'success', text: 'Partnership protocol initiated. Vehicle verification in progress.' });
         setTimeout(() => {
-          setFormData({
-            ownerName: '',
-            phone: '',
-            vehicleModel: '',
-            evType: '',
-            rcUpload: null,
-            insuranceUpload: null,
-          });
+          setFormData({ ownerName: '', phone: '', vehicleModel: '', evType: '', rcUpload: null, insuranceUpload: null });
           setFilePreview({ rc: null, insurance: null });
-        }, 1500);
+          setShowModal(false);
+          setMessage({ type: '', text: '' });
+        }, 3000);
       }
     } catch (error) {
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Registration failed. Please try again.' 
+        text: error.response?.data?.message || 'Synchronization failed. System reset required.' 
       });
     } finally {
       setLoading(false);
@@ -128,417 +124,392 @@ export default function CabPartnerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 py-8 px-4">
-      <div className="max-w-[1400px] mx-auto">
+    <div className="min-h-screen bg-slate-50 pt-32 pb-24 px-4 md:px-8">
+      <div className="max-w-[1400px] mx-auto space-y-16">
         
-        {/* ===== HERO BANNER ===== */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 rounded-3xl shadow-2xl p-6 md:p-12 mb-12 text-white">
-          <div className="flex flex-col lg:flex-row items-start gap-8">
-            <div className="flex-1">
-              <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                <span className="text-sm font-bold">Now Accepting Partners</span>
+        {/* ===== HERO SECTION ===== */}
+        <div className="relative bg-slate-900 rounded-[4rem] p-12 md:p-20 text-white overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] -mr-48 -mt-48" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] -ml-48 -mb-48" />
+          
+          <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Fleet Partnership</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                Earn Steady Income with Your EV
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-[0.9]">
+                Monetize Your <span className="text-blue-400">EV Asset</span>.
               </h1>
-              <p className="text-lg md:text-xl text-blue-50 mb-8">
-                Join GoElectriQ's premium fleet. Zero fuel costs, guaranteed bookings, and consistent earnings. Partner with us today!
+              <p className="text-xl text-slate-400 font-medium leading-relaxed max-w-xl mb-12">
+                Integrate your electric vehicle into जयपुर's premium mobility grid. Achieve up to <span className="text-white font-black">{apiConfig.cab.earningsMonthly.text}</span> ROI with guaranteed volume.
               </p>
+              
+              <div className="flex flex-wrap gap-4 mb-12">
+                <StatusBadge type="blue">Zero Commission Gap</StatusBadge>
+                <StatusBadge type="emerald">Weekly Settlement</StatusBadge>
+                <StatusBadge type="violet">Asset Security</StatusBadge>
+              </div>
+
               <button
                 onClick={() => setShowModal(true)}
-                className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition text-base md:text-lg flex items-center gap-2"
+                className="group px-12 py-6 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 active:scale-[0.98] flex items-center gap-4"
               >
-                <Car className="w-5 h-5" />
-                Register Your Cab Now
+                Register Fleet Node
+                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-            <div className="hidden lg:block text-center">
-              <div className="inline-block bg-white/10 backdrop-blur-sm px-8 py-6 rounded-2xl">
-                <p className="text-sm text-blue-100 mb-2">Support Team</p>
-                <p className="text-3xl font-bold">+91 8690366601</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* ===== EARNINGS & COMMISSION ===== */}
-        <div className="mb-16">
-          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">How Much Can You Earn?</h2>
-          
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-8">
-            {/* Monthly Earnings */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 text-center">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <DollarSign className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Monthly Earnings</h3>
-              <p className="text-3xl md:text-5xl font-bold text-blue-600 mb-2">{apiConfig.cab.earningsMonthly.text}</p>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Based on rides completed</p>
-            </div>
-
-            {/* Per Ride */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 text-center border-2 border-blue-500">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <TrendingUp className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Per Ride</h3>
-              <p className="text-3xl md:text-5xl font-bold text-blue-600 mb-2">₹{apiConfig.cab.earningsPerRide.min}-{apiConfig.cab.earningsPerRide.max}</p>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">Average per completed ride</p>
-              <div className="bg-blue-100 dark:bg-blue-900/20 rounded-lg px-3 py-2 mt-4 text-xs md:text-sm font-semibold text-blue-600">Highest Potential</div>
-            </div>
-
-            {/* Daily Potential */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 text-center">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <Clock className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Daily Average</h3>
-              <p className="text-3xl md:text-5xl font-bold text-blue-600 mb-2">₹{apiConfig.cab.earningsDailyAverage.min.toLocaleString()}-{apiConfig.cab.earningsDailyAverage.max.toLocaleString()}</p>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">6-8 hours work</p>
-            </div>
-          </div>
-
-          <p className="text-center text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-            *Earnings vary based on ride demand, distance, and time spent online
-          </p>
-        </div>
-
-        {/* ===== COMMISSION & PAYMENT ===== */}
-        <div className="mb-16 bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Payment & Commission Structure</h2>
-          
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-            {/* Commission Details */}
-            <div className="space-y-4">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                <DollarSign className="w-5 md:w-6 h-5 md:h-6 text-blue-600" />
-                Commission Details
-              </h3>
-              
-              <div className="bg-blue-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">{apiConfig.cab.commission.firstRides.label}</span>
-                  <span className="text-base md:text-lg font-bold text-green-600">{apiConfig.cab.commission.firstRides.percentage}% Commission</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Complete bonus rides free</p>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">{apiConfig.cab.commission.standardCommission.label}</span>
-                  <span className="text-base md:text-lg font-bold text-blue-600">{apiConfig.cab.commission.standardCommission.percentage}% Commission</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Competitive industry standard</p>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">{apiConfig.cab.commission.bonus.label}</span>
-                  <span className="text-base md:text-lg font-bold text-green-600">Extra ₹{apiConfig.cab.commission.bonus.min}-{apiConfig.cab.commission.bonus.max}</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Peak hour and surge rewards</p>
-              </div>
-            </div>
-
-            {/* Payment Details */}
-            <div className="space-y-4">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                <Clock className="w-5 md:w-6 h-5 md:h-6 text-green-600" />
-                Payment Schedule
-              </h3>
-              
-              <div className="bg-green-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">Payment Frequency</span>
-                  <span className="text-base md:text-lg font-bold text-green-600">{apiConfig.cab.payment.frequency}</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Every {apiConfig.cab.payment.day} to your bank account</p>
-              </div>
-
-              <div className="bg-green-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">Processing Time</span>
-                  <span className="text-base md:text-lg font-bold text-green-600">{apiConfig.cab.payment.processingHours}</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">From week end to your account</p>
-              </div>
-
-              <div className="bg-green-50 dark:bg-slate-700 p-3 md:p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                  <span className="font-semibold text-xs md:text-base text-gray-900 dark:text-white">Withdrawal</span>
-                  <span className="text-base md:text-lg font-bold text-green-600">{apiConfig.cab.payment.withdrawalPolicy}</span>
-                </div>
-                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Withdraw your earnings whenever needed</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ===== WHY PARTNER WITH US ===== */}
-        <div className="mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Why Join GoElectriQ?</h2>
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <Zap className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Zero Fuel Costs</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-                We provide premium EVs. No fuel expenses, just charge at our stations
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <Shield className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Full Insurance</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-                Complete coverage for vehicle and passengers. Protection included
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <TrendingUp className="w-6 md:w-8 h-6 md:h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Guaranteed Bookings</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-                Consistent ride requests via our app. No waiting periods
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* ===== CTA BUTTON ===== */}
-        <div className="text-center mb-8">
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 md:gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 md:py-4 px-6 md:px-12 rounded-xl transition duration-200 text-sm md:text-lg shadow-lg"
-          >
-            <Car className="w-5 md:w-6 h-5 md:h-6" />
-            Register Your Cab & Start Earning
-            <ChevronDown className="w-5 md:w-6 h-5 md:h-6" />
-          </button>
-        </div>
-
-        {/* ===== REGISTRATION MODAL ===== */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 md:p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto">
-              {/* Modal Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 p-6 md:p-8 text-white flex items-start justify-between sticky top-0">
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Register Your EV Cab</h2>
-                  <p className="text-sm md:text-base text-blue-50">Complete your application to start earning</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setMessage({ type: '', text: '' });
-                  }}
-                  className="text-white text-2xl font-bold hover:opacity-80 transition flex-shrink-0 ml-4"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="p-4 md:p-8">
-                {/* Message Display */}
-                {message.text && (
-                  <div className={`mb-6 p-4 rounded-lg ${
-                    message.type === 'success' 
-                      ? 'bg-green-100 text-green-800 border border-green-300' 
-                      : 'bg-red-100 text-red-800 border border-red-300'
-                  }`}>
-                    {message.text}
+            <div className="hidden lg:block relative">
+              <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] p-10 border border-white/10">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="p-4 bg-blue-500/20 text-blue-400 rounded-2xl">
+                    <ShieldCheck size={32} />
                   </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-                  {/* Owner Name Field */}
                   <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <User className="inline-block w-4 h-4 mr-2" />
-                      Owner Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="ownerName"
-                      value={formData.ownerName}
-                      onChange={handleInputChange}
-                      placeholder="Enter your full name"
-                      className="w-full px-4 py-2 md:py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
-                      disabled={loading}
-                    />
+                    <h3 className="text-lg font-black tracking-tight">Enterprise Protocol</h3>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Partner Tier: PLATINUM</p>
                   </div>
-
-                  {/* Phone Field */}
-                  <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <Phone className="inline-block w-4 h-4 mr-2" />
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="10-digit phone number (e.g., 9876543210)"
-                      className="w-full px-4 py-2 md:py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
-                      disabled={loading}
-                    />
-                  </div>
-
-                  {/* EV Type Field */}
-                  <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <Zap className="inline-block w-4 h-4 mr-2" />
-                      EV Type *
-                    </label>
-                    <select
-                      name="evType"
-                      value={formData.evType}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 md:py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
-                      disabled={loading}
-                    >
-                      <option value="">Select EV type</option>
-                      {evTypes.map(ev => (
-                        <option key={ev.value} value={ev.value}>{ev.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Vehicle Model Field */}
-                  <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <Car className="inline-block w-4 h-4 mr-2" />
-                      Vehicle Model / Year *
-                    </label>
-                    <input
-                      type="text"
-                      name="vehicleModel"
-                      value={formData.vehicleModel}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Tesla Model 3 2023"
-                      className="w-full px-4 py-2 md:py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
-                      disabled={loading}
-                    />
-                  </div>
-
-                  {/* RC Upload */}
-                  <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <FileText className="inline-block w-4 h-4 mr-2" />
-                      RC (Registration Certificate) *
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept={apiConfig.cab.allowedFileTypes.join(',')}
-                        onChange={(e) => handleFileUpload(e, 'rc')}
-                        className="hidden"
-                        id="rcInput"
-                        disabled={loading}
-                      />
-                      <label
-                        htmlFor="rcInput"
-                        className="block w-full px-4 py-6 md:py-8 border-2 border-dashed border-blue-300 rounded-lg text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition"
-                      >
-                        {filePreview.rc ? (
-                          <div>
-                            <img src={filePreview.rc} alt="RC Preview" className="max-h-24 md:max-h-32 mx-auto mb-2 rounded" />
-                            <p className="text-xs md:text-sm text-blue-600 dark:text-blue-400">File selected</p>
-                          </div>
-                        ) : (
-                          <div>
-                            <Upload className="w-6 md:w-8 h-6 md:h-8 mx-auto mb-2 text-gray-400" />
-                            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                              Click to upload or drag and drop
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">PDF, JPG, PNG (Max 5MB)</p>
-                          </div>
-                        )}
-                      </label>
+                </div>
+                
+                <div className="space-y-6">
+                  {[
+                    { label: 'Asset Insurance', value: 'Full Coverage', icon: Shield },
+                    { label: 'Payout Cycle', value: '7-Day Settlement', icon: Clock },
+                    { label: 'Node Support', value: 'Priority Link', icon: Phone }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="flex items-center gap-4">
+                        <item.icon size={18} className="text-slate-400" />
+                        <span className="text-sm font-bold text-slate-300">{item.label}</span>
+                      </div>
+                      <span className="text-sm font-black text-white">{item.value}</span>
                     </div>
-                    {formData.rcUpload && (
-                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-2 break-all">
-                        {formData.rcUpload.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Insurance Upload */}
-                  <div>
-                    <label className="block text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                      <FileText className="inline-block w-4 h-4 mr-2" />
-                      Insurance Documents *
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept={apiConfig.cab.allowedFileTypes.join(',')}
-                        onChange={(e) => handleFileUpload(e, 'insurance')}
-                        className="hidden"
-                        id="insuranceInput"
-                        disabled={loading}
-                      />
-                      <label
-                        htmlFor="insuranceInput"
-                        className="block w-full px-4 py-6 md:py-8 border-2 border-dashed border-blue-300 rounded-lg text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition"
-                      >
-                        {filePreview.insurance ? (
-                          <div>
-                            <img src={filePreview.insurance} alt="Insurance Preview" className="max-h-24 md:max-h-32 mx-auto mb-2 rounded" />
-                            <p className="text-xs md:text-sm text-blue-600 dark:text-blue-400">File selected</p>
-                          </div>
-                        ) : (
-                          <div>
-                            <Upload className="w-6 md:w-8 h-6 md:h-8 mx-auto mb-2 text-gray-400" />
-                            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                              Click to upload or drag and drop
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">PDF, JPG, PNG (Max 5MB)</p>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-                    {formData.insuranceUpload && (
-                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-2 break-all">
-                        {formData.insuranceUpload.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex gap-2 md:gap-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        setMessage({ type: '', text: '' });
-                      }}
-                      disabled={loading}
-                      className="flex-1 px-4 py-2 md:py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-xs md:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition disabled:opacity-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-2 md:py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2 text-xs md:text-sm"
-                    >
-                      <Zap className="w-4 md:w-5 h-4 md:h-5" />
-                      {loading ? 'Processing...' : 'Register Your Cab'}
-                    </button>
-                  </div>
-                </form>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* ===== ANALYTICS / EARNINGS ===== */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { 
+              title: 'Asset Yield', 
+              value: `₹${apiConfig.cab.earningsPerRide.min} - ₹${apiConfig.cab.earningsPerRide.max}`, 
+              sub: 'Per Successful Dispatch',
+              icon: TrendingUp,
+              color: 'text-blue-500',
+              bg: 'bg-blue-50'
+            },
+            { 
+              title: 'Monthly Trajectory', 
+              value: apiConfig.cab.earningsMonthly.text, 
+              sub: 'Full Network Utilization',
+              icon: DollarSign,
+              color: 'text-emerald-500',
+              bg: 'bg-emerald-50',
+              popular: true
+            },
+            { 
+              title: 'Daily Average', 
+              value: `₹${apiConfig.cab.earningsDailyAverage.min.toLocaleString()} - ₹${apiConfig.cab.earningsDailyAverage.max.toLocaleString()}`, 
+              sub: '8-Hour Activity Node',
+              icon: Clock,
+              color: 'text-violet-500',
+              bg: 'bg-violet-50'
+            }
+          ].map((stat, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className={`relative bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100 overflow-hidden ${stat.popular ? 'ring-2 ring-blue-500/20' : ''}`}
+            >
+              {stat.popular && (
+                <div className="absolute top-8 right-8">
+                  <StatusBadge type="blue">Peak ROI</StatusBadge>
+                </div>
+              )}
+              <div className={`p-5 ${stat.bg} ${stat.color} rounded-2xl w-fit mb-8`}>
+                <stat.icon size={28} />
+              </div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{stat.title}</p>
+              <h3 className="text-3xl font-black text-slate-900 mb-2">{stat.value}</h3>
+              <p className="text-xs font-bold text-slate-500">{stat.sub}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* ===== COMMISSION STRUCTURE GRID ===== */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="bg-white rounded-[4rem] p-12 shadow-sm border border-slate-100">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tighter mb-10 flex items-center gap-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Zap size={24}/></div>
+              Commission Protocol
+            </h3>
+            <div className="space-y-6">
+              {[
+                { label: apiConfig.cab.commission.firstRides.label, value: `${apiConfig.cab.commission.firstRides.percentage}%`, sub: 'Initial Onboarding Period' },
+                { label: apiConfig.cab.commission.standardCommission.label, value: `${apiConfig.cab.commission.standardCommission.percentage}%`, sub: 'Enterprise Standard' },
+                { label: apiConfig.cab.commission.bonus.label, value: `+₹${apiConfig.cab.commission.bonus.max}`, sub: 'Peak Network Performance' }
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div>
+                    <p className="text-sm font-black text-slate-900 mb-1">{item.label}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.sub}</p>
+                  </div>
+                  <div className="text-xl font-black text-blue-600">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[4rem] p-12 shadow-sm border border-slate-100">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tighter mb-10 flex items-center gap-4">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Clock size={24}/></div>
+              Settlement Protocol
+            </h3>
+            <div className="space-y-6">
+              {[
+                { label: 'Payment Frequency', value: apiConfig.cab.payment.frequency, sub: `Every ${apiConfig.cab.payment.day}` },
+                { label: 'Processing Window', value: apiConfig.cab.payment.processingHours, sub: 'Network Reconciliation Time' },
+                { label: 'Withdrawal Access', value: apiConfig.cab.payment.withdrawalPolicy, sub: 'On-demand Liquidity' }
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div>
+                    <p className="text-sm font-black text-slate-900 mb-1">{item.label}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.sub}</p>
+                  </div>
+                  <div className="text-sm font-black text-emerald-600 uppercase tracking-widest">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ===== INTEGRATED REGISTRATION MODAL ===== */}
+        <AnimatePresence>
+          {showModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowModal(false)}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-3xl bg-white rounded-[3.5rem] shadow-2xl overflow-hidden"
+              >
+                {/* Modal Header */}
+                <div className="bg-slate-900 p-10 md:p-14 text-white relative">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Partnership Initiation</span>
+                      </div>
+                      <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+                        <X size={24} />
+                      </button>
+                    </div>
+                    <h2 className="text-4xl font-black tracking-tighter">Cab Registration</h2>
+                  </div>
+                </div>
+
+                <div className="p-10 md:p-14 overflow-y-auto max-h-[60vh]">
+                  <AnimatePresence mode="wait">
+                    {message.text && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className={`mb-10 p-5 rounded-2xl flex items-center gap-4 ${
+                          message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                        }`}
+                      >
+                        {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                        <p className="text-xs font-black uppercase tracking-widest">{message.text}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Fleet Owner Identity</label>
+                        <div className="relative group">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                            <User size={18} />
+                          </div>
+                          <input
+                            type="text"
+                            name="ownerName"
+                            value={formData.ownerName}
+                            onChange={handleInputChange}
+                            placeholder="Full Name"
+                            className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 text-sm font-bold transition-all"
+                            disabled={loading}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contact Matrix</label>
+                        <div className="relative group">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                            <Phone size={18} />
+                          </div>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="10-digit Phone"
+                            className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 text-sm font-bold transition-all"
+                            disabled={loading}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">EV Node Type</label>
+                        <div className="relative group">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                            <Zap size={18} />
+                          </div>
+                          <select
+                            name="evType"
+                            value={formData.evType}
+                            onChange={handleInputChange}
+                            className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 text-sm font-bold transition-all appearance-none"
+                            disabled={loading}
+                          >
+                            <option value="">Select EV Tier</option>
+                            {evTypes.map(ev => (
+                              <option key={ev.value} value={ev.value}>{ev.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vehicle Telemetry</label>
+                        <div className="relative group">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                            <Car size={18} />
+                          </div>
+                          <input
+                            type="text"
+                            name="vehicleModel"
+                            value={formData.vehicleModel}
+                            onChange={handleInputChange}
+                            placeholder="Model / Year (e.g. Nexon EV 2024)"
+                            className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 text-sm font-bold transition-all"
+                            disabled={loading}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">RC Authorization</label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept={apiConfig.cab.allowedFileTypes.join(',')}
+                            onChange={(e) => handleFileUpload(e, 'rc')}
+                            className="hidden"
+                            id="rcInput"
+                            disabled={loading}
+                          />
+                          <label
+                            htmlFor="rcInput"
+                            className="flex flex-col items-center justify-center w-full py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                          >
+                            {filePreview.rc ? (
+                              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                                <img src={filePreview.rc} alt="RC Preview" className="max-h-32 mx-auto mb-4 rounded-2xl shadow-lg" />
+                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">RC Secured</p>
+                              </motion.div>
+                            ) : (
+                              <div className="text-center">
+                                <Upload size={20} className="mx-auto mb-3 text-slate-400" />
+                                <p className="text-xs font-black text-slate-900 mb-1">Upload RC</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">MAX 5MB</p>
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Insurance Protocol</label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept={apiConfig.cab.allowedFileTypes.join(',')}
+                            onChange={(e) => handleFileUpload(e, 'insurance')}
+                            className="hidden"
+                            id="insuranceInput"
+                            disabled={loading}
+                          />
+                          <label
+                            htmlFor="insuranceInput"
+                            className="flex flex-col items-center justify-center w-full py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                          >
+                            {filePreview.insurance ? (
+                              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                                <img src={filePreview.insurance} alt="Insurance Preview" className="max-h-32 mx-auto mb-4 rounded-2xl shadow-lg" />
+                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Policy Secured</p>
+                              </motion.div>
+                            ) : (
+                              <div className="text-center">
+                                <Upload size={20} className="mx-auto mb-3 text-slate-400" />
+                                <p className="text-xs font-black text-slate-900 mb-1">Upload Policy</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">MAX 5MB</p>
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowModal(false)}
+                        className="flex-1 py-5 bg-slate-50 text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all"
+                      >
+                        Abort
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-[2] py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3"
+                      >
+                        {loading ? <Loader className="animate-spin" size={16} /> : <Zap size={16} />}
+                        {loading ? 'Processing...' : 'Establish Partnership'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

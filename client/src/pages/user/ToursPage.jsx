@@ -1,6 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, Calendar, MapPin, Users, Filter, Search, XCircle, Check, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Plane, 
+  Calendar, 
+  MapPin, 
+  Users, 
+  Filter, 
+  Search, 
+  XCircle, 
+  Check, 
+  AlertCircle,
+  Clock,
+  ArrowRight,
+  CreditCard,
+  CheckCircle,
+  ChevronRight,
+  MoreVertical,
+  Car
+} from 'lucide-react';
 import UserLayout from './UserLayout.jsx';
 import * as packageService from '../../services/packageService.js';
 import { ridePaymentService } from '../../services/ridePaymentService.js';
@@ -81,23 +99,13 @@ export default function ToursPage() {
     try {
       setLoading(true);
       const response = await packageService.getMyTourBookings?.();
-      console.log('📊 Tours API Response:', response);
       if (response?.success) {
-        // API returns { success: true, data: [...], pagination: {...} }
         const toursList = Array.isArray(response.data) ? response.data : [];
-        console.log('✈️ Processed Tours:', toursList);
-        console.log('Sample Tour Data:', toursList[0] ? {
-          _id: toursList[0]._id,
-          totalAmount: toursList[0].pricing?.totalAmount,
-          paidAmount: toursList[0].pricing?.paidAmount,
-          paymentStatus: toursList[0].paymentStatus,
-          has20Percent: (toursList[0].pricing?.paidAmount || 0) >= ((toursList[0].pricing?.totalAmount || 0) * 0.2)
-        } : null);
         setTours(toursList);
         filterTours(toursList, 'all', '');
       }
     } catch (err) {
-      setError('Failed to load tours');
+      setError('Failed to sync tour data with the server');
       console.error(err);
     } finally {
       setLoading(false);
@@ -145,45 +153,42 @@ export default function ToursPage() {
     return tour.pricing?.totalAmount || tour.package?.basePrice || 0;
   };
 
-  const getPaidAmount = (tour) => {
-    return tour.pricing?.paidAmount ?? 0;
-  };
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      case 'confirmed':
-        return 'bg-emerald-100 text-emerald-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const has20PercentPaid = (tour) => {
     const totalPrice = getTotalPrice(tour);
-    // For tours, paidAmount is nested in pricing object
     const paidAmount = tour.pricing?.paidAmount || 0;
     return totalPrice > 0 && paidAmount >= (totalPrice * 0.2);
   };
 
-  const get20PercentAmount = (tour) => {
-    const totalPrice = getTotalPrice(tour);
-    return (totalPrice * 0.2).toFixed(2);
+  const getStatusConfig = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return { color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle, label: 'Completed' };
+      case 'confirmed':
+        return { color: 'text-amber-500', bg: 'bg-amber-500/10', icon: CheckCircle, label: 'Confirmed' };
+      case 'cancelled':
+        return { color: 'text-rose-500', bg: 'bg-rose-500/10', icon: XCircle, label: 'Cancelled' };
+      default:
+        return { color: 'text-slate-500', bg: 'bg-slate-500/10', icon: Clock, label: 'Pending' };
+    }
+  };
+
+  // Statistics calculation
+  const statsData = {
+    total: tours.length,
+    completed: tours.filter(t => t.status?.toLowerCase() === 'completed').length,
+    pending: tours.filter(t => t.status?.toLowerCase() === 'pending').length
   };
 
   if (loading) {
     return (
       <UserLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading tours...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full mb-4"
+          />
+          <p className="text-slate-500 font-medium animate-pulse">Syncing your tour experiences...</p>
         </div>
       </UserLayout>
     );
@@ -191,198 +196,181 @@ export default function ToursPage() {
 
   return (
     <UserLayout>
-      <div className="w-full space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
-            <Plane size={40} className="text-emerald-500" />
-            My Tours
-          </h1>
-          <p className="text-gray-600">Explore and manage your tour bookings</p>
+      <div className="max-w-7xl mx-auto space-y-10">
+        {/* Premium Header Section */}
+        <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-white text-slate-900 p-8 md:p-12 shadow-xl border border-slate-100">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/20 to-transparent pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+                My <span className="text-emerald-400">Tours</span>
+              </h1>
+              <p className="text-slate-500 text-lg max-w-md font-medium leading-relaxed">
+                Explore your curated travel experiences and manage your upcoming adventures.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.total}</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Total Bookings</p>
+              </div>
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.completed}</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Completed</p>
+              </div>
+              <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm hidden md:block">
+                <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.pending}</p>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Awaiting</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border-2 border-red-300 text-red-800 p-4 rounded-xl flex items-center gap-3">
-            <XCircle size={24} />
-            {error}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex items-center gap-4 text-rose-600"
+          >
+            <AlertCircle size={20} />
+            <p className="font-bold text-sm">{error}</p>
+          </motion.div>
         )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl shadow-lg p-6 border border-emerald-400">
-            <p className="text-emerald-100 text-sm font-medium uppercase">Total Tours</p>
-            <p className="text-4xl font-bold mt-2">{tours.length}</p>
-          </div>
-          <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl shadow-lg p-6 border border-green-400">
-            <p className="text-green-100 text-sm font-medium uppercase">Completed</p>
-            <p className="text-4xl font-bold mt-2">{tours.filter(t => t.status?.toLowerCase() === 'completed').length}</p>
-          </div>
-          <div className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-xl shadow-lg p-6 border border-teal-400">
-            <p className="text-teal-100 text-sm font-medium uppercase">Pending</p>
-            <p className="text-4xl font-bold mt-2">{tours.filter(t => t.status?.toLowerCase() === 'pending').length}</p>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search by tour name or destination..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              <Filter size={20} className="text-gray-600" />
-              {['all', 'completed', 'pending', 'confirmed', 'cancelled'].map(status => (
-                <button
-                  key={status}
-                  onClick={() => handleFilterChange(status)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap ${
-                    filterStatus === status
-                      ? 'bg-emerald-500 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        {/* Controls Section */}
+        <div className="flex flex-col md:flex-row gap-6 mb-10 items-center justify-between bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+          <div className="flex flex-wrap gap-2">
+            {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+              <button
+                key={status}
+                onClick={() => handleFilterChange(status)}
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${filterStatus === status
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 scale-105'
+                  : 'text-slate-500 hover:bg-slate-100'
                   }`}
-                >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </button>
-              ))}
-            </div>
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full md:w-80 group">
+            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+            <input
+              type="text"
+              placeholder="Search tours..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full pl-12 pr-6 py-3 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 text-sm font-medium transition-all"
+            />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          {filteredTours.length === 0 ? (
-            <div className="p-12 text-center">
-              <Plane size={48} className="text-gray-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Tours Found</h3>
-              <p className="text-gray-600">
-                {tours.length === 0 
-                  ? "You haven't booked any tours yet."
-                  : "No tours match your filters."}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-200 bg-gray-50">
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Tour Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Destination</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Date</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Car Type</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Passengers</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Total Amount</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Paid / 20% Needed</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredTours.map((tour, index) => (
-                    <tr key={tour._id || index} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Plane size={16} className="text-emerald-500 flex-shrink-0" />
-                          <p className="font-semibold text-gray-900">
-                            {tour.package?.title || tour.tourName || 'Tour'}
-                          </p>
+        {/* Tours Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode='popLayout'>
+            {filteredTours.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full py-20 text-center"
+              >
+                <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                  <Plane size={40} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-2">No Tours Found</h3>
+                <p className="text-slate-500 font-medium">Try adjusting your filters or explore our packages.</p>
+              </motion.div>
+            ) : (
+              filteredTours.map((tour, idx) => {
+                const statusConfig = getStatusConfig(tour.status);
+                const isPaid = has20PercentPaid(tour);
+                
+                return (
+                  <motion.div
+                    key={tour._id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="group bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+                  >
+                    <div className="p-8">
+                      <div className="flex justify-between items-start mb-8">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Package ID</p>
+                          <p className="text-sm font-bold text-slate-900 font-mono">{tour._id.slice(-8).toUpperCase()}</p>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <MapPin size={16} className="text-red-500 flex-shrink-0" />
-                          {tour.package?.location || tour.destination || 'N/A'}
+                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusConfig.bg} ${statusConfig.color}`}>
+                          {statusConfig.label}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-900">
-                          <Calendar size={16} className="text-blue-500 flex-shrink-0" />
-                          {formatDate(tour.scheduledDate || tour.createdAt)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-semibold text-sm">
-                          {tour.carType || 'Premium'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-gray-900 font-semibold">
-                          <Users size={16} className="text-blue-500" />
-                          {tour.passengers || 1}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-green-600 text-lg">
-                          ₹{getTotalPrice(tour)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
-                          <div className="text-sm">
-                            <span className="font-semibold">₹{getPaidAmount(tour)}</span>
-                            <span className="text-gray-500"> / ₹{get20PercentAmount(tour)}</span>
+                      </div>
+
+                      <div className="space-y-6 mb-8">
+                        <div className="flex gap-4">
+                          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
+                            <Plane size={24} />
                           </div>
-                          {has20PercentPaid(tour) ? (
-                            <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs font-semibold inline-flex items-center gap-1 w-fit">
-                              <Check size={14} /> Paid
-                            </span>
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Tour Name</p>
+                            <p className="text-lg font-black text-slate-800 line-clamp-1">{tour.package?.title || tour.tourName || 'Tour'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                          <MapPin size={18} className="text-emerald-500 shrink-0 mt-0.5" />
+                          <p className="text-sm font-bold text-slate-600">{tour.package?.location || tour.destination || 'N/A'}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50/80 p-4 rounded-3xl">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Date</p>
+                            <div className="flex items-center gap-2">
+                              <Calendar size={12} className="text-emerald-500" />
+                              <p className="text-xs font-black text-slate-700">{formatDate(tour.scheduledDate || tour.createdAt)}</p>
+                            </div>
+                          </div>
+                          <div className="bg-slate-50/80 p-4 rounded-3xl text-right">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Package</p>
+                            <p className="text-xs font-black text-slate-900 capitalize">{tour.carType || 'Premium'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-slate-100 pt-6">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Total Fare</p>
+                          <p className="text-xl font-black text-emerald-600">₹{getTotalPrice(tour)}</p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          {!isPaid && tour.status !== 'cancelled' ? (
+                            <button
+                              onClick={() => handlePayAdvance(tour)}
+                              className="px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2"
+                            >
+                              <CreditCard size={14} />
+                              Pay 20%
+                            </button>
                           ) : (
-                            <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs font-semibold inline-flex items-center gap-1 w-fit">
-                              <AlertCircle size={14} /> Pending
-                            </span>
+                            <button
+                              onClick={() => navigate(`/user/booking-confirmation?id=${tour._id}`)}
+                              className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-xl"
+                            >
+                              Details
+                            </button>
                           )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-lg font-semibold text-sm ${getStatusColor(tour.status)}`}>
-                          {tour.status || 'Pending'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {!has20PercentPaid(tour) ? (
-                          <button
-                            onClick={() => handlePayAdvance(tour)}
-                            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-sm transition"
-                          >
-                            Pay Now
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => navigate(`/user/booking-confirmation?id=${tour._id}`)}
-                            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold text-sm transition"
-                          >
-                            View
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </AnimatePresence>
         </div>
-
-        {/* Summary */}
-        {filteredTours.length > 0 && (
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-100 rounded-xl p-6 border border-emerald-200">
-            <p className="text-gray-900 font-semibold">
-              Showing {filteredTours.length} tours out of {tours.length} total
-            </p>
-          </div>
-        )}
       </div>
     </UserLayout>
   );

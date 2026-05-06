@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Users,
   Calendar,
@@ -15,6 +15,12 @@ import {
   LogOut,
   Box,
   PieChart as PieIcon,
+  ArrowUpRight,
+  ShieldCheck,
+  Globe,
+  Layers,
+  Search,
+  Bell
 } from 'lucide-react';
 import {
   AreaChart,
@@ -31,6 +37,7 @@ import {
 import { Link } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { getAnalytics } from '../../services/adminService';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DashboardPage = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -50,219 +57,185 @@ const DashboardPage = () => {
     }
   };
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    await fetchAnalytics();
-  };
-
   useEffect(() => {
-    // Initial fetch
     void fetchAnalytics();
-
-    // Set up auto-refresh interval (every 10 seconds for real-time updates)
     let intervalId;
     if (autoRefresh) {
       intervalId = window.setInterval(() => {
         void fetchAnalytics();
-      }, 10000); // 10 seconds
+      }, 15000); // 15 seconds
     }
-
-    // Cleanup interval on unmount or when autoRefresh changes
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
   }, [autoRefresh]);
 
-  const quickStats = [
+  const quickStats = useMemo(() => [
     {
       title: 'Total Users',
-      value: `${analytics?.totalUsers || 0}`,
-      subtitle: `${analytics?.activeUsers || 0} active`,
+      value: analytics?.totalUsers || 0,
+      subtitle: `${analytics?.activeUsers || 0} Synchronized`,
       icon: Users,
       link: '/admin/users',
-      color: 'from-emerald-500 to-emerald-600',
-      bgLight: 'bg-emerald-50',
-      textLight: 'text-emerald-500',
-      trend: '+12% this month',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+      trend: '+12.5%',
     },
     {
-      title: 'Active Drivers',
+      title: 'Active Fleet',
       value: analytics?.activeDrivers || 0,
+      subtitle: 'Operational Units',
       icon: Car,
       link: '/admin/driver-bookings',
-      color: 'from-cyan-500 to-cyan-600',
-      bgLight: 'bg-cyan-50',
-      textLight: 'text-cyan-500',
-      trend: '+8% this month',
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/10',
+      trend: '+8.2%',
     },
     {
-      title: 'Total Bookings',
+      title: 'Gross Bookings',
       value: analytics?.totalBookings || 0,
+      subtitle: 'System Wide',
       icon: Calendar,
       link: '/admin/rides',
-      color: 'from-teal-500 to-teal-600',
-      bgLight: 'bg-teal-50',
-      textLight: 'text-teal-500',
-      trend: '+23% this month',
+      color: 'text-violet-500',
+      bg: 'bg-violet-500/10',
+      trend: '+23.1%',
     },
     {
       title: 'Total Revenue',
-      value: `₹${analytics?.totalRevenue || 0}`,
+      value: `₹${(analytics?.totalRevenue || 0).toLocaleString()}`,
+      subtitle: 'Net Volume',
       icon: DollarSign,
       link: '/admin/payments',
-      color: 'from-emerald-600 to-cyan-600',
-      bgLight: 'bg-emerald-50',
-      textLight: 'text-emerald-600',
-      trend: '+15% this month',
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
+      trend: '+15.4%',
     },
-    {
-      title: 'Charging Enquiries',
-      value: analytics?.chargingEnquiries || 0,
-      icon: Zap,
-      link: '/admin/charging-bookings',
-      color: 'from-orange-500 to-orange-600',
-      bgLight: 'bg-orange-50',
-      textLight: 'text-orange-500',
-      trend: 'New leads this week',
-    },
-  ];
+  ], [analytics]);
+
+  const chartData = useMemo(() => analytics?.revenueData || [], [analytics]);
 
   return (
     <AdminLayout>
-      <div className="space-y-6 md:space-y-8 pb-8">
-        {/* Premium Header */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl shadow-xl p-6 md:p-8 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-xl"></div>
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/10 rounded-full -ml-20 -mb-20 blur-xl"></div>
+      <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+        {/* Dynamic System Header */}
+        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-slate-900 rounded-[3rem] p-10 md:p-14 text-white overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] -mr-48 -mt-48" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -ml-48 -mb-48" />
           
-          <div className="relative z-10 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-3xl md:text-4xl font-bold drop-shadow-lg">
-                Welcome back, Admin!
-              </h1>
-              <p className="text-indigo-100 mt-3 text-sm md:text-base">
-                Manage your entire GoElectriQ ecosystem at a glance
-                {lastUpdated && (
-                  <span className="block md:inline md:ml-2 text-xs text-indigo-200 mt-2 md:mt-0 font-medium">
-                    <RefreshCw size={12} className="inline mr-1" /> Last updated: {lastUpdated.toLocaleTimeString()}
-                  </span>
-                )}
-              </p>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">System Command Center</span>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 font-medium shadow-lg ${
-                  autoRefresh
-                    ? 'bg-green-400 hover:bg-green-500 text-gray-900'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white'
-                }`}
-                title={autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
-              >
-                <RefreshCw size={18} className={autoRefresh ? 'animate-spin' : ''} />
-                <span>{autoRefresh ? 'Live' : 'Off'}</span>
-              </button>
-              <button
-                onClick={handleRefresh}
-                disabled={loading}
-                className="flex items-center gap-2 bg-white hover:bg-gray-100 text-purple-600 px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 font-medium shadow-lg"
-              >
-                <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-                <span>Refresh</span>
-              </button>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+              Operational <span className="text-emerald-400">Intelligence</span>
+            </h1>
+            <p className="text-slate-400 text-lg max-w-xl font-medium leading-relaxed">
+              Global oversight of the GoElectriQ EV ecosystem. Real-time telemetry and financial analytics synchronized across all nodes.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-wrap items-center gap-4">
+            <div className="px-6 py-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Last Update</p>
+              <p className="text-sm font-black text-white">{lastUpdated?.toLocaleTimeString() || '--:--:--'}</p>
             </div>
+            <button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
+                autoRefresh
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                  : 'bg-slate-800 text-slate-400'
+              }`}
+            >
+              <RefreshCw size={16} className={autoRefresh ? 'animate-spin' : ''} />
+              {autoRefresh ? 'Live Node' : 'Manual Sync'}
+            </button>
           </div>
         </div>
 
-        {/* Quick Stats - Enhanced */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
-          {quickStats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Link
-                key={index}
-                to={stat.link}
-                className="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-2 overflow-hidden border border-gray-100 dark:border-gray-700"
-              >
-                <div className={`bg-gradient-to-br ${stat.color} p-4 md:p-5 text-white relative overflow-hidden`}>
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10 blur-lg"></div>
-                  <div className="relative z-10 flex justify-between items-start">
-                    <div>
-                      <p className="text-xs md:text-sm font-semibold text-white/90">
-                        {stat.title}
-                      </p>
-                      <p className="text-2xl md:text-3xl font-bold mt-2 md:mt-3 drop-shadow-lg break-words">
-                        {stat.value}
-                      </p>
-                    </div>
-                    <Icon size={32} className="opacity-20" />
-                  </div>
+        {/* Analytical Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {quickStats.map((stat, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="group bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500"
+            >
+              <div className="flex justify-between items-start mb-8">
+                <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl`}>
+                  <stat.icon size={24} />
                 </div>
-                <div className="p-4 md:p-5">
-                  {stat.subtitle && (
-                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      {stat.subtitle}
-                    </p>
-                  )}
-                  <p className="text-xs font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-1 text-emerald-500">
                     <TrendingUp size={14} />
-                    {stat.trend}
-                  </p>
-                  <div className="mt-3 inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold text-xs group-hover:gap-2 transition-all">
-                    View Details
-                    <span>→</span>
+                    <span className="text-[10px] font-black">{stat.trend}</span>
                   </div>
                 </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.title}</p>
+                <h3 className="text-3xl font-black text-slate-900 mb-2">{stat.value}</h3>
+                <p className="text-xs font-bold text-slate-500">{stat.subtitle}</p>
+              </div>
+              <Link to={stat.link} className="mt-8 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
+                Deep Analysis
+                <ArrowUpRight size={14} />
               </Link>
-            );
-          })}
+            </motion.div>
+          ))}
         </div>
 
-        {/* Business Overview - Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Revenue Trend Chart */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
+        {/* Primary Data Visualizations */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 bg-white rounded-[3rem] shadow-sm border border-slate-100 p-10 md:p-14">
+            <div className="flex items-center justify-between mb-12">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Revenue Trends</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Daily revenue for the last 7 days</p>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Revenue Dynamics</h2>
+                <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest">Financial Performance Index</p>
               </div>
-              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-600">
-                <TrendingUp size={20} />
+              <div className="flex gap-2">
+                {['7D', '1M', '3M', '1Y'].map(t => (
+                  <button key={t} className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${t === '7D' ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}>{t}</button>
+                ))}
               </div>
             </div>
-            <div className="h-[300px] w-full">
+            <div className="h-[400px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={analytics?.revenueData || []}>
+                <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
                       <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis 
                     dataKey="date" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{fill: '#94a3b8', fontSize: 12}}
+                    tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}}
                     dy={10}
                   />
                   <YAxis 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{fill: '#94a3b8', fontSize: 12}}
+                    tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}}
                     tickFormatter={(value) => `₹${value}`}
                   />
                   <Tooltip 
-                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
-                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                    contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.1)', padding: '20px'}}
+                    itemStyle={{fontWeight: '900', fontSize: '12px'}}
+                    labelStyle={{fontWeight: '900', color: '#64748b', marginBottom: '8px', fontSize: '10px', textTransform: 'uppercase'}}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="revenue" 
                     stroke="#10b981" 
-                    strokeWidth={3}
+                    strokeWidth={4}
                     fillOpacity={1} 
                     fill="url(#colorRev)" 
                   />
@@ -271,260 +244,151 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Booking Distribution Pie Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
+          <div className="lg:col-span-4 bg-slate-900 rounded-[3rem] shadow-2xl p-10 md:p-14 text-white relative overflow-hidden flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+            
+            <div className="relative z-10">
+              <h2 className="text-2xl font-black tracking-tight mb-2">Ecosystem Split</h2>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-10">Asset Allocation</p>
+              
+              <div className="h-[250px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Rides', value: analytics?.rideBookings || 0 },
+                        { name: 'Tours', value: analytics?.tourBookings || 0 },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={90}
+                      paddingAngle={8}
+                      dataKey="value"
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#3b82f6" />
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{borderRadius: '20px', border: 'none', backgroundColor: '#0f172a', color: '#fff'}}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="text-3xl font-black text-white">{analytics?.totalBookings || 0}</p>
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total Nodes</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-bold text-slate-400">Direct Rides</span>
+                </div>
+                <span className="text-sm font-black">{analytics?.rideBookings || 0}</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="text-xs font-bold text-slate-400">Curated Tours</span>
+                </div>
+                <span className="text-sm font-black">{analytics?.tourBookings || 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Operational Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+            <div className="p-10 md:p-12 border-b border-slate-50 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Distribution</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Rides vs Tours</p>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Recent Missions</h2>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Live Transaction Stream</p>
               </div>
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600">
-                <PieIcon size={20} />
-              </div>
+              <Link to="/admin/rides" className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all">
+                <ArrowUpRight size={20} />
+              </Link>
             </div>
-            <div className="h-[300px] w-full relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'Rides', value: analytics?.rideBookings || 0 },
-                      { name: 'Tours', value: analytics?.tourBookings || 0 },
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    <Cell fill="#10b981" />
-                    <Cell fill="#06b6d4" />
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.totalBookings || 0}</p>
-                <p className="text-xs text-gray-500 font-medium uppercase">Total</p>
-              </div>
-            </div>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#10b981]"></div>
-                  <span className="text-gray-600 dark:text-gray-400 font-medium">Ride Bookings</span>
-                </div>
-                <span className="font-bold text-gray-900 dark:text-white">{analytics?.rideBookings || 0}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
-                  <span className="text-gray-600 dark:text-gray-400 font-medium">Tour Bookings</span>
-                </div>
-                <span className="font-bold text-gray-900 dark:text-white">{analytics?.tourBookings || 0}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Management Quick Links - Enhanced */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-3 mb-6 md:mb-8">
-            <div className="w-1 h-8 bg-gradient-to-b from-indigo-600 to-purple-600 rounded-full"></div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-              Quick Management
-            </h2>
-            <Activity size={24} className="text-purple-600 ml-auto" />
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-            <Link
-              to="/admin/users"
-              className="group p-5 md:p-6 border-2 border-blue-200 dark:border-blue-900 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-blue-100 dark:bg-blue-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-blue-200 transition-all">
-                <Users size={24} className="text-blue-600 dark:text-blue-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Manage Users</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">View all users</p>
-            </Link>
-
-            <Link
-              to="/admin/driver-bookings"
-              className="group p-5 md:p-6 border-2 border-green-200 dark:border-green-900 rounded-xl hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-green-100 dark:bg-green-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-green-200 transition-all">
-                <Car size={24} className="text-green-600 dark:text-green-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Manage Drivers</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Monitor drivers</p>
-            </Link>
-
-            <Link
-              to="/admin/charging-bookings"
-              className="group p-5 md:p-6 border-2 border-orange-200 dark:border-orange-900 rounded-xl hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-orange-100 dark:bg-orange-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-orange-200 transition-all">
-                <Zap size={24} className="text-orange-600 dark:text-orange-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Charging Enquiries</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">New leads</p>
-            </Link>
-
-            <Link
-              to="/admin/rides"
-              className="group p-5 md:p-6 border-2 border-teal-200 dark:border-teal-900 rounded-xl hover:border-teal-500 dark:hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-teal-100 dark:bg-teal-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-teal-200 transition-all">
-                <Calendar size={24} className="text-teal-600 dark:text-teal-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Ride Bookings</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Active bookings</p>
-            </Link>
-
-            <Link
-              to="/admin/tours"
-              className="group p-5 md:p-6 border-2 border-cyan-200 dark:border-cyan-900 rounded-xl hover:border-cyan-500 dark:hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-cyan-100 dark:bg-cyan-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-cyan-200 transition-all">
-                <Package size={24} className="text-cyan-600 dark:text-cyan-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Tour Bookings</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tour packages</p>
-            </Link>
-
-            <Link
-              to="/admin/packages"
-              className="group p-5 md:p-6 border-2 border-cyan-200 dark:border-cyan-900 rounded-xl hover:border-cyan-500 dark:hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-cyan-100 dark:bg-cyan-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-cyan-200 transition-all">
-                <Box size={24} className="text-cyan-600 dark:text-cyan-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Packages</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Package plans</p>
-            </Link>
-
-            <Link
-              to="/admin/payments"
-              className="group p-5 md:p-6 border-2 border-emerald-200 dark:border-emerald-900 rounded-xl hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
-            >
-              <div className="bg-emerald-100 dark:bg-emerald-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-all">
-                <BarChart3 size={24} className="text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Payments</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenue & Payments</p>
-            </Link>
-          </div>
-        </div>
-
-        {/* Recent Activity Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-8 bg-emerald-500 rounded-full"></div>
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                Recent Ride Activity
-              </h2>
-            </div>
-            <Link to="/admin/rides" className="text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline">
-              View All Rides
-            </Link>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/50">
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">ID</th>
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Customer</th>
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Type</th>
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
-                  <th className="px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {analytics?.recentBookings?.length > 0 ? (
-                  analytics.recentBookings.map((ride) => (
-                    <tr key={ride._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white">#{ride.bookingId.slice(-6)}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">{ride.user?.firstName} {ride.user?.lastName}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{ride.cabType}</span>
-                        </div>
+            
+            <div className="overflow-x-auto flex-1">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-slate-50/50">
+                    <th className="px-10 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Identifier</th>
+                    <th className="px-10 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Operator</th>
+                    <th className="px-10 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
+                    <th className="px-10 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Volume</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {analytics?.recentBookings?.slice(0, 6).map((ride) => (
+                    <tr key={ride._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-10 py-6">
+                        <p className="text-sm font-black text-slate-900 font-mono">#{ride.bookingId.slice(-8).toUpperCase()}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">{ride.rideType}</p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                          ride.rideType === 'airport' ? 'bg-blue-100 text-blue-600' : 
-                          ride.rideType === 'intercity' ? 'bg-purple-100 text-purple-600' : 'bg-green-100 text-green-600'
-                        }`}>
-                          {ride.rideType}
-                        </span>
+                      <td className="px-10 py-6">
+                        <p className="text-sm font-black text-slate-900">{ride.user?.firstName} {ride.user?.lastName}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">{ride.cabType}</p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`flex items-center gap-1.5 text-xs font-bold ${
-                          ride.status === 'completed' ? 'text-green-500' : 
-                          ride.status === 'cancelled' ? 'text-red-500' : 'text-amber-500'
+                      <td className="px-10 py-6">
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${
+                          ride.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 
+                          ride.status === 'cancelled' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'
                         }`}>
                           <div className={`w-1.5 h-1.5 rounded-full ${
-                            ride.status === 'completed' ? 'bg-green-500' : 
-                            ride.status === 'cancelled' ? 'bg-red-500' : 'bg-amber-500'
-                          }`}></div>
+                            ride.status === 'completed' ? 'bg-emerald-500' : 
+                            ride.status === 'cancelled' ? 'bg-rose-500' : 'bg-amber-500'
+                          }`} />
                           {ride.status}
-                        </span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-black text-gray-900 dark:text-white">
-                        ₹{ride.pricing?.totalFare || 0}
+                      <td className="px-10 py-6 text-right text-sm font-black text-slate-900">
+                        ₹{ride.pricing?.totalFare?.toLocaleString() || 0}
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                      No recent ride activity found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        {/* Additional Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link
-            to="/admin/settings"
-            className="group bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 text-white border border-slate-700 hover:border-slate-500"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                  <Settings size={20} />
-                  Settings & Configuration
-                </h3>
-                <p className="text-slate-300 text-sm">Manage system settings and preferences</p>
+          <div className="space-y-6">
+            <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm">
+              <h3 className="text-lg font-black text-slate-900 mb-8 tracking-tight uppercase tracking-widest text-[10px] text-slate-400">System Shortcuts</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: ShieldCheck, label: 'Security', color: 'text-blue-500', bg: 'bg-blue-50', link: '/admin/settings' },
+                  { icon: Globe, label: 'Regional', color: 'text-emerald-500', bg: 'bg-emerald-50', link: '/admin/pricing' },
+                  { icon: Layers, label: 'Assets', color: 'text-violet-500', bg: 'bg-violet-50', link: '/admin/packages' },
+                  { icon: Bell, label: 'Alerts', color: 'text-amber-500', bg: 'bg-amber-50', link: '/admin/feedback' }
+                ].map((item, idx) => (
+                  <Link key={idx} to={item.link} className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-3xl hover:bg-slate-100 transition-all group">
+                    <div className={`p-4 ${item.bg} ${item.color} rounded-2xl mb-3 group-hover:scale-110 transition-transform`}>
+                      <item.icon size={20} />
+                    </div>
+                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{item.label}</span>
+                  </Link>
+                ))}
               </div>
-              <Settings size={32} className="opacity-20" />
             </div>
-          </Link>
 
-          <Link
-            to="/admin/profile"
-            className="group bg-gradient-to-br from-purple-600 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 text-white border border-purple-500 hover:border-purple-400"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                  <User size={20} />
-                  My Profile
-                </h3>
-                <p className="text-purple-100 text-sm">View and update your profile</p>
+            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+              <div className="relative z-10">
+                <Zap size={32} className="text-emerald-400 mb-6" />
+                <h3 className="text-2xl font-black mb-2 tracking-tight">Active Enquiries</h3>
+                <p className="text-indigo-100 text-sm font-medium mb-8 leading-relaxed opacity-80">There are {analytics?.chargingEnquiries || 0} pending charging station enquiries requiring administrative review.</p>
+                <Link to="/admin/charging-bookings" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:shadow-2xl transition-all">
+                  Process Queue
+                  <ArrowRight size={16} />
+                </Link>
               </div>
-              <User size={32} className="opacity-20" />
             </div>
-          </Link>
+          </div>
         </div>
       </div>
     </AdminLayout>

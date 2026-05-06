@@ -1,9 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import UserLayout from './UserLayout.jsx';
 import * as userService from '../../services/userService.js';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, Upload } from 'lucide-react';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Calendar, 
+  Edit2, 
+  Save, 
+  X, 
+  Upload, 
+  ShieldCheck, 
+  ChevronRight,
+  Camera,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
 import { getImageUrl } from '../../utils/imageUrl';
 
 export default function UserProfile() {
@@ -26,7 +42,6 @@ export default function UserProfile() {
   }, [authLoading, isAuthenticated, navigate]);
 
   useEffect(() => {
-    // Only load once when component mounts and user is authenticated
     if (hasLoadedRef.current) return;
     if (!isAuthenticated) return;
 
@@ -39,16 +54,13 @@ export default function UserProfile() {
       setError('');
       try {
         const res = await userService.getProfile();
-        console.log('📥 Profile loaded from server:', res);
         if (isMounted && res.success) {
-          console.log('✅ Setting user and formData:', res.data);
           setUser(res.data);
           setFormData(res.data);
         }
       } catch (err) {
         if (isMounted) {
           setError('Failed to load profile. Please try again.');
-          console.error('❌ Load error:', err);
         }
       } finally {
         if (isMounted) {
@@ -62,7 +74,7 @@ export default function UserProfile() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,16 +99,13 @@ export default function UserProfile() {
         if (res.success) {
           setUser(res.data);
           setFormData(res.data);
-          setSuccessMessage('Profile picture updated!');
+          setSuccessMessage('Profile picture updated successfully!');
           setTimeout(() => setSuccessMessage(''), 3000);
-          
-          // Force auth context update
           if (loadUser) await loadUser();
         } else {
           setError(res.message || 'Failed to upload image');
         }
       } catch (err) {
-        console.error('❌ Upload error:', err);
         setError('Failed to upload image. Please try again.');
       }
     }
@@ -107,34 +116,14 @@ export default function UserProfile() {
       setError('');
       setSuccessMessage('');
       const updateData = { ...formData };
-      if (profileImage) {
-        updateData.profileImage = profileImage;
-      }
-      console.log('📝 Saving profile with data:', updateData);
       const res = await userService.updateProfile(updateData);
-      console.log('✅ Update response:', res);
       
       if (res.success) {
-        // Update both user and formData with the response
         setUser(res.data);
         setFormData(res.data);
-        
-        // Also refetch to ensure latest data from server
-        const profileRes = await userService.getProfile();
-        if (profileRes.success) {
-          setUser(profileRes.data);
-          setFormData(profileRes.data);
-          console.log('🔄 Profile refetched:', profileRes.data);
-        }
-        
-        // Update global auth context with latest user data
-        if (loadUser) {
-          await loadUser();
-          console.log('✅ Auth context updated with latest profile data');
-        }
+        if (loadUser) await loadUser();
         
         setIsEditing(false);
-        setProfileImage(null);
         setSuccessMessage('Profile updated successfully!');
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
@@ -142,260 +131,301 @@ export default function UserProfile() {
       }
     } catch (err) {
       setError('Failed to update profile. Please try again.');
-      console.error('❌ Save error:', err);
     }
   };
 
   const handleCancel = () => {
     setFormData(user);
     setIsEditing(false);
-    setProfileImage(null);
   };
 
   if (authLoading || loading) {
     return (
       <UserLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full mb-4"
+          />
+          <p className="text-slate-500 font-medium animate-pulse">Synchronizing your profile...</p>
         </div>
       </UserLayout>
     );
   }
 
-  console.log('👤 Current user state:', user);
-  console.log('📝 Current formData state:', formData);
-
   return (
     <UserLayout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-          <p className="text-sm sm:text-base text-gray-600">Manage your personal information</p>
+      <div className="max-w-5xl mx-auto space-y-10">
+        {/* Premium Header Section */}
+        <div className="relative rounded-[2.5rem] overflow-hidden bg-white text-slate-900 p-8 md:p-12 shadow-xl border border-slate-100 mb-8">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            {/* Profile Avatar */}
+            <div className="relative group">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="w-40 h-40 rounded-[3rem] bg-gradient-to-br from-emerald-400 to-teal-500 p-1.5 shadow-2xl overflow-hidden"
+              >
+                <div className="w-full h-full rounded-[2.7rem] bg-white overflow-hidden flex items-center justify-center text-5xl font-black text-emerald-500">
+                  {user?.profileImage ? (
+                    <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    (user?.firstName?.charAt(0) || user?.lastName?.charAt(0) || 'U')
+                  )}
+                </div>
+              </motion.div>
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-700 hover:text-emerald-500 transition-colors border border-slate-100"
+              >
+                <Camera size={20} />
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+            </div>
+
+            <div className="text-center md:text-left space-y-3">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
+                {user?.firstName} <span className="text-emerald-500">{user?.lastName}</span>
+              </h1>
+              <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                  <Mail size={14} className="text-emerald-500" />
+                  {user?.email}
+                </div>
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-50 rounded-full border border-emerald-100 text-emerald-600 text-xs font-bold uppercase tracking-widest">
+                  <ShieldCheck size={14} />
+                  Verified Partner
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Messages */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm sm:text-base">
-            {error}
-          </div>
-        )}
-        {successMessage && (
-          <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm sm:text-base">
-            {successMessage}
-          </div>
-        )}
+        {/* Notifications */}
+        <AnimatePresence>
+          {successMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-emerald-50 border border-emerald-100 p-4 rounded-3xl flex items-center gap-4 text-emerald-600 shadow-sm"
+            >
+              <CheckCircle2 size={20} />
+              <p className="font-bold text-sm">{successMessage}</p>
+            </motion.div>
+          )}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-rose-50 border border-rose-100 p-4 rounded-3xl flex items-center gap-4 text-rose-600 shadow-sm"
+            >
+              <AlertCircle size={20} />
+              <p className="font-bold text-sm">{error}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
-          {/* Profile Image Section */}
-          <div className="mb-8 flex flex-col items-center">
-            <div className="relative mb-4">
-              <div className="w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-3xl sm:text-5xl font-bold overflow-hidden">
-                {user?.profileImage ? (
-                  <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  (user?.firstName?.charAt(0) || user?.lastName?.charAt(0) || 'U')
-                )}
+        {/* Profile Content */}
+        <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+          <div className="p-8 md:p-12">
+            <div className="flex justify-between items-center mb-10 pb-6 border-b border-slate-100">
+              <div>
+                <h3 className="text-2xl font-black text-slate-900">Personal Information</h3>
+                <p className="text-slate-500 font-medium">Update your profile details and preferences.</p>
               </div>
-              {isEditing && (
+              {!isEditing && (
                 <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition"
+                  onClick={() => setIsEditing(true)}
+                  className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black hover:bg-black transition-all flex items-center gap-2 shadow-lg"
                 >
-                  <Upload size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <Edit2 size={14} />
+                  Edit Profile
                 </button>
               )}
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Field Groups */}
+              <div className="space-y-6">
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">First Name</label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName || ''}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all"
+                      />
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">{user?.firstName}</div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Last Name</label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName || ''}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all"
+                      />
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">{user?.lastName}</div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Phone Number</label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone || ''}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all"
+                      />
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">{user?.phone || 'Not provided'}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Date of Birth</label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                      <input
+                        type="date"
+                        name="dateOfBirth"
+                        value={formData.dateOfBirth?.split('T')[0] || ''}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all"
+                      />
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">
+                      {user?.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not provided'}
+                    </div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Gender</label>
+                  {isEditing ? (
+                    <select
+                      name="gender"
+                      value={formData.gender || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all appearance-none"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">{user?.gender || 'Not provided'}</div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Address</label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-4 text-slate-400" size={18} />
+                      <textarea
+                        name="address"
+                        value={formData.address || ''}
+                        onChange={handleInputChange}
+                        rows="1"
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-emerald-500 font-bold transition-all resize-none"
+                      />
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 bg-slate-50/50 rounded-2xl font-black text-slate-700">{user?.address || 'Not provided'}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Editing Controls */}
             {isEditing && (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="text-xs sm:text-sm text-green-600 hover:underline"
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-12 flex gap-4 pt-10 border-t border-slate-100"
               >
-                Change Profile Picture
-              </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 md:flex-none px-10 py-4 bg-emerald-600 text-white rounded-[1.5rem] font-black hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                >
+                  <Save size={18} />
+                  Save Changes
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="flex-1 md:flex-none px-10 py-4 bg-slate-100 text-slate-500 rounded-[1.5rem] font-black hover:bg-slate-200 transition-all flex items-center justify-center gap-3"
+                >
+                  <X size={18} />
+                  Cancel
+                </button>
+              </motion.div>
             )}
           </div>
+        </div>
 
-          {/* Profile Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
-            {/* First Name */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                <User size={14} className="sm:w-4 sm:h-4 inline mr-2" />
-                First Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                />
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.firstName}</p>
-              )}
+        {/* Security Summary Footer */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center gap-5">
+            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shrink-0">
+              <ShieldCheck size={24} />
             </div>
-
-            {/* Last Name */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                Last Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                />
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.lastName}</p>
-              )}
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Account Status</p>
+              <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Active & Secure</p>
             </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                <Mail size={14} className="sm:w-4 sm:h-4 inline mr-2" />
-                Email
-              </label>
-              <p className="text-gray-900 font-semibold text-sm sm:text-base break-all">{user?.email}</p>
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+          </div>
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center gap-5">
+            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shrink-0">
+              <Calendar size={24} />
             </div>
-
-            {/* Phone */}
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                <Phone size={14} className="sm:w-4 sm:h-4 inline mr-2" />
-                Phone Number
-              </label>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                />
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.phone || 'Not provided'}</p>
-              )}
-            </div>
-
-            {/* Date of Birth */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                <Calendar size={14} className="sm:w-4 sm:h-4 inline mr-2" />
-                Date of Birth
-              </label>
-              {isEditing ? (
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth?.split('T')[0] || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                />
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">
-                  {user?.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : 'Not provided'}
-                </p>
-              )}
-            </div>
-
-            {/* Gender */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                Gender
-              </label>
-              {isEditing ? (
-                <select
-                  name="gender"
-                  value={formData.gender || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.gender || 'Not provided'}</p>
-              )}
-            </div>
-
-            {/* Account Created */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                Member Since
-              </label>
-              <p className="text-gray-900 font-semibold text-sm sm:text-base">
-                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Member Since</p>
+              <p className="text-sm font-black text-slate-800 uppercase tracking-tight">
+                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : 'N/A'}
               </p>
             </div>
           </div>
-
-          {/* Address */}
-          <div className="mb-8 pb-8 border-b border-gray-200">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-              <MapPin size={14} className="sm:w-4 sm:h-4 inline mr-2" />
-              Address
-            </label>
-            {isEditing ? (
-                <textarea
-                  name="address"
-                  value={formData.address || ''}
-                  onChange={handleInputChange}
-                  rows="3"
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                />
-              ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{user?.address || 'Not provided'}</p>
-              )}
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center gap-5">
+            <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500 shrink-0">
+              <User size={24} />
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              {isEditing ? (
-                <>
-                  <button
-                    onClick={handleSave}
-                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
-                  >
-                    <Save size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition font-semibold text-sm sm:text-base"
-                  >
-                    <X size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    Cancel
-                  </button>
-                </>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition font-semibold text-sm sm:text-base"
-              >
-                <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
-                Edit Profile
-              </button>
-            )}
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Profile Completeness</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: '85%' }} />
+                </div>
+                <p className="text-xs font-black text-slate-800 uppercase tracking-tight">85%</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
