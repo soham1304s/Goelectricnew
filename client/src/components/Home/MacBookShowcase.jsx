@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  Smartphone,
-  Monitor,
   Shield,
   Zap,
   Clock,
   MapPin,
-  Check,
   Plane,
   Navigation,
-  Landmark,
-  Star,
   Search,
   LocateFixed,
   Calendar,
   Car,
-  MessageSquare,
-  ChevronRight,
   TrendingUp
 } from 'lucide-react';
 import LocationPickerComponent from '../LocationPickerComponent.jsx';
@@ -77,9 +70,9 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
             100% { transform: translateY(0px) rotateX(0deg); }
           }
           @keyframes floatPhone {
-            0% { transform: translateY(0px) rotate(-2deg); }
-            50% { transform: translateY(-20px) rotate(0deg); }
-            100% { transform: translateY(0px) rotate(-2deg); }
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
           }
           .animate-float-mac {
             animation: floatMac 6s ease-in-out infinite;
@@ -258,182 +251,164 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="md:hidden relative mx-auto w-[260px] sm:w-[300px] z-20 group animate-float-phone"
+            className="md:hidden relative mx-auto w-[270px] max-w-[82vw] sm:w-[310px] z-20 group animate-float-phone"
           >
-            <div className={`relative rounded-[2.5rem] p-2 shadow-2xl border-[6px] ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-slate-800'}`}>
+            <div className={`relative rounded-[2.35rem] p-2 shadow-[0_30px_90px_rgba(15,23,42,0.25)] border-[7px] ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-950 border-slate-800'}`}>
+              <div className="absolute -left-[10px] top-24 h-12 w-1.5 rounded-l-full bg-slate-800" />
+              <div className="absolute -right-[10px] top-32 h-16 w-1.5 rounded-r-full bg-slate-800" />
               {/* Speaker / Notch */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-4 bg-slate-900 rounded-full z-30" />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-5 bg-slate-950 rounded-full border border-white/5 z-30" />
 
               {/* Screen Content */}
-              <div className="aspect-[9/19.5] rounded-[2rem] overflow-hidden bg-white relative">
+              <div className="aspect-[9/19.25] rounded-[1.85rem] overflow-hidden bg-slate-50 relative">
                 {/* Mobile UI - Full Smart Booking Form */}
-                <div className="p-4 sm:p-5 flex flex-col h-full bg-white overflow-y-auto scrollbar-hide">
+                <div className="flex h-full flex-col overflow-y-auto scrollbar-hide bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_30%),linear-gradient(180deg,#f8fafc_0%,#ffffff_56%,#f8fafc_100%)] px-4 pb-4 pt-5">
                   {/* Status Bar */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black text-slate-900">9:41</span>
-                    <div className="flex gap-1.5 items-center">
-                      <TrendingUp size={10} className="text-slate-900" />
-                      <div className="flex gap-0.5">
-                        <div className="w-3 h-1.5 bg-slate-900 rounded-[2px]" />
-                        <div className="w-1.5 h-1.5 bg-slate-900 rounded-full" />
+                  <div className="mb-3 flex h-6 items-center justify-between px-1">
+                    <span className="text-[10px] font-black leading-none text-slate-900">9:41</span>
+                    <div className="flex items-center gap-1.5 text-slate-900">
+                      <TrendingUp size={10} strokeWidth={3} />
+                      <div className="flex items-center gap-0.5">
+                        <div className="h-1.5 w-3 rounded-[2px] bg-slate-900" />
+                        <div className="h-1.5 w-1.5 rounded-full bg-slate-900" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Header with Car Illustration */}
-                  <div className="relative mb-6 pt-2">
-                    <div className="pr-20">
-                      <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest mb-1.5">
-                        <Zap size={8} className="fill-current animate-pulse" /> Smart Booking
+                  {/* Header */}
+                  <div className="mb-3 shrink-0 overflow-hidden rounded-[1.35rem] bg-slate-950 p-3 text-white shadow-xl shadow-slate-900/15">
+                    <div className="flex items-center gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-2 py-0.5 text-[7px] font-black uppercase tracking-wider text-emerald-200">
+                          <Zap size={9} className="fill-current" /> Smart Booking
+                        </div>
+                        <h4 className="text-[19px] font-black leading-[1.05] tracking-tight">
+                          Plan Your Ride
+                        </h4>
+                        <p className="mt-1.5 max-w-[120px] text-[8.5px] font-medium leading-relaxed text-slate-300">
+                          Choose route, date, and time in one clean flow.
+                        </p>
                       </div>
-                      <h4 className="text-2xl font-black text-slate-900 leading-[1.1] mb-2">Plan Your <br/>Ride</h4>
-                      <p className="text-[9px] font-medium text-slate-500 max-w-[120px] leading-relaxed">
-                        Choose your trip details and find the best ride for you.
-                      </p>
-                    </div>
-                    <div className="absolute top-0 -right-4 w-32 sm:w-40 pointer-events-none">
-                      <img 
-                        src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=400&auto=format&fit=crop" 
-                        alt="EV Car" 
-                        className="w-full h-auto drop-shadow-2xl rounded-2xl"
+                      <img
+                        src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=400&auto=format&fit=crop"
+                        alt="EV Car"
+                        className="h-16 w-16 flex-shrink-0 rounded-[1rem] object-cover shadow-lg shadow-black/30"
                       />
                     </div>
                   </div>
 
                   {/* Integrated Service Toggle */}
-                  <div className="flex p-1.5 rounded-2xl mb-4 bg-slate-50/80 border border-slate-100 shadow-sm">
+                  <div className="mb-3 grid shrink-0 grid-cols-3 gap-1.5 rounded-[1.25rem] border border-slate-200 bg-white p-1.5 shadow-sm shadow-slate-200/70">
                     {[
-                      { id: 'Local', icon: <MapPin size={12} />, label: 'Local' },
-                      { id: 'Intercity', icon: <Navigation size={12} />, label: 'Intercity' },
-                      { id: 'Airport', icon: <Plane size={12} />, label: 'Airport' }
+                      { id: 'Local', icon: <MapPin size={13} />, label: 'Local' },
+                      { id: 'Intercity', icon: <Navigation size={13} />, label: 'Intercity' },
+                      { id: 'Airport', icon: <Plane size={13} />, label: 'Airport' }
                     ].map((type) => (
                       <button
                         key={type.id}
                         onClick={() => setActiveTab(type.id)}
-                        className={`flex-1 py-2.5 rounded-xl text-[9px] font-extrabold transition-all flex items-center justify-center gap-1.5 ${activeTab === type.id
-                            ? 'bg-white text-emerald-600 shadow-md ring-1 ring-emerald-500/10'
-                            : 'text-slate-400 hover:text-slate-600'
+                        className={`flex min-h-[38px] min-w-0 items-center justify-center gap-1.5 rounded-2xl px-1.5 text-[8.5px] font-extrabold transition-all ${activeTab === type.id
+                            ? 'bg-slate-950 text-white shadow-md shadow-slate-900/20'
+                            : 'text-slate-500 hover:bg-slate-50 hover:text-emerald-600'
                           }`}
                       >
-                        <span className={activeTab === type.id ? 'text-emerald-500' : 'text-slate-300'}>
+                        <span className={`flex-shrink-0 ${activeTab === type.id ? 'text-emerald-300' : 'text-slate-400'}`}>
                           {type.icon}
                         </span>
-                        {type.label}
+                        <span className="truncate">{type.label}</span>
                       </button>
                     ))}
                   </div>
 
-                  {/* Card-Based Inputs with Connection Line */}
-                  <div className="relative space-y-3 mb-4 z-[60]">
+                  {/* Route Inputs */}
+                  <div className="relative z-[60] mb-3 shrink-0 rounded-[1.35rem] border border-slate-200 bg-white p-2.5 shadow-sm shadow-slate-200/70">
                     {/* Connection Line */}
-                    <div className="absolute left-[26px] top-12 bottom-12 w-[1.5px] border-l-2 border-dotted border-emerald-200 pointer-events-none" />
+                    <div className="pointer-events-none absolute left-[24px] top-[50px] bottom-[50px] w-px border-l border-dashed border-emerald-300" />
                     
-                    {/* Pickup Card */}
-                    <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm relative group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
-                          <div className="w-2.5 h-2.5 rounded-full border-2 border-emerald-500" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Pickup Location</p>
-                          <LocationPickerComponent
-                            value={pickup.address}
-                            onChange={(val) => setPickup({ ...pickup, address: val })}
-                            onSelectLocation={(loc) => setPickup(loc)}
-                            placeholder="Enter pickup location"
-                            darkMode={false}
-                            compact={true}
-                            naked={true}
-                            inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
-                          />
-                        </div>
-                        <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
-                          <LocateFixed size={14} />
-                        </button>
+                    <div className="relative flex min-h-[52px] items-center gap-2.5">
+                      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                        <div className="h-3 w-3 rounded-full border-[2.5px] border-emerald-500" />
                       </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="mb-1 text-[8px] font-black uppercase tracking-wider text-slate-500">Pickup</p>
+                        <LocationPickerComponent
+                          value={pickup.address}
+                          onChange={(val) => setPickup({ ...pickup, address: val })}
+                          onSelectLocation={(loc) => setPickup(loc)}
+                          placeholder="Enter pickup location"
+                          darkMode={false}
+                          compact={true}
+                          naked={true}
+                          inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 placeholder:!text-slate-400 border-none ring-0 focus:ring-0"
+                        />
+                      </div>
+                      <button type="button" className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 text-emerald-600 transition-colors hover:bg-emerald-50">
+                        <LocateFixed size={14} />
+                      </button>
                     </div>
 
-                    {/* Destination Card */}
-                    <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm relative group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
-                          <MapPin size={14} className="fill-current" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Destination</p>
-                          <LocationPickerComponent
-                            value={dest.address}
-                            onChange={(val) => setDest({ ...dest, address: val })}
-                            onSelectLocation={(loc) => setDest(loc)}
-                            placeholder="Enter destination"
-                            darkMode={false}
-                            compact={true}
-                            naked={true}
-                            inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
-                          />
-                        </div>
-                        <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
-                          <LocateFixed size={14} />
-                        </button>
+                    <div className="relative mt-2 flex min-h-[52px] items-center gap-2.5 border-t border-slate-100 pt-2">
+                      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+                        <MapPin size={14} className="fill-current" />
                       </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="mb-1 text-[8px] font-black uppercase tracking-wider text-slate-500">Destination</p>
+                        <LocationPickerComponent
+                          value={dest.address}
+                          onChange={(val) => setDest({ ...dest, address: val })}
+                          onSelectLocation={(loc) => setDest(loc)}
+                          placeholder="Enter destination"
+                          darkMode={false}
+                          compact={true}
+                          naked={true}
+                          inputClassName="!p-0 !h-auto !bg-transparent !text-[11px] !font-bold !text-slate-900 placeholder:!text-slate-400 border-none ring-0 focus:ring-0"
+                        />
+                      </div>
+                      <button type="button" className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 text-emerald-600 transition-colors hover:bg-emerald-50">
+                        <LocateFixed size={14} />
+                      </button>
                     </div>
                   </div>
 
                   {/* Unified Date/Time Card */}
-                  <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm mb-4">
-                    <div className="flex items-center divide-x divide-slate-100">
-                      <div className="flex-1 flex flex-col pr-3">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">Date</p>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="date"
-                            value={bookingDate}
-                            onChange={(e) => setBookingDate(e.target.value)}
-                            className="bg-transparent border-none outline-none text-[10px] font-black text-slate-900 w-full [color-scheme:light]"
-                          />
-                          <Calendar size={14} className="text-emerald-500" />
-                        </div>
-                      </div>
-                      <div className="flex-1 flex flex-col pl-3">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">Time</p>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            value={bookingTime}
-                            onChange={(e) => setBookingTime(e.target.value)}
-                            className="bg-transparent border-none outline-none text-[10px] font-black text-slate-900 w-full [color-scheme:light]"
-                          />
-                          <Clock size={14} className="text-emerald-500" />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="mb-3 grid shrink-0 grid-cols-2 gap-1.5">
+                    <label className="rounded-[1rem] border border-slate-200 bg-white px-2.5 py-2 shadow-sm shadow-slate-200/70">
+                      <span className="mb-1.5 flex items-center justify-between text-[7.5px] font-black uppercase tracking-wider text-slate-500">
+                        Date
+                        <Calendar size={12} className="text-emerald-600" />
+                      </span>
+                      <input
+                        type="date"
+                        value={bookingDate}
+                        onChange={(e) => setBookingDate(e.target.value)}
+                        className="w-full min-w-0 bg-transparent text-[8.5px] font-bold text-slate-900 outline-none [color-scheme:light]"
+                      />
+                    </label>
+                    <label className="rounded-[1rem] border border-slate-200 bg-white px-2.5 py-2 shadow-sm shadow-slate-200/70">
+                      <span className="mb-1.5 flex items-center justify-between text-[7.5px] font-black uppercase tracking-wider text-slate-500">
+                        Time
+                        <Clock size={12} className="text-emerald-600" />
+                      </span>
+                      <input
+                        type="time"
+                        value={bookingTime}
+                        onChange={(e) => setBookingTime(e.target.value)}
+                        className="w-full min-w-0 bg-transparent text-[8.5px] font-bold text-slate-900 outline-none [color-scheme:light]"
+                      />
+                    </label>
                   </div>
 
-                  {/* Ride Better Promo Card */}
-                  <div className="bg-emerald-50/50 rounded-2xl p-3 mb-6 flex items-center gap-3 border border-emerald-100/50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-                      <MessageSquare size={18} />
-                    </div>
-                    <div className="flex-1">
-                      <h5 className="text-[10px] font-black text-slate-900 mb-0.5">Ride Better with Smart Booking</h5>
-                      <p className="text-[8px] font-medium text-slate-500 leading-tight">
-                        Real-time tracking, best prices, and secure rides.
-                      </p>
-                    </div>
-                    <ChevronRight size={14} className="text-slate-400" />
-                  </div>
-
-                  {/* Search Button (Pill Style) */}
+                  {/* Search Button */}
                   <button
                     onClick={handleSearch}
                     disabled={isSearching}
-                    className="w-full bg-[#00A65A] hover:bg-emerald-600 text-white py-4 rounded-2xl font-black text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                    className="mt-auto flex w-full shrink-0 items-center justify-center gap-2 rounded-[1rem] bg-emerald-600 px-4 py-3.5 text-[11px] font-black text-white shadow-lg shadow-emerald-600/25 transition-all hover:bg-emerald-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSearching ? (
-                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
                     ) : (
                       <>
-                        <Search size={16} strokeWidth={3} />
+                        <Search size={16} strokeWidth={2.75} />
                         Search Rides Now
                       </>
                     )}

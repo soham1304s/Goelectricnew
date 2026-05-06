@@ -257,11 +257,14 @@ export default function LocationPickerComponent({
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
-              className={`absolute top-full left-1/2 -translate-x-1/2 w-[280px] mt-3 p-2 rounded-2xl border shadow-2xl z-[100] backdrop-blur-xl ${darkMode ? 'bg-zinc-900/95 border-zinc-800' : 'bg-white/95 border-slate-100'
+              className={`absolute top-full z-[100] border backdrop-blur-xl ${compact
+                ? 'left-[-38px] right-[-38px] mt-7 max-h-[156px] overflow-y-auto rounded-[1.1rem] p-1.5 shadow-xl'
+                : 'left-1/2 -translate-x-1/2 w-[280px] mt-3 p-2 rounded-2xl shadow-2xl'
+                } ${darkMode ? 'bg-zinc-900/95 border-zinc-800' : 'bg-white/95 border-slate-100'
                 }`}
             >
               {!value && (
-                <div className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
+                <div className={`${compact ? 'px-3 py-1.5 text-[8px]' : 'px-4 py-2 text-[10px]'} font-black uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
                   <TrendingUp size={12} />
                   Popular Destinations
                 </div>
@@ -271,17 +274,17 @@ export default function LocationPickerComponent({
                   key={s.placeId}
                   onClick={() => handleSelectSuggestion(s)}
                   onMouseEnter={() => setSelectedIndex(i)}
-                  className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-start gap-3 mb-1 last:mb-0 ${selectedIndex === i
+                  className={`w-full text-left rounded-xl transition-all flex items-start mb-1 last:mb-0 ${compact ? 'px-3 py-2 gap-2' : 'px-4 py-3 gap-3'} ${selectedIndex === i
                     ? darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
                     : darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-slate-700 hover:bg-slate-50'
                     }`}
                 >
-                  <div className={`mt-1 p-1.5 rounded-lg ${selectedIndex === i ? 'bg-emerald-500/20' : darkMode ? 'bg-zinc-800' : 'bg-slate-100'}`}>
-                    {s.isPopular && !value ? <Star size={14} className="text-amber-500 fill-amber-500" /> : <MapPin size={14} className={selectedIndex === i ? 'text-emerald-500' : 'text-slate-400'} />}
+                  <div className={`mt-0.5 rounded-lg ${compact ? 'p-1.5' : 'p-1.5'} ${selectedIndex === i ? 'bg-emerald-500/20' : darkMode ? 'bg-zinc-800' : 'bg-slate-100'}`}>
+                    {s.isPopular && !value ? <Star size={compact ? 12 : 14} className="text-amber-500 fill-amber-500" /> : <MapPin size={compact ? 12 : 14} className={selectedIndex === i ? 'text-emerald-500' : 'text-slate-400'} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate">{s.mainText}</p>
-                    <p className={`text-xs truncate ${selectedIndex === i ? 'opacity-80' : 'opacity-50'}`}>
+                    <p className={`${compact ? 'text-xs' : 'text-sm'} font-bold truncate`}>{s.mainText}</p>
+                    <p className={`${compact ? 'text-[10px]' : 'text-xs'} truncate ${selectedIndex === i ? 'opacity-80' : 'opacity-50'}`}>
                       {s.secondaryText}
                     </p>
                   </div>
