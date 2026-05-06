@@ -436,7 +436,6 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                     )}
                   </button>
                 </div>
-                </div>
               </div>
             </div>
           </motion.div>
