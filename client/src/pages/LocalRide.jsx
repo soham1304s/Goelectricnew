@@ -387,40 +387,40 @@ export default function LocalRidePage() {
 
   return (
     <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
-      <div className="container mx-auto px-4 py-8 md:py-16">
+      <div className="container mx-auto px-3 pt-12 pb-8 sm:px-4 sm:pt-14 md:py-16">
         <div className="mx-auto max-w-6xl">
           {/* Header Section */}
-          <div className="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
+          <div className="mb-6 flex flex-col items-start justify-between gap-4 text-left sm:mb-8 md:mb-10 md:flex-row md:items-center">
+            <div className="w-full min-w-0">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs mb-4">
                 <Leaf size={14} />
                 <span>100% Electric Fleet</span>
               </div>
-              <h1 className={`text-4xl font-black tracking-tight md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <h1 className={`text-3xl font-black tracking-tight sm:text-4xl md:text-5xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 Local Ride <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Booking</span>
               </h1>
-              <p className={`mt-3 text-base md:text-lg ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className={`mt-3 text-sm leading-relaxed sm:text-base md:text-lg ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 Quick, convenient, and zero-emission rides within your city.
               </p>
             </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-12">
+          <div className="grid gap-5 sm:gap-8 lg:grid-cols-12">
             {/* Left Column: Form */}
-            <div className={`rounded-3xl p-6 md:p-8 shadow-sm lg:col-span-8 ${isDark ? 'border border-zinc-800 bg-zinc-900/50' : 'border border-slate-200 bg-white'}`}>
+            <div className={`rounded-[1.5rem] p-4 shadow-sm sm:p-6 md:rounded-3xl md:p-8 lg:col-span-8 ${isDark ? 'border border-zinc-800 bg-zinc-900/50' : 'border border-slate-200 bg-white'}`}>
               {bookingError && (
-                <div className="mb-6 rounded-xl border border-red-400/50 bg-red-50 p-4 text-red-600 flex items-start gap-3">
+                <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-400/50 bg-red-50 p-3 text-red-600 sm:mb-6 sm:p-4">
                   <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <p className="text-sm font-medium">{bookingError}</p>
                 </div>
               )}
 
               {/* Locations Section */}
-              <div className="space-y-6 mb-8">
+              <div className="mb-6 space-y-5 sm:mb-8 sm:space-y-6">
                 <div>
                   <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Pickup Location</label>
-                  <div className="flex gap-3 items-start">
-                    <div className="flex-1">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:gap-3">
+                    <div className="min-w-0">
                       <LocationPickerComponent
                         value={pickupLocation}
                         onChange={(value) => setPickupLocation(value)}
@@ -440,7 +440,7 @@ export default function LocalRidePage() {
                       type="button"
                       onClick={detectPickupLocation}
                       disabled={isDetectingPickup}
-                      className={`rounded-xl p-3.5 flex-shrink-0 transition-all border ${isDetectingPickup ? 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400' : isDark ? 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-emerald-400' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-emerald-600'}`}
+                      className={`flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-xl border transition-all sm:h-[50px] sm:w-[50px] ${isDetectingPickup ? 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400' : isDark ? 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-emerald-400' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-emerald-600'}`}
                       title="Use current location"
                     >
                       {isDetectingPickup ? (
@@ -454,8 +454,7 @@ export default function LocalRidePage() {
 
                 <div>
                   <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Drop Location</label>
-                  <div className="flex gap-3 items-start">
-                    <div className="flex-1">
+                  <div className="min-w-0">
                       <LocationPickerComponent
                         value={dropLocation}
                         onChange={(value) => setDropLocation(value)}
@@ -470,13 +469,12 @@ export default function LocalRidePage() {
                         placeholder="Search destination..."
                         showMap={false}
                       />
-                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Time Section */}
-              <div className="mb-8 grid gap-6 md:grid-cols-2">
+              <div className="mb-6 grid gap-4 sm:mb-8 sm:gap-6 md:grid-cols-2">
                 <div>
                   <label className={`mb-2.5 block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Date</label>
                   <div className="relative group">
@@ -509,16 +507,16 @@ export default function LocalRidePage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <label className={`block text-sm font-bold ${isDark ? 'text-gray-200' : 'text-slate-800'}`}>Choose Vehicle</label>
-                  {ratesLoading && <span className="text-xs text-emerald-600 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Updating rates</span>}
+                  {ratesLoading && <span className="flex items-center gap-1 text-[11px] text-emerald-600 sm:text-xs"><Loader2 className="w-3 h-3 animate-spin" /> Updating rates</span>}
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
                   {carTypes.map((car) => (
                     <button
                       key={car.id}
                       type="button"
                       onClick={() => setSelectedCar(car.id)}
-                      className={`group relative rounded-2xl border p-5 text-left transition-all overflow-hidden ${selectedCar === car.id
+                      className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all sm:p-5 ${selectedCar === car.id
                         ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 shadow-sm ring-1 ring-emerald-500'
                         : isDark
                           ? 'border-zinc-800 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
@@ -554,20 +552,20 @@ export default function LocalRidePage() {
 
             {/* Right Column: Summary */}
             <div className="lg:col-span-4">
-              <div className="mb-6 h-[350px] rounded-3xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800">
+              <div className="mb-5 h-[220px] overflow-hidden rounded-[1.5rem] border border-slate-200 shadow-sm dark:border-zinc-800 sm:h-[280px] md:rounded-3xl lg:mb-6 lg:h-[350px]">
                 <GoogleMapComponent
                   pickupCoords={pickupCoordinates}
                   dropCoords={dropCoordinates}
                   isDark={isDark}
                 />
               </div>
-              <div className={`sticky top-24 rounded-3xl border p-6 md:p-8 shadow-sm ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-slate-200 bg-white'}`}>
-                <h2 className={`mb-6 text-xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
+              <div className={`rounded-[1.5rem] border p-4 shadow-sm sm:p-6 md:rounded-3xl md:p-8 lg:sticky lg:top-24 ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-slate-200 bg-white'}`}>
+                <h2 className={`mb-5 text-lg font-black tracking-tight sm:mb-6 sm:text-xl ${isDark ? 'text-white' : 'text-slate-900'}`}>Fare Summary</h2>
 
-                <div className="space-y-4 text-sm mb-6">
+                <div className="mb-5 space-y-4 text-sm sm:mb-6">
                   <div className="flex items-start justify-between gap-4">
                     <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Pickup</span>
-                    <span className={`text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`min-w-0 flex-1 text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {pickupLocation ? (
                         <span className="line-clamp-2" title={pickupLocation}>{pickupLocation}</span>
                       ) : (
@@ -577,7 +575,7 @@ export default function LocalRidePage() {
                   </div>
                   <div className="flex items-start justify-between gap-4">
                     <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>Drop</span>
-                    <span className={`text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`min-w-0 flex-1 text-right font-semibold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {dropLocation ? (
                         <span className="line-clamp-2" title={dropLocation}>{dropLocation}</span>
                       ) : (
@@ -602,18 +600,18 @@ export default function LocalRidePage() {
 
                 <div className={`my-6 h-px border-t border-dashed ${isDark ? 'border-zinc-700' : 'border-slate-200'}`} />
 
-                <div className="space-y-4 mb-8">
+                <div className="mb-6 space-y-4 sm:mb-8">
                   <div className="flex items-end justify-between">
                     <span className={`font-bold ${isDark ? 'text-zinc-300' : 'text-slate-700'}`}>Total Fare</span>
-                    <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatMoney(totalAmount)}</span>
+                    <span className={`text-xl font-black sm:text-2xl ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatMoney(totalAmount)}</span>
                   </div>
 
-                  <div className={`p-4 rounded-xl ${isDark ? 'bg-emerald-900/10 border border-emerald-900/30' : 'bg-emerald-50 border border-emerald-100'}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                  <div className={`rounded-xl p-3 sm:p-4 ${isDark ? 'bg-emerald-900/10 border border-emerald-900/30' : 'bg-emerald-50 border border-emerald-100'}`}>
+                    <div className="mb-1 flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-400">
                         <CheckCircle2 size={16} /> Pay Now (20%)
                       </span>
-                      <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">{formatMoney(advancePayment)}</span>
+                      <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 sm:text-xl">{formatMoney(advancePayment)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
                       <span className={`font-medium ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>Balance (Due later)</span>

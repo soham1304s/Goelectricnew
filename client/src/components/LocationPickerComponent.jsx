@@ -239,7 +239,7 @@ export default function LocationPickerComponent({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             disabled={fetchingDetails}
-            className={`flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:font-medium ${darkMode ? 'text-white placeholder:text-zinc-600' : 'text-slate-900 placeholder:text-slate-400'
+            className={`min-w-0 flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:font-medium ${darkMode ? 'text-white placeholder:text-zinc-600' : 'text-slate-900 placeholder:text-slate-400'
               } ${inputClassName}`}
           />
           {isLoading || fetchingDetails ? (
@@ -259,7 +259,7 @@ export default function LocationPickerComponent({
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               className={`absolute top-full z-[100] border backdrop-blur-xl ${compact
                 ? 'left-[-38px] right-[-38px] mt-7 max-h-[156px] overflow-y-auto rounded-[1.1rem] p-1.5 shadow-xl'
-                : 'left-1/2 -translate-x-1/2 w-[280px] mt-3 p-2 rounded-2xl shadow-2xl'
+                : 'left-0 w-full sm:left-1/2 sm:-translate-x-1/2 sm:w-[280px] mt-3 p-2 rounded-2xl shadow-2xl'
                 } ${darkMode ? 'bg-zinc-900/95 border-zinc-800' : 'bg-white/95 border-slate-100'
                 }`}
             >
