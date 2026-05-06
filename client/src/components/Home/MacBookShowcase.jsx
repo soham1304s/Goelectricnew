@@ -12,12 +12,13 @@ import {
   Plane,
   Navigation,
   Landmark,
-  ChevronRight,
   Star,
   Search,
   LocateFixed,
   Calendar,
-  Car
+  Car,
+  MessageSquare,
+  ChevronRight
 } from 'lucide-react';
 import LocationPickerComponent from '../LocationPickerComponent.jsx';
 
@@ -45,7 +46,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
     setTimeout(() => {
       setIsSearching(false);
       const options = { state: searchData };
-      
+
       if (activeTab === 'Local Ride' || activeTab === 'Local') navigate('/local-ride', options);
       else if (activeTab === 'Intercity Ride' || activeTab === 'Intercity') navigate('/intercity-ride', options);
       else if (activeTab === 'Airport') navigate('/airport', options);
@@ -171,8 +172,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                         key={type}
                         onClick={() => setActiveTab(type === 'Intercity Ride' ? 'Intercity' : type)}
                         className={`flex-1 py-2 rounded-lg text-[10px] font-black transition-all ${(activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
-                            ? 'bg-gradient-to-r from-emerald-500 to-blue-600 text-white shadow-md scale-105'
-                            : 'text-slate-500 hover:text-slate-700 hover:scale-105'
+                          ? 'bg-gradient-to-r from-emerald-500 to-blue-600 text-white shadow-md scale-105'
+                          : 'text-slate-500 hover:text-slate-700 hover:scale-105'
                           }`}
                       >
                         {type}
@@ -267,95 +268,174 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                 {/* Mobile UI - Full Smart Booking Form */}
                 <div className="p-4 sm:p-5 flex flex-col h-full bg-white overflow-y-auto scrollbar-hide">
                   {/* Status Bar */}
-                  <div className="flex items-center justify-between mb-4 mt-2">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-black text-slate-900">9:41</span>
-                    <div className="flex gap-1">
-                      <div className="w-3 h-2 bg-slate-900 rounded-[2px]" />
-                      <div className="w-1.5 h-1.5 bg-slate-900 rounded-full" />
+                    <div className="flex gap-1.5 items-center">
+                      <TrendingUp size={10} className="text-slate-900" />
+                      <div className="flex gap-0.5">
+                        <div className="w-3 h-1.5 bg-slate-900 rounded-[2px]" />
+                        <div className="w-1.5 h-1.5 bg-slate-900 rounded-full" />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Header */}
-                  <div className="mb-5">
-                    <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest mb-2">
-                      <Zap size={8} className="fill-current animate-pulse" /> Smart Booking
+                  {/* Header with Car Illustration */}
+                  <div className="relative mb-6 pt-2">
+                    <div className="pr-20">
+                      <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest mb-1.5">
+                        <Zap size={8} className="fill-current animate-pulse" /> Smart Booking
+                      </div>
+                      <h4 className="text-2xl font-black text-slate-900 leading-[1.1] mb-2">Plan Your <br/>Ride</h4>
+                      <p className="text-[9px] font-medium text-slate-500 max-w-[120px] leading-relaxed">
+                        Choose your trip details and find the best ride for you.
+                      </p>
                     </div>
-                    <h4 className="text-lg sm:text-xl font-black text-slate-900 leading-tight">Plan Your Ride</h4>
+                    <div className="absolute top-0 -right-4 w-32 sm:w-40 pointer-events-none">
+                      <img 
+                        src="/home/soham/.gemini/antigravity/brain/94ad1ff4-63b5-4ef6-b669-35a29e49fc2a/ev_car_illustration_1778074769708.png" 
+                        alt="EV Car" 
+                        className="w-full h-auto drop-shadow-2xl"
+                      />
+                    </div>
                   </div>
 
-                  {/* Service Toggle */}
-                  <div className="flex p-1 rounded-xl mb-5 bg-slate-100">
-                    {['Local', 'Intercity', 'Airport'].map((type) => (
+                  {/* Integrated Service Toggle */}
+                  <div className="flex p-1.5 rounded-2xl mb-4 bg-slate-50/80 border border-slate-100 shadow-sm">
+                    {[
+                      { id: 'Local', icon: <MapPin size={12} />, label: 'Local' },
+                      { id: 'Intercity', icon: <Navigation size={12} />, label: 'Intercity' },
+                      { id: 'Airport', icon: <Plane size={12} />, label: 'Airport' }
+                    ].map((type) => (
                       <button
-                        key={type}
-                        onClick={() => setActiveTab(type === 'Intercity' ? 'Intercity' : type)}
-                        className={`flex-1 py-2 rounded-lg text-[9px] font-black transition-all ${(activeTab === type || (activeTab === 'Intercity' && type === 'Intercity Ride'))
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md scale-105'
-                            : 'text-slate-500 hover:scale-105'
+                        key={type.id}
+                        onClick={() => setActiveTab(type.id)}
+                        className={`flex-1 py-2.5 rounded-xl text-[9px] font-extrabold transition-all flex items-center justify-center gap-1.5 ${activeTab === type.id
+                            ? 'bg-white text-emerald-600 shadow-md ring-1 ring-emerald-500/10'
+                            : 'text-slate-400 hover:text-slate-600'
                           }`}
                       >
-                        {type}
+                        <span className={activeTab === type.id ? 'text-emerald-500' : 'text-slate-300'}>
+                          {type.icon}
+                        </span>
+                        {type.label}
                       </button>
                     ))}
                   </div>
 
-                  {/* Inputs */}
-                  <div className="space-y-3 mb-5 relative z-[60]">
-                    <LocationPickerComponent
-                      value={pickup.address}
-                      onChange={(val) => setPickup({ ...pickup, address: val })}
-                      onSelectLocation={(loc) => setPickup(loc)}
-                      placeholder="Pickup Location"
-                      darkMode={false}
-                      compact={true}
-                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[8px] !font-bold"
-                    />
-                    <LocationPickerComponent
-                      value={dest.address}
-                      onChange={(val) => setDest({ ...dest, address: val })}
-                      onSelectLocation={(loc) => setDest(loc)}
-                      placeholder="Destination"
-                      darkMode={false}
-                      compact={true}
-                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[8px] !font-bold"
-                    />
+                  {/* Card-Based Inputs with Connection Line */}
+                  <div className="relative space-y-3 mb-4 z-[60]">
+                    {/* Connection Line */}
+                    <div className="absolute left-[26px] top-12 bottom-12 w-[1.5px] border-l-2 border-dotted border-emerald-200 pointer-events-none" />
+                    
+                    {/* Pickup Card */}
+                    <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm relative group">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+                          <div className="w-2.5 h-2.5 rounded-full border-2 border-emerald-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Pickup Location</p>
+                          <LocationPickerComponent
+                            value={pickup.address}
+                            onChange={(val) => setPickup({ ...pickup, address: val })}
+                            onSelectLocation={(loc) => setPickup(loc)}
+                            placeholder="Enter pickup location"
+                            darkMode={false}
+                            compact={true}
+                            inputClassName="!p-0 !h-auto !bg-transparent !text-[10px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
+                          />
+                        </div>
+                        <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
+                          <LocateFixed size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Destination Card */}
+                    <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm relative group">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+                          <MapPin size={14} className="fill-current" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Destination</p>
+                          <LocationPickerComponent
+                            value={dest.address}
+                            onChange={(val) => setDest({ ...dest, address: val })}
+                            onSelectLocation={(loc) => setDest(loc)}
+                            placeholder="Enter destination"
+                            darkMode={false}
+                            compact={true}
+                            inputClassName="!p-0 !h-auto !bg-transparent !text-[10px] !font-bold !text-slate-900 border-none ring-0 focus:ring-0"
+                          />
+                        </div>
+                        <button className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 transition-colors">
+                          <LocateFixed size={14} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Date & Time */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
-                      <Calendar size={14} className="text-purple-500" />
-                      <input
-                        type="date"
-                        value={bookingDate}
-                        onChange={(e) => setBookingDate(e.target.value)}
-                        className="bg-transparent border-none outline-none text-[9px] font-bold text-slate-900 w-full [color-scheme:light]"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
-                      <Clock size={14} className="text-blue-500" />
-                      <input
-                        type="time"
-                        value={bookingTime}
-                        onChange={(e) => setBookingTime(e.target.value)}
-                        className="bg-transparent border-none outline-none text-[9px] font-bold text-slate-900 w-full [color-scheme:light]"
-                      />
+                  {/* Unified Date/Time Card */}
+                  <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm mb-4">
+                    <div className="flex items-center divide-x divide-slate-100">
+                      <div className="flex-1 flex flex-col pr-3">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">Date</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="date"
+                            value={bookingDate}
+                            onChange={(e) => setBookingDate(e.target.value)}
+                            className="bg-transparent border-none outline-none text-[10px] font-black text-slate-900 w-full [color-scheme:light]"
+                          />
+                          <Calendar size={14} className="text-emerald-500" />
+                        </div>
+                      </div>
+                      <div className="flex-1 flex flex-col pl-3">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">Time</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={bookingTime}
+                            onChange={(e) => setBookingTime(e.target.value)}
+                            className="bg-transparent border-none outline-none text-[10px] font-black text-slate-900 w-full [color-scheme:light]"
+                          />
+                          <Clock size={14} className="text-emerald-500" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Action Button */}
+                  {/* Ride Better Promo Card */}
+                  <div className="bg-emerald-50/50 rounded-2xl p-3 mb-6 flex items-center gap-3 border border-emerald-100/50">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <MessageSquare size={18} />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-[10px] font-black text-slate-900 mb-0.5">Ride Better with Smart Booking</h5>
+                      <p className="text-[8px] font-medium text-slate-500 leading-tight">
+                        Real-time tracking, best prices, and secure rides.
+                      </p>
+                    </div>
+                    <ChevronRight size={14} className="text-slate-400" />
+                  </div>
+
+                  {/* Search Button (Pill Style) */}
                   <button
                     onClick={handleSearch}
                     disabled={isSearching}
-                    className="w-full mt-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70"
+                    className="w-full bg-[#00A65A] hover:bg-emerald-600 text-white py-4 rounded-2xl font-black text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
                   >
                     {isSearching ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Routing...
-                      </div>
-                    ) : "Search Rides Now"}
+                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <Search size={16} strokeWidth={3} />
+                        Search Rides Now
+                      </>
+                    )}
                   </button>
+                </div>
                 </div>
               </div>
             </div>
@@ -373,8 +453,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 className={`p-8 rounded-[2rem] border transition-all hover:-translate-y-2 ${darkMode
-                    ? 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800'
-                    : 'bg-white border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-emerald-200/20'
+                  ? 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800'
+                  : 'bg-white border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-emerald-200/20'
                   }`}
               >
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
