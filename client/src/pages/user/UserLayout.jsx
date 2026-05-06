@@ -26,7 +26,11 @@ import {
 } from 'lucide-react';
 import logoDark from '../../assets/logo_dark.png';
 import logoLight from '../../assets/logo_light.png';
-import * as bookingService from '../../services/bookingService.js';
+import { 
+  getMyBookings, 
+  getDriverBookings, 
+  getMyTourBookings 
+} from '../../services/bookingService.js';
 import * as authService from '../../services/authService.js';
 import { useTheme } from '../../context/ThemeContext.jsx';
 
@@ -48,12 +52,12 @@ const UserLayout = ({ children }) => {
         try {
           let res, tourRes;
           if (user.role === 'driver') {
-            res = await bookingService.getDriverBookings?.() || { success: false };
+            res = await getDriverBookings?.() || { success: false };
           } else {
             // Fetch both regular rides and tour bookings
             [res, tourRes] = await Promise.all([
-              bookingService.getMyBookings(),
-              bookingService.getMyTourBookings?.() || { success: true, data: [] }
+              getMyBookings(),
+              getMyTourBookings?.() || { success: true, data: [] }
             ]);
           }
 
