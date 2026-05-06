@@ -81,13 +81,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS
+const cleanOrigin = (url) => url.replace(/['"]+/g, '').replace(/\/+$/, '').trim();
+
 const allowedOrigins = [
   ...(process.env.CLIENT_URLS || '')
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => cleanOrigin(origin))
     .filter(Boolean),
-  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL.trim()] : []),
+  ...(process.env.CLIENT_URL ? [cleanOrigin(process.env.CLIENT_URL)] : []),
   'http://localhost:5173',
   'http://127.0.0.1:5173',
 ];
@@ -96,10 +97,11 @@ const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || uniqueAllowedOrigins.includes(origin)) {
+    if (!origin || uniqueAllowedOrigins.includes(cleanOrigin(origin))) {
       callback(null, true);
       return;
     }
+    console.error(`CORS Blocked: ${origin} not in [${uniqueAllowedOrigins.join(', ')}]`);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
