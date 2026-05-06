@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar'; // ✅ ADD THIS
+import Navbar from './components/Navbar'; // High-Fidelity UI Professionalization Heartbeat - Deployment f1ab863+1
 import Loader from './components/Loader';
 import WhatsAppButton from './components/WhatsAppButton';
 import ScrollToTop from './components/ScrollToTop';
