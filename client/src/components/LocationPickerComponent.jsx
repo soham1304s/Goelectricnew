@@ -63,6 +63,7 @@ export default function LocationPickerComponent({
   searchOptions = DEFAULT_SEARCH_OPTIONS,
   darkMode = false,
   inputClassName = '',
+  compact = false,
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -257,8 +258,8 @@ export default function LocationPickerComponent({
                 }`}
             >
               {!value && (
-                <div className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
-                  <TrendingUp size={12} />
+                <div className={`px-4 py-2 ${compact ? 'text-[8px]' : 'text-[10px]'} font-black uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
+                  <TrendingUp size={compact ? 10 : 12} />
                   Popular Destinations
                 </div>
               )}
@@ -276,8 +277,8 @@ export default function LocationPickerComponent({
                     {s.isPopular && !value ? <Star size={14} className="text-amber-500 fill-amber-500" /> : <MapPin size={14} className={selectedIndex === i ? 'text-emerald-500' : 'text-slate-400'} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate">{s.mainText}</p>
-                    <p className={`text-xs truncate ${selectedIndex === i ? 'opacity-80' : 'opacity-50'}`}>
+                    <p className={`font-bold ${compact ? 'text-xs' : 'text-sm'} truncate`}>{s.mainText}</p>
+                    <p className={`${compact ? 'text-[9px]' : 'text-xs'} truncate ${selectedIndex === i ? 'opacity-80' : 'opacity-50'}`}>
                       {s.secondaryText}
                     </p>
                   </div>

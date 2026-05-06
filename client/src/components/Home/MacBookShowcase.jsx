@@ -307,7 +307,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                       onSelectLocation={(loc) => setPickup(loc)}
                       placeholder="Pickup Location"
                       darkMode={false}
-                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[10px] !font-bold"
+                      compact={true}
+                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[8px] !font-bold"
                     />
                     <LocationPickerComponent
                       value={dest.address}
@@ -315,7 +316,8 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                       onSelectLocation={(loc) => setDest(loc)}
                       placeholder="Destination"
                       darkMode={false}
-                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[10px] !font-bold"
+                      compact={true}
+                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[8px] !font-bold"
                     />
                   </div>
 
