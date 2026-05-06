@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const apiRoot = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
-const baseURL = apiRoot ? `${apiRoot}/api` : '/api';
+const apiRoot = (import.meta.env.VITE_API_URL || 'https://goelectricnew-production.up.railway.app').replace(/\/+$/, '');
+const baseURL = apiRoot ? `${apiRoot}/api` : 'https://goelectricnew-production.up.railway.app/api';
 
 const api = axios.create({
   baseURL,
