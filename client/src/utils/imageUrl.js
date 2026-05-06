@@ -1,13 +1,22 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
-
 /**
- * Returns an absolute URL for a package/tour cover image so it loads on the home page.
- * If the stored value is relative (e.g. /uploads/images/xxx), prepends the API base.
+ * Utility to format image URLs
+ * Handles both full Cloudinary URLs and local relative paths
  */
-export function getPackageImageUrl(coverImage, images, defaultImage = '') {
-  const raw = coverImage || images?.[0];
-  if (!raw || typeof raw !== 'string') return defaultImage;
-  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-  const base = API_BASE.replace(/\/$/, '');
-  return base + (raw.startsWith('/') ? raw : `/${raw}`);
-}
+export const getImageUrl = (path) => {
+  if (!path) return '';
+  
+  // If it's already a full URL (Cloudinary, Unsplash, etc.)
+  if (path.startsWith('http') || path.startsWith('data:')) {
+    return path;
+  }
+  
+  // Get API URL from env
+  const apiRoot = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+  
+  // Ensure path starts with a slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  
+  return `${apiRoot}${normalizedPath}`;
+};
+
+export default getImageUrl;

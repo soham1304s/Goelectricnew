@@ -12,6 +12,13 @@
   --auth-input-border: #e2e8f0;
 }
 
+.dark {
+  --auth-bg-dark: #020617;
+  --auth-card-bg: #0f172a;
+  --auth-input-border: #1e293b;
+  --auth-card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -124,9 +131,10 @@
   padding: 60px 80px;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: var(--auth-card-bg);
   justify-content: center;
   position: relative;
+  transition: background 0.3s ease;
 }
 
 .auth-logo-text {
@@ -169,6 +177,11 @@
   color: var(--auth-bg-dark);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+}
+
+.dark .form-group label {
+  color: #94a3b8;
 }
 
 .form-input-container {
@@ -185,6 +198,10 @@
   color: var(--auth-bg-dark);
   transition: all 0.3s ease;
   background: transparent;
+}
+
+.dark .form-input {
+  color: #f8fafc;
 }
 
 .form-input:focus {
@@ -280,7 +297,7 @@
 }
 
 .auth-divider span {
-  background: white;
+  background: var(--auth-card-bg);
   padding: 0 16px;
   position: relative;
   z-index: 2;
@@ -288,6 +305,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
+  transition: background 0.3s ease;
 }
 
 .google-btn-wrapper {

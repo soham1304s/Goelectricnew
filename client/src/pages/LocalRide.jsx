@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Calendar, CarTaxiFront, Clock3, Loader2, MapPin, Navigation, Zap, CheckCircle2, AlertCircle, Locate, Leaf } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import LocationPickerComponent from '../components/LocationPickerComponent.jsx';
@@ -9,6 +9,7 @@ import { estimateDistance } from '../services/locationService.js';
 import { fetchCarRates } from '../services/rateService.js';
 import { ridePaymentService } from '../services/ridePaymentService.js';
 import GoogleMapComponent from '../components/GoogleMapComponent.jsx';
+import { getReverseGeocodedAddress } from '../services/googleMapsService.js';
 
 const formatDateValue = (date) => {
   const year = date.getFullYear();
@@ -53,6 +54,30 @@ export default function LocalRidePage() {
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [isDetectingPickup, setIsDetectingPickup] = useState(false);
   const [isDetectingDrop, setIsDetectingDrop] = useState(false);
+  const location = useLocation();
+
+  // Consume state from navigate (e.g. from Home Hero)
+  useEffect(() => {
+    if (location.state) {
+      const { pickup, destination, date, time, pickupData, destData } = location.state;
+      if (pickup) setPickupLocation(pickup);
+      if (destination) setDropLocation(destination);
+      if (date) setSelectedDate(date);
+      if (time) setSelectedTime(time);
+      if (pickupData?.latitude) {
+        setPickupCoordinates({
+          latitude: pickupData.latitude,
+          longitude: pickupData.longitude
+        });
+      }
+      if (destData?.latitude) {
+        setDropCoordinates({
+          latitude: destData.latitude,
+          longitude: destData.longitude
+        });
+      }
+    }
+  }, [location.state]);
 
   // Fetch rates from admin when component mounts
   useEffect(() => {
@@ -174,7 +199,6 @@ export default function LocalRidePage() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          const { getReverseGeocodedAddress } = await import('../services/googleMapsService.js');
           const address = await getReverseGeocodedAddress(latitude, longitude);
           setPickupLocation(address);
           setPickupCoordinates({

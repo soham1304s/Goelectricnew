@@ -426,14 +426,6 @@ export const loginDriver = async (req, res) => {
       });
     }
 
-    // Check if driver is approved
-    if (!driver.isApproved) {
-      return res.status(403).json({
-        success: false,
-        message: 'Your driver account is pending approval',
-      });
-    }
-
     // Check if driver is blocked
     if (driver.status === 'blocked') {
       return res.status(403).json({
@@ -465,6 +457,7 @@ export const loginDriver = async (req, res) => {
           role: 'driver',
           status: driver.status,
           availability: driver.availability,
+          isApproved: driver.isApproved,
         },
         token,
       },
@@ -517,7 +510,7 @@ export const logout = async (req, res) => {
   try {
     // For JWT, logout is handled on client side by removing token
     // But we can blacklist tokens if needed (requires Redis or DB storage)
-    
+
     res.status(200).json({
       success: true,
       message: 'Logged out successfully',

@@ -27,6 +27,21 @@ export const bookingService = {
   async cancelBooking(id, reason) {
     const { data } = await api.put(`/bookings/${id}/cancel`, { reason });
     return data;
+  },
+  
+  async getDriverBookings() {
+    const { data } = await api.get('/driver/my-bookings');
+    return data;
+  },
+
+  async getMyTourBookings() {
+    const { data } = await api.get('/tours/my-bookings');
+    return data;
+  },
+
+  async getTourBookingById(id) {
+    const { data } = await api.get(`/tours/${id}`);
+    return data;
   }
 };
 

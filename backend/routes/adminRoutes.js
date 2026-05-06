@@ -23,6 +23,7 @@ import {
   getAllDriversAdmin,
   deleteDriverAdmin,
   updateDriverStatusAdmin,
+  updateDriverAdmin,
   deleteBookingAdmin,
   updateBookingStatusAdmin,
   deleteTourBookingAdmin,
@@ -42,6 +43,7 @@ import {
   getAdminCabPartners,
   updateAdminCabPartner,
   deleteAdminCabPartner,
+  collectTourPayment,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -62,6 +64,7 @@ router.patch('/users/:id/status', updateUserStatusAdmin);
 router.get('/drivers', getAllDriversAdmin);
 router.delete('/drivers/:id', deleteDriverAdmin);
 router.patch('/drivers/:id/status', updateDriverStatusAdmin);
+router.put('/drivers/:id', updateDriverAdmin);
 
 // ============ BOOKINGS MANAGEMENT ============
 router.get('/bookings', getAllBookings);
@@ -83,6 +86,7 @@ router.post('/bookings/:id/collect-payment', collectRemainingPayment);
 router.get('/tour-bookings', getAdminTourBookings);
 router.get('/tour-bookings/:tourBookingId/payments', getTourBookingPayments);
 router.patch('/tour-bookings/:id', updateTourBookingStatus);
+router.post('/tour-bookings/:id/collect-payment', collectTourPayment);
 router.delete('/tour-bookings/:id', deleteTourBookingAdmin);
 
 // ============ PACKAGES MANAGEMENT ============

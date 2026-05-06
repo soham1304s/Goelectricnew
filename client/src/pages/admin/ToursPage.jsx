@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Eye } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, DollarSign, Clock, AlertTriangle } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { getAllTourBookings } from '../../services/adminService';
+import { getAllTourBookings, updateTourBookingStatus, collectTourPayment } from '../../services/adminService';
 
 const ToursPage = () => {
   const [tours, setTours] = useState([]);
@@ -15,7 +15,7 @@ const ToursPage = () => {
   const [error, setError] = useState(null);
   const [packagePrices, setPackagePrices] = useState({});
   const [actualPayments, setActualPayments] = useState({});
-  const [advancePaymentOnly, setAdvancePaymentOnly] = useState(true); // Show only tours with advance payment by default
+  const [advancePaymentOnly, setAdvancePaymentOnly] = useState(false); // Show all tours by default
 
   const fetchTours = async (page = 1) => {
     try {
@@ -152,6 +152,66 @@ const ToursPage = () => {
     if (!tour || !tour._id) return 0;
     const paymentData = actualPayments[tour._id];
     return paymentData?.totalActualPaid || 0;
+  };
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await fetchTours(pagination.page);
+  };
+
+  const handleUpdateStatus = async (id, status) => {
+    if (!window.confirm(`Are you sure you want to change status to ${status.toUpperCase()}?`)) return;
+    try {
+      setLoading(true);
+      await updateTourBookingStatus(id, { status });
+      alert(`Booking ${status} successfully!`);
+      // Update local state instead of full refresh for smoother UI
+      setTours(prev => prev.map(t => t._id === id ? { ...t, status } : t));
+      if (selectedTour?._id === id) {
+        setSelectedTour(prev => ({ ...prev, status }));
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Failed to update status: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [manualPaymentData, setManualPaymentData] = useState({ amount: '', method: 'cash', notes: '' });
+  const [showManualPayment, setShowManualPayment] = useState(false);
+
+  const handleCollectPayment = async (id) => {
+    if (!manualPaymentData.amount || manualPaymentData.amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const response = await collectTourPayment(id, {
+        amount: Number(manualPaymentData.amount),
+        paymentMethod: manualPaymentData.method,
+        notes: manualPaymentData.notes
+      });
+      
+      alert('Payment collected successfully!');
+      setShowManualPayment(false);
+      setManualPaymentData({ amount: '', method: 'cash', notes: '' });
+      
+      // Refresh current tour data
+      await fetchTours(pagination.page);
+      
+      // Update selected tour if open
+      if (selectedTour?._id === id) {
+        setSelectedTour(response.data);
+      }
+    } catch (err) {
+      console.error('Error collecting payment:', err);
+      alert('Failed to collect payment: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Initial fetch and auto-refresh
@@ -640,9 +700,133 @@ const ToursPage = () => {
                 )}
               </div>
 
+              {/* Admin Actions - APPROVAL & REJECTION */}
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-lg space-y-6">
+                <div className="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 pb-4">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                  <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-wider">🛠️ Admin Control Panel</h3>
+                </div>
+
+                {/* Status Actions */}
+                <div className="space-y-4">
+                  <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Update Booking Status</p>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedTour.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStatus(selectedTour._id, 'confirmed')}
+                          className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-4 rounded-xl transition-all font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 transform hover:scale-105"
+                        >
+                          <CheckCircle size={20} /> Approve & Confirm
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(selectedTour._id, 'cancelled')}
+                          className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-xl transition-all font-black uppercase tracking-widest shadow-lg shadow-red-500/20 transform hover:scale-105"
+                        >
+                          <XCircle size={20} /> Reject Booking
+                        </button>
+                      </>
+                    )}
+                    
+                    {selectedTour.status === 'confirmed' && (
+                      <button
+                        onClick={() => handleUpdateStatus(selectedTour._id, 'completed')}
+                        className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl transition-all font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transform hover:scale-105"
+                      >
+                        <CheckCircle size={20} /> Mark as Completed
+                      </button>
+                    )}
+
+                    {selectedTour.status === 'completed' && (
+                      <div className="w-full p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3">
+                        <CheckCircle className="text-green-600" size={24} />
+                        <div>
+                          <p className="text-green-800 dark:text-green-200 font-black uppercase text-xs tracking-widest">Ride Completed</p>
+                          <p className="text-green-600 dark:text-green-400 text-sm">This tour has been successfully completed and closed.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Manual Payment Section */}
+                {getActualPaidAmount(selectedTour) < getTotalPrice(selectedTour) && selectedTour.status !== 'cancelled' && (
+                  <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Financial Management</p>
+                      <span className="text-orange-600 font-black text-xs bg-orange-100 px-2 py-1 rounded">PENDING: ₹{getTotalPrice(selectedTour) - getActualPaidAmount(selectedTour)}</span>
+                    </div>
+
+                    {!showManualPayment ? (
+                      <button
+                        onClick={() => setShowManualPayment(true)}
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white px-6 py-4 rounded-xl transition-all font-black uppercase tracking-widest shadow-xl transform hover:scale-[1.02]"
+                      >
+                        <DollarSign size={20} /> Collect Manual Payment
+                      </button>
+                    ) : (
+                      <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-2xl border-2 border-blue-200 dark:border-blue-800 space-y-4 animate-in slide-in-from-top duration-300">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-black text-gray-900 dark:text-white text-sm uppercase tracking-wider">Payment Collection Form</h4>
+                          <button onClick={() => setShowManualPayment(false)} className="text-gray-400 hover:text-gray-600">
+                            <XCircle size={20} />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black text-gray-500 uppercase ml-1">Amount to Collect (₹)</label>
+                            <input
+                              type="number"
+                              value={manualPaymentData.amount}
+                              onChange={(e) => setManualPaymentData({...manualPaymentData, amount: e.target.value})}
+                              placeholder={`Max: ₹${getTotalPrice(selectedTour) - getActualPaidAmount(selectedTour)}`}
+                              className="w-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 font-bold text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black text-gray-500 uppercase ml-1">Payment Method</label>
+                            <select
+                              value={manualPaymentData.method}
+                              onChange={(e) => setManualPaymentData({...manualPaymentData, method: e.target.value})}
+                              className="w-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 font-bold text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all"
+                            >
+                              <option value="cash">Cash</option>
+                              <option value="upi">UPI / Scanner</option>
+                              <option value="bank">Bank Transfer</option>
+                              <option value="cheque">Cheque</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-gray-500 uppercase ml-1">Collection Notes (Optional)</label>
+                          <textarea
+                            value={manualPaymentData.notes}
+                            onChange={(e) => setManualPaymentData({...manualPaymentData, notes: e.target.value})}
+                            placeholder="e.g., Collected by driver at pickup"
+                            className="w-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 font-medium text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all h-20 resize-none"
+                          />
+                        </div>
+
+                        <button
+                          onClick={() => handleCollectPayment(selectedTour._id)}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg transform hover:scale-[1.02]"
+                        >
+                          Confirm Collection
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <button
-                onClick={() => setSelectedTour(null)}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition font-semibold"
+                onClick={() => {
+                  setSelectedTour(null);
+                  setShowManualPayment(false);
+                }}
+                className="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 px-4 py-4 rounded-xl transition font-black uppercase tracking-widest shadow-xl mt-4"
               >
                 Close Details
               </button>

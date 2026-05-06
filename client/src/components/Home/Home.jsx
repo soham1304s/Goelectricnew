@@ -45,10 +45,11 @@ import TourBookingModal from "../TourBookingModal.jsx";
 import RideBookingModal from "../RideBookingModal_NEW.jsx";
 import LocationPickerComponent from "../LocationPickerComponent.jsx";
 import Footer from "../Footer.jsx";
-import { estimateDistance, formatDistance, formatDuration, calculateFare } from "../../services/googleMapsService.js";
+import { estimateDistance, formatDistance, formatDuration, calculateFare, getReverseGeocodedAddress } from "../../services/googleMapsService.js";
 import OfferBanner from "../OfferBanner.jsx";
 import MacBookShowcase from "./MacBookShowcase.jsx";
 import SEO from "../SEO.jsx";
+import { getImageUrl } from "../../utils/imageUrl";
 
 
 const DEFAULT_AVATAR = '/review/image.png';
@@ -61,7 +62,7 @@ const ReviewAvatar = ({ profileImage, name, darkMode }) => {
     <div className="flex-shrink-0">
       {!showDefault && profileImage ? (
         <img
-          src={profileImage}
+          src={getImageUrl(profileImage)}
           alt={name}
           className="w-12 h-12 rounded-full object-cover border-2 border-emerald-200 dark:border-emerald-400/30"
           onError={() => {
@@ -1018,7 +1019,7 @@ const GoelectriqLanding = () => {
       <div className="relative h-40 md:h-44 overflow-hidden">
         <img
           src={
-            tour.coverImage ||
+            getImageUrl(tour.coverImage) ||
             "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=400"
           }
           alt={tour.title}
@@ -1158,7 +1159,6 @@ const GoelectriqLanding = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          const { getReverseGeocodedAddress } = await import('../../services/googleMapsService.js');
           const address = await getReverseGeocodedAddress(latitude, longitude);
           setPickupLocation(address);
         } catch (error) {
@@ -1196,7 +1196,6 @@ const GoelectriqLanding = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          const { getReverseGeocodedAddress } = await import('../../services/googleMapsService.js');
           const address = await getReverseGeocodedAddress(latitude, longitude);
           setDestination(address);
         } catch (error) {
@@ -1285,7 +1284,7 @@ const GoelectriqLanding = () => {
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/5 to-transparent pointer-events-none" />
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+        <div className="max-w-[1360px] mx-auto px-4 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 items-center relative z-10">
           <div className="space-y-8 text-left animate-slideUpFade">
             <div
               className={`inline-flex items-center ${darkMode ? "bg-emerald-900/30 text-emerald-400 border-emerald-800/50" : "bg-emerald-50 text-emerald-700 border-emerald-100"} px-4 py-2 rounded-full text-xs font-black tracking-widest border shadow-sm transition-all`}
@@ -1337,37 +1336,14 @@ const GoelectriqLanding = () => {
             </div>
           </div>
 
-          <div className="relative lg:h-[600px] flex items-center justify-center animate-fadeIn">
-            {/* Image Glow */}
-            <div className="absolute inset-0 bg-emerald-500/10 blur-[120px] rounded-full scale-75" />
-
-            <div className="relative w-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 group">
-              <img
-                src="/home-hero-new.png"
-                alt="Premium Electric Car"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-              {/* Floating Badge */}
-              <div className="absolute bottom-8 left-8 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-white animate-float">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/40">
-                    <Zap size={20} className="fill-current" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black opacity-80 uppercase tracking-widest">Active Fleet</p>
-                    <p className="text-xl font-black leading-tight">12 Vehicles</p>
-                  </div>
-                </div>
-              </div>
+          <div className="relative flex items-center justify-center animate-fadeIn">
+            {/* Embedded MacBook Showcase */}
+            <div className="w-full">
+              <MacBookShowcase darkMode={darkMode} isHero={true} />
             </div>
           </div>
         </div>
       </header>
-
-      {/* MacBook Showcase Section */}
-      <MacBookShowcase darkMode={darkMode} />
       {/* Services Categories Redesigned */}
       {/* Services Categories Redesigned */}
       <section className={`px-4 md:px-12 py-20 md:py-32 relative overflow-hidden ${darkMode ? "bg-[#0f172a]" : "bg-slate-50/50"}`}>
@@ -1679,7 +1655,7 @@ const GoelectriqLanding = () => {
             <div className="relative h-40 md:h-48">
               <img
                 src={
-                  selectedTourDetails.coverImage ||
+                  getImageUrl(selectedTourDetails.coverImage) ||
                   "https://images.unsplash.com/photo-1600100397608-f010e423b971?auto=format&fit=crop&q=80&w=1000"
                 }
                 alt={selectedTourDetails.title}

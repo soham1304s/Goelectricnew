@@ -12,6 +12,7 @@ import {
   rejectCabPartner,
   approveChargingStation,
   rejectChargingStation,
+  getDriverStatus,
 } from '../controllers/partnerController.js';
 import { protect } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/roleCheck.js';
@@ -68,6 +69,12 @@ router.post('/charging-station/register', upload.single('businessDocument'), reg
  * @access  Public
  */
 router.get('/charging-stations', getApprovedChargingStations);
+/**
+ * @route   GET /api/partners/driver/status
+ * @desc    Get current user's driver registration status
+ * @access  Private (Authenticated User)
+ */
+router.get('/driver/status', protect, getDriverStatus);
 
 // =================== ADMIN ROUTES ===================
 

@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { GoogleLogin } from '@react-oauth/google';
 import { Eye, EyeOff, Loader, ArrowRight } from 'lucide-react';
 import { animate, createTimeline, stagger } from 'animejs';
 import '../styles/Auth.css';
 
 import AuthImageSlider from '../components/AuthImageSlider';
+import logo from '../assets/logo_light.png';
+import logoWhite from '../assets/logo_dark.png';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login: authLogin, loginWithGoogle, user } = useAuth();
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark';
   
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -110,19 +115,19 @@ export default function LoginPage() {
 
         {/* Right Side */}
         <div className="auth-right" ref={rightRef}>
-          <img src="/src/assets/main2.png" alt="GoElectriQ Logo" className="h-12 w-auto mb-6 object-contain" />
+          <img src={darkMode ? logoWhite : logo} alt="GoElectriQ Logo" className="h-48 md:h-64 w-auto mb-6 object-contain" />
           <h1 className="auth-title">Welcome to GoElectriQ</h1>
 
-          {error && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-red-50 text-red-500 border border-red-100 text-center">{error}</div>}
-          {success && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-green-50 text-green-500 border border-green-100 text-center">{success}</div>}
+          {error && <div className={`p-3 rounded-xl mb-4 text-xs font-bold border text-center ${darkMode ? 'bg-red-900/20 text-red-400 border-red-900/50' : 'bg-red-50 text-red-500 border-red-100'}`}>{error}</div>}
+          {success && <div className={`p-3 rounded-xl mb-4 text-xs font-bold border text-center ${darkMode ? 'bg-green-900/20 text-green-400 border-green-900/50' : 'bg-green-50 text-green-500 border-green-100'}`}>{success}</div>}
 
           <form onSubmit={handleLogin} className="auth-form">
             <div className="form-group">
-              <label>Users name or Email</label>
+              <label>Email Address</label>
               <div className="form-input-container">
                 <input
                   type="text"
-                  placeholder="David Brooks"
+                  placeholder="john@example.com"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="form-input"

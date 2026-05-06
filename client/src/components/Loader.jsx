@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
-import logo from '../assets/main2.png';
+import logoLight from '../assets/logo_light.png';
+import logoDark from '../assets/logo_dark.png';
+import { useTheme } from '../context/ThemeContext.jsx';
 import '../styles/Loader.css';
 
 export default function Loader() {
   const [showLoader, setShowLoader] = useState(false);
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark';
 
   useEffect(() => {
     // Check if loader has been shown in this session
@@ -35,7 +39,7 @@ export default function Loader() {
         <div className="loader-content">
           {/* Logo Image */}
           <img 
-            src={logo} 
+            src={darkMode ? logoDark : logoLight} 
             alt="GoElectriQ Logo" 
             className="loader-logo"
           />

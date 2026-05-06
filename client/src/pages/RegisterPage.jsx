@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff, Loader, ArrowRight } from "lucide-react";
 import { animate, createTimeline, stagger } from 'animejs';
 import '../styles/Auth.css';
 
 import AuthImageSlider from '../components/AuthImageSlider';
+import logo from '../assets/logo_light.png';
+import logoWhite from '../assets/logo_dark.png';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { register: authRegister, loginWithGoogle, user } = useAuth();
+  const { theme } = useTheme();
+  const darkMode = theme === 'dark';
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -68,6 +73,14 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       return setError("Passwords do not match");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return setError("Please enter a valid email address");
+    }
+
+    if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, '').slice(-10))) {
+      return setError("Please enter a valid 10-digit phone number starting with 6-9");
     }
 
     setLoading(true);
@@ -130,11 +143,11 @@ export default function RegisterPage() {
 
         {/* Right Side */}
         <div className="auth-right">
-          <img src="/src/assets/main2.png" alt="GoElectriQ Logo" className="h-12 w-auto mb-6 object-contain" />
+          <img src={darkMode ? logoWhite : logo} alt="GoElectriQ Logo" className="h-48 md:h-64 w-auto mb-6 object-contain" />
           <h1 className="auth-title">Join GoElectriQ Today</h1>
 
-          {error && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-red-50 text-red-500 border border-red-100 text-center">{error}</div>}
-          {success && <div className="p-3 rounded-xl mb-4 text-xs font-bold bg-green-50 text-green-500 border border-green-100 text-center">{success}</div>}
+          {error && <div className={`p-3 rounded-xl mb-4 text-xs font-bold border text-center ${darkMode ? 'bg-red-900/20 text-red-400 border-red-900/50' : 'bg-red-50 text-red-500 border-red-100'}`}>{error}</div>}
+          {success && <div className={`p-3 rounded-xl mb-4 text-xs font-bold border text-center ${darkMode ? 'bg-green-900/20 text-green-400 border-green-900/50' : 'bg-green-50 text-green-500 border-green-100'}`}>{success}</div>}
 
           <form onSubmit={handleRegister} className="auth-form">
             <div className="form-row">
@@ -155,7 +168,7 @@ export default function RegisterPage() {
 
             <div className="form-group">
               <label>Phone Number</label>
-              <input type="tel" name="phone" placeholder="+1 234 567 890" onChange={handleChange} className="form-input" required />
+              <input type="tel" name="phone" placeholder="98765 43210" onChange={handleChange} className="form-input" required />
             </div>
 
             <div className="form-row">

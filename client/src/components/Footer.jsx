@@ -2,8 +2,8 @@ import React from 'react';
 import { Facebook, Instagram, Send, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.jsx';
-import logoDark from '../assets/main2.png';
-import logoLight from '../assets/main2.png';
+import logoLight from '../assets/logo_light.png';
+import logoDark from '../assets/logo_dark.png';
 
 const Footer = ({ darkMode }) => {
   const { theme } = useTheme();
@@ -12,10 +12,10 @@ const Footer = ({ darkMode }) => {
   return (
     <footer
       id="contact"
-      className={`relative w-full px-6 md:px-16 py-14 overflow-hidden ${
+      className={`relative w-full px-6 md:px-16 py-14 overflow-hidden transition-colors duration-500 ${
         isDarkMode
-          ? 'bg-black text-white'
-          : 'bg-white text-slate-900'
+          ? 'bg-slate-950 text-white'
+          : 'bg-white text-slate-900 border-t border-slate-100'
       }`}
     >
       {/* Glow Background */}
@@ -30,7 +30,7 @@ const Footer = ({ darkMode }) => {
             <img 
               src={isDarkMode ? logoDark : logoLight} 
               alt="GoElectriQ" 
-              className="h-16 w-auto object-contain"
+              className="h-48 w-auto object-contain"
             />
 
             <p className={`text-sm leading-relaxed ${

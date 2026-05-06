@@ -115,6 +115,16 @@ const DashboardPage = () => {
       textLight: 'text-emerald-600',
       trend: '+15% this month',
     },
+    {
+      title: 'Charging Enquiries',
+      value: analytics?.chargingEnquiries || 0,
+      icon: Zap,
+      link: '/admin/charging-bookings',
+      color: 'from-orange-500 to-orange-600',
+      bgLight: 'bg-orange-50',
+      textLight: 'text-orange-500',
+      trend: 'New leads this week',
+    },
   ];
 
   return (
@@ -165,7 +175,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Quick Stats - Enhanced */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {quickStats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -329,7 +339,7 @@ const DashboardPage = () => {
             <Activity size={24} className="text-purple-600 ml-auto" />
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
             <Link
               to="/admin/users"
               className="group p-5 md:p-6 border-2 border-blue-200 dark:border-blue-900 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
@@ -350,6 +360,17 @@ const DashboardPage = () => {
               </div>
               <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Manage Drivers</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Monitor drivers</p>
+            </Link>
+
+            <Link
+              to="/admin/charging-bookings"
+              className="group p-5 md:p-6 border-2 border-orange-200 dark:border-orange-900 rounded-xl hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-gray-700 transition-all duration-300 text-center transform hover:scale-105"
+            >
+              <div className="bg-orange-100 dark:bg-orange-900/30 w-12 h-12 md:w-14 md:h-14 rounded-lg mx-auto flex items-center justify-center mb-3 group-hover:bg-orange-200 transition-all">
+                <Zap size={24} className="text-orange-600 dark:text-orange-400" />
+              </div>
+              <p className="text-sm md:text-base font-bold text-gray-900 dark:text-white">Charging Enquiries</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">New leads</p>
             </Link>
 
             <Link

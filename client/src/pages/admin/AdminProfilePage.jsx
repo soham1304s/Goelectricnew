@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import * as userService from '../../services/userService.js';
 import * as authService from '../../services/authService.js';
 import AdminLayout from './AdminLayout';
+import { getImageUrl } from '../../utils/imageUrl';
 
 export default function AdminProfilePage() {
   const navigate = useNavigate();
@@ -206,7 +207,7 @@ export default function AdminProfilePage() {
                 {/* Profile Image */}
                 <div className="relative group">
                   <img
-                    src={profileImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop'}
+                    src={getImageUrl(profileImage) || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop'}
                     alt="Profile"
                     className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-lg"
                   />

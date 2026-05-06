@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Pricing from '../models/Pricing.js';
 import User from '../models/User.js';
 import Driver from '../models/Driver.js';
+import TourBooking from '../models/TourBooking.js';
 import { calculateDistanceWithGoogleMaps } from '../utils/distanceCalculator.js';
 import { calculateFare } from '../utils/fareCalculator.js';
 import { generateInvoicePDF } from '../utils/pdfGenerator.js';
@@ -407,11 +408,47 @@ export const getMyBookings = async (req, res) => {
  */
 export const getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
+    const { id } = req.params;
+    console.log('🔍 Fetching booking by ID:', id);
+
+    // 1. Try finding in regular Rides Booking collection
+    let booking = await Booking.findById(id)
       .populate('user', 'name email phone')
-      .populate('driver', 'name phone vehicleDetails rating');
+      .populate('driver', 'name phone vehicleDetails rating')
+      .populate('pricing'); // Ensure pricing is populated if it's a ref
+
+    // 2. If not found, try finding in TourBooking collection
+    if (!booking) {
+      console.log('🔄 Booking not found in Rides, checking TourBookings...');
+      const tourBooking = await TourBooking.findById(id)
+        .populate('user', 'name email phone')
+        .populate('package');
+
+      if (tourBooking) {
+        console.log('✅ Found in TourBookings!');
+        // Normalize TourBooking to match frontend expectation in confirmation page
+        booking = tourBooking.toObject();
+        booking.rideType = 'tour';
+        booking.cabType = tourBooking.carType;
+        
+        // Map pricing to match regular booking structure for UI compatibility
+        if (booking.pricing) {
+          booking.pricing.totalFare = booking.pricing.totalAmount;
+          // paidAmount is already named correctly in both
+        }
+        
+        // Add package info to pickupLocation/dropLocation if they are missing addresses
+        if (typeof booking.pickupLocation === 'string') {
+          booking.pickupLocation = { address: booking.pickupLocation };
+        }
+        
+        // For tours, drop location might be the destination
+        booking.dropLocation = { address: tourBooking.package?.location || 'Tour Destination' };
+      }
+    }
 
     if (!booking) {
+      console.log('❌ Booking not found in either collection');
       return res.status(404).json({
         success: false,
         message: 'Booking not found',
@@ -419,7 +456,8 @@ export const getBookingById = async (req, res) => {
     }
 
     // Check if user owns this booking (or is admin)
-    if (booking.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    const bookingUserId = booking.user?._id || booking.user;
+    if (bookingUserId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to access this booking',

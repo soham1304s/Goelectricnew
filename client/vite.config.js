@@ -5,7 +5,19 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(), 
+      tailwindcss(),
+      {
+        name: 'html-transform',
+        transformIndexHtml(html) {
+          return html.replace(
+            /%VITE_GOOGLE_MAPS_API_KEY%/g,
+            env.VITE_GOOGLE_MAPS_API_KEY || ''
+          )
+        }
+      }
+    ],
     server: {
       port: 5173,
       host: 'localhost',
@@ -20,5 +32,17 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor': ['react', 'react-dom', 'react-router-dom'],
+            'maps': ['lucide-react'],
+            'ui': ['react-hot-toast', 'framer-motion'],
+          },
+        },
+      },
+    },
   };
-})
+});

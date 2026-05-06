@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+// Load env if not already loaded (e.g. when running this file directly)
+if (!process.env.MONGODB_URI) {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  dotenv.config({ path: path.join(__dirname, '../.env') });
+}
 
 /**
  * Connect to MongoDB database
@@ -15,11 +21,13 @@ const connectDB = async () => {
       process.exit(1);
     }
 
+    console.log('🔍 Connecting to MongoDB...');
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 15000,
       connectTimeoutMS: 15000,
     });
 
+    const maskedUri = uri.replace(/\/\/.*@/, '//****:****@');
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📊 Database: ${conn.connection.name}`);
 
@@ -32,10 +40,12 @@ const connectDB = async () => {
     });
 
   } catch (error) {
-    console.error("❌ Error connecting to MongoDB:", error.message);
+    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
     console.log("💡 Tip: Make sure your MONGODB_URI is correct in the backend/.env file.");
-    console.log("💡 If using a local database, ensure MongoDB is running: 'sudo systemctl start mongod'");
-    process.exit(1);
+    // Don't exit in dev mode so nodemon can retry
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
   }
 };
 

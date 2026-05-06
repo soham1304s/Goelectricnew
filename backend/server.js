@@ -18,6 +18,7 @@ dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '.
 import connectDB from './config/database.js';
 import { verifyEmailConfig } from './config/nodemailer.js';
 import { verifyWhatsAppConfig } from './config/whatsapp.js';
+import { verifyCloudinaryConfig } from './config/cloudinary.js';
 
 // Import middleware
 import errorHandler, { notFound } from './middleware/errorHandler.js';
@@ -52,6 +53,7 @@ connectDB();
 
 verifyEmailConfig();
 verifyWhatsAppConfig();
+verifyCloudinaryConfig();
 
 // Middleware
 

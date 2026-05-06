@@ -565,7 +565,7 @@ export const createTourPaymentOrder = async (req, res) => {
     }
 
     // Check if booking has valid pricing/amount
-    if (!booking.pricing || !booking.pricing.totalFare) {
+    if (!booking.pricing || !booking.pricing.totalAmount) {
       console.error(`❌ Tour Booking has invalid pricing:`, booking.pricing);
       return res.status(400).json({
         success: false,

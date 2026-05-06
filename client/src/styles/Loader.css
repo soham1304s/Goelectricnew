@@ -32,8 +32,8 @@
 /* Main Loader Container */
 .loader-container {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 600px;
+  height: 600px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,8 +62,8 @@
 
 /* Logo Image - Static (No Rotation) */
 .loader-logo {
-  width: 120px;
-  height: 120px;
+  width: 500px;
+  height: 500px;
   object-fit: contain;
   filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.4));
   position: relative;

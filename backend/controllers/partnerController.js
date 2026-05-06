@@ -165,7 +165,7 @@ export const registerCabPartner = async (req, res) => {
 
     if (req.files) {
       const { uploadFile } = await import('../utils/uploader.js');
-      
+
       if (req.files.rcDocument) {
         try {
           const res = await uploadFile(req.files.rcDocument[0], 'documents');
@@ -622,6 +622,42 @@ export const rejectChargingStation = async (req, res) => {
       success: false,
       message: 'Error rejecting charging station',
       error: error.message,
+    });
+  }
+};
+/**
+ * @desc    Get current user's driver registration status
+ * @route   GET /api/partners/driver/status
+ * @access  Private (Authenticated User)
+ */
+export const getDriverStatus = async (req, res) => {
+  try {
+    // Find driver by email or phone associated with the user
+    const driver = await Driver.findOne({
+      $or: [
+        { email: req.user.email },
+        { phone: req.user.phone }
+      ]
+    }).select('name email phone licenseNumber status isApproved rejectionReason createdAt vehicleDetails');
+
+    if (!driver) {
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: 'No driver application found for this user'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: driver
+    });
+  } catch (error) {
+    console.error('Error fetching driver status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching driver application status',
+      error: error.message
     });
   }
 };

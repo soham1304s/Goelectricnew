@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Calendar, CarTaxiFront, ChevronLeft, Clock3, Loader2, Navigation, AlertCircle, MapPin, CheckCircle2, Zap } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import LocationPickerComponent from '../components/LocationPickerComponent.jsx';
@@ -62,6 +62,31 @@ export default function IntercityRidePage() {
   const [bookingError, setBookingError] = useState('');
   const [calculatedDistance, setCalculatedDistance] = useState(0);
   const [distanceLoading, setDistanceLoading] = useState(false);
+  const location = useLocation();
+
+  // Consume state from navigate (e.g. from Home Hero)
+  useEffect(() => {
+    if (location.state) {
+      const { pickup, destination, date, time, pickupData, destData } = location.state;
+      setSelectedRoute('custom');
+      if (pickup) setCustomFromCity(pickup);
+      if (destination) setCustomToCity(destination);
+      if (date) setSelectedDate(date);
+      if (time) setSelectedTime(time);
+      if (pickupData?.latitude) {
+        setCustomFromCoordinates({
+          lat: pickupData.latitude,
+          lng: pickupData.longitude
+        });
+      }
+      if (destData?.latitude) {
+        setCustomToCoordinates({
+          lat: destData.latitude,
+          lng: destData.longitude
+        });
+      }
+    }
+  }, [location.state]);
 
   // Fetch rates from admin when component mounts
   useEffect(() => {

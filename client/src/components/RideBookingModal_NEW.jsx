@@ -4,7 +4,7 @@ import { X, Calendar, Clock, MapPin, AlertCircle, CheckCircle, Info, Loader2, Ch
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
 import { ridePaymentService } from '../services/ridePaymentService.js';
-import googleMapsService from '../services/googleMapsService.js';
+import { estimateDistance } from '../services/googleMapsService.js';
 import bookingValidator from '../utils/bookingValidator.js';
 
 /**
@@ -113,7 +113,7 @@ export default function RideBookingModal({
     setDistanceError('');
 
     try {
-      const result = await googleMapsService.estimateDistance(
+      const result = await estimateDistance(
         pickupLocation,
         destination,
         pickupCoordinates

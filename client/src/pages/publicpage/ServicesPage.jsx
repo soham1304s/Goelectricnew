@@ -12,7 +12,9 @@ import {
   Clock,
   ChevronRight,
   Monitor,
-  Navigation
+  Navigation,
+  UserPlus,
+  Briefcase
 } from 'lucide-react';
 import Footer from '../../components/Footer.jsx';
 import SEO from '../../components/SEO.jsx';
@@ -45,6 +47,20 @@ const services = [
     description: 'Curated sightseeing experiences. Explore heritage sites and hidden gems in our eco-friendly fleet.',
     path: '/tours',
     features: ['Guided Tours', 'Half/Full Day', 'Custom Itinerary']
+  },
+  {
+    icon: Zap,
+    title: 'EV Charging Solutions',
+    description: 'Smart charging infrastructure for your home or business. We provide end-to-end installation and maintenance services.',
+    path: '/charging',
+    features: ['Fast Charging', 'Expert Installation', '24/7 Monitoring']
+  },
+  {
+    icon: Briefcase,
+    title: 'Driver Partner',
+    description: 'Join our mission to electrify urban mobility. Become an EV Pilot and enjoy premium earnings, flexible hours, and zero fuel costs.',
+    path: '/partner/driver',
+    features: ['Weekly Payments', 'Zero Fuel Costs', 'Premium EV Training']
   },
 ];
 
@@ -180,6 +196,82 @@ const ServicesPage = () => {
                   <p className="text-slate-400 font-medium max-w-xs">{adv.desc}</p>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Driver Recruitment Section */}
+        <section className="py-24 md:py-32 px-4 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto">
+            <div className={`rounded-[3.5rem] p-8 md:p-20 relative overflow-hidden transition-all duration-500 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-2xl shadow-emerald-500/5 group`}>
+              
+              {/* Background Accents */}
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-emerald-500/5 to-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-700"></div>
+              
+              <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-8">
+                    <UserPlus size={14} /> Join the Revolution
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight leading-tight">
+                    Drive with Purpose. <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Earn with Pride.</span>
+                  </h2>
+                  <p className="text-xl text-slate-500 dark:text-zinc-400 font-medium mb-10 leading-relaxed">
+                    We aren't just looking for drivers; we are looking for EV Pilots. Be part of Jaipur's most premium electric fleet and take home better earnings every week.
+                  </p>
+                  
+                  <div className="grid sm:grid-cols-2 gap-6 mb-12">
+                    {[
+                      { title: "Zero Maintenance", desc: "We handle all the servicing." },
+                      { title: "Flexible Shifts", desc: "Work when you want." },
+                      { title: "High Demand", desc: "Guaranteed ride requests." },
+                      { title: "Premium Brand", desc: "Drive the best-in-class EVs." }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-700 transition-colors hover:border-emerald-500/30">
+                        <div className="mt-1 w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                        <div>
+                          <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{item.title}</h4>
+                          <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => navigate('/partner/driver')}
+                    className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl hover:shadow-emerald-500/20"
+                  >
+                    Start Your Application
+                    <ArrowRight className="transition-transform group-hover:translate-x-2" size={20} />
+                  </button>
+                </div>
+
+                <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden group/img shadow-2xl border border-slate-200 dark:border-zinc-800">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 opacity-0 group-hover/img:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-12">
+                    <p className="text-white text-2xl font-black mb-2 italic">"Switching to EV was the best career move I made."</p>
+                    <p className="text-emerald-400 font-bold">- Pilot Rajesh, Joined 2023</p>
+                  </div>
+                  <img 
+                    src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2070&auto=format&fit=crop" 
+                    alt="Driver Partner" 
+                    className="w-full h-full object-cover grayscale-[20%] group-hover/img:grayscale-0 group-hover/img:scale-110 transition-all duration-1000"
+                  />
+                  
+                  {/* Floating Stats */}
+                  <div className="absolute top-8 left-8 z-20 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl p-6 rounded-3xl border border-white/20 shadow-2xl animate-bounce-slow">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                        <Zap size={24} fill="white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">₹60K+</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400">Monthly Potential</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

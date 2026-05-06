@@ -34,6 +34,7 @@ export default function RidesPage() {
   const [selectedRideForCancel, setSelectedRideForCancel] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  const [driverApp, setDriverApp] = useState(null);
   const navigate = useNavigate();
 
   const handlePayAdvance = async (ride) => {
@@ -44,7 +45,7 @@ export default function RidesPage() {
       }
 
       toast.loading('Initiating secure payment...', { id: 'payment' });
-      
+
       const paymentParams = {
         bookingId: ride.bookingId,
         _id: ride._id,
@@ -73,7 +74,24 @@ export default function RidesPage() {
 
   useEffect(() => {
     loadRides();
+    fetchDriverStatus();
   }, []);
+
+  const fetchDriverStatus = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api'}/partners/driver/status`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setDriverApp(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching driver status:', err);
+    }
+  };
 
   const loadRides = async () => {
     try {
@@ -207,6 +225,69 @@ export default function RidesPage() {
   return (
     <UserLayout>
       <div className="max-w-7xl mx-auto space-y-10">
+        {/* Driver Application Status Banners */}
+        {driverApp && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            {(driverApp.status === 'approved' || driverApp.status === 'active') ? (
+              <div className="bg-emerald-600 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group border border-emerald-400/20">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:scale-110 transition-transform duration-700" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center shadow-inner transform -rotate-3">
+                      <CheckCircle size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h2 className="text-2xl font-black tracking-tight">You are selected!</h2>
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-widest">Partner Active</span>
+                      </div>
+                      <p className="text-emerald-50 text-sm font-medium max-w-md">
+                        Congratulations! Your driver application has been approved. You are now part of Jaipur's premier EV network.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/user/application-status')}
+                    className="px-8 py-4 bg-white text-emerald-600 rounded-2xl font-black text-sm hover:bg-emerald-50 transition-all shadow-xl hover:scale-105 active:scale-95 whitespace-nowrap"
+                  >
+                    View Driver Profile
+                  </button>
+                </div>
+              </div>
+            ) : driverApp.status === 'pending' ? (
+              <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group border border-blue-400/20">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:scale-110 transition-transform duration-700" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center shadow-inner animate-pulse">
+                      <Clock size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h2 className="text-2xl font-black tracking-tight">Application Pending</h2>
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-widest">In Review</span>
+                      </div>
+                      <p className="text-blue-50 text-sm font-medium max-w-md">
+                        Your driver profile is currently being verified by our team. This usually takes 24-48 hours.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/user/application-status')}
+                    className="px-8 py-4 bg-white text-blue-600 rounded-2xl font-black text-sm hover:bg-blue-50 transition-all shadow-xl hover:scale-105 active:scale-95 whitespace-nowrap"
+                  >
+                    Track Progress
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </motion.div>
+        )}
+
         {/* Premium Header Section */}
         <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-white text-slate-900 p-8 md:p-12 shadow-xl border border-slate-100">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/20 to-transparent pointer-events-none" />
@@ -219,7 +300,7 @@ export default function RidesPage() {
                 Track your carbon-neutral travels and manage your upcoming reservations.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
               <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center shadow-sm">
                 <p className="text-emerald-600 text-2xl font-black mb-1">{statsData.total}</p>
@@ -255,11 +336,10 @@ export default function RidesPage() {
               <button
                 key={status}
                 onClick={() => handleFilterChange(status)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-                  filterStatus === status
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 scale-105'
-                    : 'text-slate-500 hover:bg-slate-100'
-                }`}
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${filterStatus === status
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 scale-105'
+                  : 'text-slate-500 hover:bg-slate-100'
+                  }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </button>
@@ -312,11 +392,10 @@ export default function RidesPage() {
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Booking ID</p>
                           <p className="text-sm font-bold text-slate-900 font-mono">{ride.bookingId}</p>
                         </div>
-                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                          ride.status === 'completed' ? 'bg-emerald-100 text-emerald-600' :
+                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${ride.status === 'completed' ? 'bg-emerald-100 text-emerald-600' :
                           ride.status === 'cancelled' ? 'bg-rose-100 text-rose-600' :
-                          'bg-emerald-100 text-emerald-600'
-                        }`}>
+                            'bg-emerald-100 text-emerald-600'
+                          }`}>
                           {ride.status}
                         </div>
                       </div>
@@ -341,7 +420,7 @@ export default function RidesPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                           <div className="bg-slate-50/80 p-4 rounded-3xl">
+                          <div className="bg-slate-50/80 p-4 rounded-3xl">
                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Date</p>
                             <div className="flex items-center gap-2">
                               <Calendar size={12} className="text-emerald-500" />
@@ -355,7 +434,7 @@ export default function RidesPage() {
                         </div>
                       </div>
 
-                       <div className="flex items-center justify-between border-t border-slate-100 pt-6">
+                      <div className="flex items-center justify-between border-t border-slate-100 pt-6">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                             <Car size={20} />
@@ -376,7 +455,7 @@ export default function RidesPage() {
                               Pay Now
                             </button>
                           ) : (
-                             <button
+                            <button
                               onClick={() => navigate(`/user/booking-confirmation?id=${ride._id}`)}
                               className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-black hover:scale-105 active:scale-95 transition-all shadow-xl"
                             >

@@ -18,9 +18,13 @@ import {
   Plane,
   Zap,
   ChevronDown,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
-import logoDark from '../../assets/main1.png';
+import { useTheme } from '../../context/ThemeContext.jsx';
+import logoDark from '../../assets/logo_dark.png';
+import logoLight from '../../assets/logo_light.png';
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,6 +34,8 @@ const AdminLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const darkMode = theme === 'dark';
 
   // Responsive
   useEffect(() => {
@@ -126,9 +132,9 @@ const AdminLayout = ({ children }) => {
         >
           <div className="flex flex-col items-center">
             <img
-              src={logoDark}
+              src={darkMode ? logoDark : logoLight}
               alt="GoElectriQ"
-              className="h-12 w-auto object-contain mb-2"
+              className="h-32 md:h-40 w-auto object-contain mb-2"
             />
           </div>
         </button>
@@ -141,8 +147,8 @@ const AdminLayout = ({ children }) => {
             to="/admin"
             onClick={() => isMobile && setSidebarOpen(false)}
             className={`flex items-center px-4 py-3 rounded-lg transition font-medium ${isActive('/admin')
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}
           >
             <LayoutDashboard size={18} />
@@ -185,8 +191,8 @@ const AdminLayout = ({ children }) => {
                       to={item.path}
                       onClick={() => isMobile && setSidebarOpen(false)}
                       className={`flex items-center ml-2 px-4 py-2 rounded-lg transition text-sm ${isActive(item.path)
-                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                         }`}
                     >
                       <Icon size={18} />
@@ -208,6 +214,14 @@ const AdminLayout = ({ children }) => {
           >
             <Home size={18} />
             <span className="ml-2">Home</span>
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-center px-4 py-3 bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 text-white rounded-lg transition font-medium shadow-lg"
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            <span className="ml-2">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
 
           <button

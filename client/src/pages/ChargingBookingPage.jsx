@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
-const ChangeoverPage = () => {
+const ChargingBookingPage = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
 
@@ -93,7 +93,7 @@ const ChangeoverPage = () => {
       }
 
       console.log('✅ Enquiry submitted successfully:', result);
-      alert('✅ Thank you! Your enquiry has been received. Our team will contact you within 1 hour.');
+      alert('✅ Thank you! Your EV Charging enquiry has been received. Our team will contact you within 1 hour.');
       
       // Reset form
       setFormData({
@@ -115,92 +115,92 @@ const ChangeoverPage = () => {
 
   const services = [
     {
-      id: "changeover",
-      name: "Automatic Changeover",
-      price: "₹1,500",
-      desc: "Safe installation with quality brands",
-      time: "2-3 hours",
+      id: "home-charging",
+      name: "Home Charging Setup",
+      price: "₹15,000",
+      desc: "Smart 7.2kW AC charger installation for your home",
+      time: "4-6 hours",
     },
     {
-      id: "manual",
-      name: "Manual Switch",
-      price: "₹800",
-      desc: "Standard manual changeover switch",
-      time: "1-2 hours",
+      id: "commercial",
+      name: "Commercial Charging",
+      price: "₹85,000",
+      desc: "Dual-gun DC fast charging for businesses",
+      time: "2-3 days",
     },
     {
-      id: "installation",
-      name: "Full Installation",
-      price: "₹2,500",
-      desc: "Complete setup with wiring",
-      time: "4-5 hours",
+      id: "maintenance",
+      name: "Annual Maintenance",
+      price: "₹4,999",
+      desc: "Regular health checks and software updates",
+      time: "Per Year",
     },
   ];
 
   const faqs = [
     {
-      q: "What is a changeover switch and why do I need it?",
-      a: "A changeover switch automatically switches your home between main electricity and backup power (inverter/generator) when power fails, ensuring uninterrupted supply to your appliances.",
+      q: "What type of EV chargers do you install?",
+      a: "We install AC Slow Chargers (3.3kW to 7.2kW) for homes and DC Fast Chargers (15kW to 120kW) for commercial spaces, supporting all major EV brands in India.",
     },
     {
-      q: "How long does the installation take?",
-      a: "Most installations take 2-3 hours depending on your home setup. Our technicians will inspect your electrical system first.",
+      q: "Is my home electrical setup compatible?",
+      a: "Our technicians perform a feasibility study of your existing load. We may suggest a load upgrade if you're installing a fast charger.",
     },
     {
-      q: "Are your technicians certified?",
-      a: "Yes, all our technicians are certified professionals with 5+ years of experience in electrical installations.",
+      q: "How long does installation take?",
+      a: "Home installations are typically completed within 4-6 hours. Commercial setups may take 2-3 days depending on civil work required.",
     },
     {
-      q: "Do you provide warranty?",
-      a: "Yes! We provide 2 years warranty on all installations and 1 year warranty on parts used.",
+      q: "Do you provide government subsidy assistance?",
+      a: "Yes, we help our customers with documentation required for state and central EV subsidies where applicable.",
     },
     {
-      q: "What brands do you use?",
-      a: "We use premium brands like Havells, Anchor, Legrand, and Schneider Electric for all installations.",
+      q: "Are the chargers weatherproof?",
+      a: "Yes, all chargers we install are IP65/IP66 rated, making them safe for outdoor installation in all weather conditions.",
     },
   ];
 
   const testimonials = [
     {
-      name: "Rajesh Kumar",
+      name: "Vikram Mehta",
       rating: 5,
-      text: "Excellent service! The technician was very professional and completed the work on time.",
-      location: "Delhi",
+      text: "GoElectric made my home charging setup so easy. The installation was neat and the app integration is seamless.",
+      location: "Jaipur",
     },
     {
-      name: "Priya Singh",
+      name: "Sunita Rao",
       rating: 5,
-      text: "Very affordable pricing and quality work. Highly recommended for all electrical needs.",
-      location: "Bangalore",
+      text: "We installed two chargers at our apartment complex. The team handled everything from wiring to society approvals.",
+      location: "Delhi NCR",
     },
     {
-      name: "Amit Patel",
+      name: "Rahul Sharma",
       rating: 5,
-      text: "Great communication and quick service. No hidden charges. Will definitely use again.",
-      location: "Mumbai",
+      text: "Top-notch service for my hotel's guest charging station. Reliable hardware and great support.",
+      location: "Udaipur",
     },
   ];
 
   const features = [
     {
       icon: <Zap size={32} className="text-yellow-500" />,
-      title: "Quick Installation",
-      desc: "Expert technicians complete work in 2-3 hours",
+      title: "Fast Charging",
+      desc: "Cutting-edge technology for minimum charging time",
     },
     {
       icon: <Shield size={32} className="text-emerald-500" />,
-      title: "Safety Certified",
-      desc: "100% safe installation with proper grounding",
+      title: "Certified Safety",
+      desc: "Standard-compliant installations with surge protection",
     },
     {
       icon: <Banknote size={32} className="text-blue-500" />,
-      title: "Best Prices",
-      desc: "Transparent pricing with no hidden charges",
+      title: "Transparent Pricing",
+      desc: "No hidden costs. Detailed quotes provided upfront",
     },
     {
       icon: <CheckCircle size={32} className="text-emerald-600" />,
-      title: "2-Year Warranty",
-      desc: "Complete warranty on installation & parts",
+      title: "3-Year Warranty",
+      desc: "Extended warranty on hardware and installation",
     },
   ];
 
@@ -210,32 +210,32 @@ const ChangeoverPage = () => {
     >
       {/* Hero Section */}
       <header
-        className={`relative py-20 px-6 overflow-hidden ${isDarkMode ? "bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900" : "bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700"}`}
+        className={`relative py-20 px-6 overflow-hidden ${isDarkMode ? "bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900" : "bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700"}`}
       >
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <span
-            className={`${isDarkMode ? "bg-blue-900/60 text-blue-200" : "bg-white/40 text-slate-900"} px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider inline-block`}
+            className={`${isDarkMode ? "bg-emerald-900/60 text-emerald-200" : "bg-white/40 text-slate-900"} px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider inline-block`}
           >
-            Professional Electrical Services
+            Sustainable Energy Solutions
           </span>
           <h1 className="mt-8 text-5xl md:text-6xl font-extrabold text-white leading-tight">
-            Need a Changeover Switch?
+            Powering Your <br />Electric Journey
           </h1>
           <p
-            className={`mt-6 text-xl max-w-2xl mx-auto leading-relaxed ${isDarkMode ? "text-blue-200" : "text-blue-100"}`}
+            className={`mt-6 text-xl max-w-2xl mx-auto leading-relaxed ${isDarkMode ? "text-emerald-200" : "text-emerald-100"}`}
           >
-            Automatic power switching for uninterrupted electricity. Get
-            professional installation from certified technicians today.
+            Expert EV charging infrastructure for homes, societies, and businesses. 
+            Join the green revolution with Jaipur's most trusted EV partner.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={toggleModal}
               className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all"
             >
-              Book Service Now
+              Get Free Consultation
             </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-pink hover:bg-opacity-10 transition-all">
-              View Pricing
+            <button className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-white hover:bg-opacity-10 transition-all">
+              View Solutions
             </button>
           </div>
         </div>
@@ -250,7 +250,7 @@ const ChangeoverPage = () => {
           {features.map((feature, idx) => (
             <div
               key={idx}
-              className={`${isDarkMode ? "bg-slate-800 border-slate-700 hover:border-blue-500" : "bg-white border-slate-100 hover:border-blue-200"} p-6 rounded-2xl shadow-md border hover:shadow-xl transition-all`}
+              className={`${isDarkMode ? "bg-slate-800 border-slate-700 hover:border-emerald-500" : "bg-white border-slate-100 hover:border-emerald-200"} p-6 rounded-2xl shadow-md border hover:shadow-xl transition-all`}
             >
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
@@ -267,32 +267,32 @@ const ChangeoverPage = () => {
         className={`py-20 px-6 ${isDarkMode ? "bg-slate-700" : "bg-slate-100"}`}
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">How It Works</h2>
+          <h2 className="text-4xl font-bold text-center mb-16">Our Installation Process</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
               {
                 step: "1",
-                title: "Schedule",
-                desc: "Book your service online or call us",
+                title: "Site Audit",
+                desc: "Technical evaluation of your electrical load",
               },
               {
                 step: "2",
-                title: "Inspection",
-                desc: "Technician evaluates your setup",
+                title: "Quotation",
+                desc: "Custom plan based on your vehicle & needs",
               },
               {
                 step: "3",
-                title: "Installation",
-                desc: "Professional installation with safety checks",
+                title: "Setup",
+                desc: "Professional installation by certified experts",
               },
               {
                 step: "4",
-                title: "Testing",
-                desc: "Complete testing & documentation",
+                title: "Handover",
+                desc: "Testing, training & support documentation",
               },
             ].map((item, idx) => (
               <div key={idx} className="text-center">
-                <div className="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="bg-emerald-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-lg mb-2">{item.title}</h3>
@@ -305,14 +305,14 @@ const ChangeoverPage = () => {
         </div>
       </section>
 
-      {/* Services & Pricing */}
+      {/* Solutions & Pricing */}
       <section id="services" className="py-20 px-6 max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-16">Our Services</h2>
+        <h2 className="text-4xl font-bold text-center mb-16">Tailored Charging Solutions</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {services.map((service) => (
             <div
               key={service.id}
-              className={`${isDarkMode ? "bg-slate-800 border-slate-600 hover:border-blue-400" : "bg-white border-slate-200 hover:border-blue-500"} border-2 rounded-2xl p-8 hover:shadow-xl transition-all`}
+              className={`${isDarkMode ? "bg-slate-800 border-slate-600 hover:border-emerald-400" : "bg-white border-slate-200 hover:border-emerald-500"} border-2 rounded-2xl p-8 hover:shadow-xl transition-all`}
             >
               <h3 className="text-2xl font-bold mb-2">{service.name}</h3>
               <p className={isDarkMode ? "text-slate-400" : "text-slate-600"}>
@@ -324,38 +324,36 @@ const ChangeoverPage = () => {
                 <span
                   className={isDarkMode ? "text-slate-400" : "text-slate-600"}
                 >
-                  Installation Time:
+                  Typical Time:
                 </span>
                 <span className="font-bold">{service.time}</span>
               </div>
-              <p className="text-3xl font-bold text-blue-600 mb-6">
-                {service.price}
+              <p className="text-3xl font-bold text-emerald-600 mb-6">
+                Starting {service.price}
               </p>
               <button
                 onClick={toggleModal}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all"
               >
-                Book Now
+                Inquire Now
               </button>
             </div>
           ))}
         </div>
         <div
-          className={`mt-12 ${isDarkMode ? "bg-blue-900/30 border-blue-700" : "bg-blue-50 border-blue-200"} border-2 rounded-2xl p-8`}
+          className={`mt-12 ${isDarkMode ? "bg-emerald-900/30 border-emerald-700" : "bg-emerald-50 border-emerald-200"} border-2 rounded-2xl p-8`}
         >
           <div className="flex items-start gap-4">
             <AlertCircle
-              className={isDarkMode ? "text-blue-400" : "text-blue-600"}
+              className={isDarkMode ? "text-emerald-400" : "text-emerald-600"}
               size={24}
             />
             <div>
               <h3 className="font-bold text-lg mb-2">
-                Important: Safety First!
+                Why Professional Installation Matters?
               </h3>
               <p className={isDarkMode ? "text-slate-300" : "text-slate-700"}>
-                Never attempt DIY electrical work. Always hire certified
-                professionals. Improper installation can cause safety hazards
-                and void warranties.
+                EV charging involves high electrical loads. Improper wiring can lead to fire hazards or battery damage. Our certified technicians ensure 100% safety and compliance with international standards.
               </p>
             </div>
           </div>
@@ -365,11 +363,11 @@ const ChangeoverPage = () => {
       {/* Testimonials */}
       <section
         id="testimonials"
-        className={`py-20 px-6 ${isDarkMode ? "bg-gradient-to-br from-slate-800 to-slate-700" : "bg-gradient-to-br from-blue-50 to-slate-50"}`}
+        className={`py-20 px-6 ${isDarkMode ? "bg-gradient-to-br from-slate-800 to-slate-700" : "bg-gradient-to-br from-emerald-50 to-slate-50"}`}
       >
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
-            What Our Customers Say
+            Trusted by EV Owners
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, idx) => (
@@ -413,13 +411,13 @@ const ChangeoverPage = () => {
         className={`py-20 px-6 max-w-4xl mx-auto ${isDarkMode ? "bg-slate-800" : ""}`}
       >
         <h2 className="text-4xl font-bold text-center mb-16">
-          Frequently Asked Questions
+          Common Questions
         </h2>
         <div className="space-y-4">
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className={`${isDarkMode ? "bg-slate-700 border-slate-600 hover:border-blue-400" : "bg-white border-slate-200 hover:border-blue-300"} border rounded-xl overflow-hidden transition-all`}
+              className={`${isDarkMode ? "bg-slate-700 border-slate-600 hover:border-emerald-400" : "bg-white border-slate-200 hover:border-emerald-300"} border rounded-xl overflow-hidden transition-all`}
             >
               <button
                 onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
@@ -428,7 +426,7 @@ const ChangeoverPage = () => {
                 <span className="font-bold text-lg text-left">{faq.q}</span>
                 <ChevronDown
                   size={24}
-                  className={`text-blue-600 flex-shrink-0 transition-transform ${expandedFAQ === idx ? "rotate-180" : ""}`}
+                  className={`text-emerald-600 flex-shrink-0 transition-transform ${expandedFAQ === idx ? "rotate-180" : ""}`}
                 />
               </button>
               {expandedFAQ === idx && (
@@ -445,21 +443,21 @@ const ChangeoverPage = () => {
 
       {/* Final CTA */}
       <section
-        className={`py-16 px-6 ${isDarkMode ? "bg-gradient-to-r from-blue-900 to-blue-800" : "bg-gradient-to-r from-blue-600 to-blue-700"}`}
+        className={`py-16 px-6 ${isDarkMode ? "bg-gradient-to-r from-emerald-900 to-emerald-800" : "bg-gradient-to-r from-emerald-600 to-emerald-700"}`}
       >
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready for Reliable Power Switching?
+            Ready to Electrify Your Space?
           </h2>
-          <p className={isDarkMode ? "text-blue-200" : "text-blue-100"}>
-            Get expert installation from certified technicians. No hidden
-            charges, transparent pricing.
+          <p className={isDarkMode ? "text-emerald-200" : "text-emerald-100"}>
+            Get a customized EV charging plan for your property. 
+            Professional service, high-quality hardware, and 24/7 support.
           </p>
           <button
             onClick={toggleModal}
             className="mt-8 bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl text-xl font-bold shadow-lg hover:shadow-2xl transition-all"
           >
-            Schedule Installation Today
+            Start Your EV Journey
           </button>
         </div>
       </section>
@@ -474,10 +472,10 @@ const ChangeoverPage = () => {
           <div
             className={`${isDarkMode ? "bg-slate-800" : "bg-white"} w-full max-w-lg rounded-3xl shadow-2xl relative z-10 overflow-hidden transform transition-all`}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
-              <h2 className="text-3xl font-bold">Book Your Service</h2>
+            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-8 text-white">
+              <h2 className="text-3xl font-bold">Request a Quote</h2>
               <p className="opacity-90 mt-2">
-                Our technician will contact you within 1 hour
+                Our EV expert will contact you within 1 hour
               </p>
             </div>
 
@@ -496,7 +494,7 @@ const ChangeoverPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition ${errors.name ? "border-red-500" : ""}`}
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.name ? "border-red-500" : ""}`}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -514,7 +512,7 @@ const ChangeoverPage = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Your 10-digit number"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition ${errors.phone ? "border-red-500" : ""}`}
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.phone ? "border-red-500" : ""}`}
                 />
                 {errors.phone && (
                   <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
@@ -532,7 +530,7 @@ const ChangeoverPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your.email@example.com"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition ${errors.email ? "border-red-500" : ""}`}
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.email ? "border-red-500" : ""}`}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -550,7 +548,7 @@ const ChangeoverPage = () => {
                   value={formData.city}
                   onChange={handleChange}
                   placeholder="Your city"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition ${errors.city ? "border-red-500" : ""}`}
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.city ? "border-red-500" : ""}`}
                 />
                 {errors.city && (
                   <p className="text-red-500 text-sm mt-1">{errors.city}</p>
@@ -559,33 +557,33 @@ const ChangeoverPage = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Service Type
+                  Enquiry Type
                 </label>
                 <select
                   id="enquiryType"
                   value={formData.enquiryType}
                   onChange={handleChange}
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition`}
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition`}
                 >
-                  <option value="installation">Installation</option>
+                  <option value="installation">Home Installation</option>
+                  <option value="commercial">Commercial/Society</option>
                   <option value="maintenance">Maintenance</option>
                   <option value="pricing">Pricing Query</option>
-                  <option value="general">General Enquiry</option>
                   <option value="other">Other</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Address *
+                  Requirement Details *
                 </label>
                 <textarea
                   id="address"
                   rows="3"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Complete address with area & city"
-                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition ${errors.address ? "border-red-500" : ""}`}
+                  placeholder="Tell us about your vehicle model and property type"
+                  className={`w-full ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-slate-50 border-slate-200"} border p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition ${errors.address ? "border-red-500" : ""}`}
                 ></textarea>
                 {errors.address && (
                   <p className="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -597,12 +595,12 @@ const ChangeoverPage = () => {
                 disabled={loading}
                 className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-95"
               >
-                {loading ? "Submitting..." : "Submit Enquiry"}
+                {loading ? "Submitting..." : "Send Request"}
               </button>
               <p
                 className={`text-center text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
               >
-                By submitting, you agree to our terms & conditions
+                Zero-commitment consultation. We respect your privacy.
               </p>
             </form>
             <button
@@ -618,4 +616,4 @@ const ChangeoverPage = () => {
   );
 };
 
-export default ChangeoverPage;
+export default ChargingBookingPage;

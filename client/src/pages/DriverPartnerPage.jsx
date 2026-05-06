@@ -123,12 +123,15 @@ export default function DriverPartnerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 pt-28 md:pt-36 pb-12 px-4 transition-colors duration-500">
       <div className="max-w-[1400px] mx-auto">
         
         {/* ===== HERO BANNER ===== */}
-        <div className="bg-gradient-to-r from-green-600 to-blue-600 dark:from-green-800 dark:to-blue-800 rounded-3xl shadow-2xl p-12 mb-12 text-white">
-          <div className="flex items-start gap-8">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800 rounded-[3rem] shadow-2xl p-12 mb-12 text-white relative overflow-hidden group">
+          {/* Decorative Circle */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          
+          <div className="flex items-start gap-8 relative z-10">
             <div className="flex-1">
               <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
                 <span className="text-sm font-bold">Now Hiring</span>
@@ -159,10 +162,10 @@ export default function DriverPartnerPage() {
               </div>
               <button
                 onClick={() => setShowModal(true)}
-                className="mt-8 bg-white text-green-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition text-lg flex items-center gap-2"
+                className="mt-8 bg-white text-emerald-600 font-bold py-4 px-10 rounded-2xl hover:bg-emerald-50 transition-all text-lg flex items-center gap-3 shadow-xl hover:shadow-emerald-500/20 active:scale-[0.98]"
               >
-                <Car className="w-5 h-5" />
-                Registerd Now
+                <Car className="w-6 h-6" />
+                Register Now
               </button>
             </div>
             <div className="hidden lg:block text-center">
@@ -179,9 +182,9 @@ export default function DriverPartnerPage() {
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Earning Potential</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {/* Daily */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 text-center">
-              <div className="inline-block p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                <Calendar className="w-8 h-8 text-green-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 text-center border border-slate-100 dark:border-zinc-700 hover:border-emerald-500/30 transition-all">
+              <div className="inline-block p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl mb-4">
+                <Calendar className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Daily</h3>
               <p className="text-4xl font-bold text-green-600 mb-2">₹{apiConfig.driver.earningsDaily.min.toLocaleString()} - ₹{apiConfig.driver.earningsDaily.max.toLocaleString()}</p>
@@ -189,20 +192,23 @@ export default function DriverPartnerPage() {
             </div>
 
             {/* Weekly */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 text-center border-2 border-green-500">
-              <div className="inline-block p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                <Zap className="w-8 h-8 text-green-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center border-2 border-emerald-500 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500 rounded-bl-[40px] flex items-start justify-end p-2 pr-3 pt-2">
+                <CheckCircle className="w-4 h-4 text-white" />
+              </div>
+              <div className="inline-block p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl mb-4">
+                <Zap className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Weekly</h3>
               <p className="text-4xl font-bold text-green-600 mb-2">₹{apiConfig.driver.earningsWeekly.min.toLocaleString()} - ₹{apiConfig.driver.earningsWeekly.max.toLocaleString()}</p>
               <p className="text-gray-600 dark:text-gray-400 text-sm">5-6 days/week</p>
-              <div className="bg-green-100 dark:bg-green-900/20 rounded-lg px-3 py-2 mt-4 text-sm font-semibold text-green-600">Most Popular</div>
+              <div className="bg-emerald-100 dark:bg-emerald-900/20 rounded-lg px-3 py-2 mt-4 text-sm font-bold text-emerald-600">Most Popular</div>
             </div>
 
             {/* Monthly */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 text-center">
-              <div className="inline-block p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                <Award className="w-8 h-8 text-green-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 text-center border border-slate-100 dark:border-zinc-700 hover:border-emerald-500/30 transition-all">
+              <div className="inline-block p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl mb-4">
+                <Award className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Monthly</h3>
               <p className="text-4xl font-bold text-green-600 mb-2">₹{apiConfig.driver.earningsMonthly.min.toLocaleString()} - ₹{apiConfig.driver.earningsMonthly.max.toLocaleString()}</p>
@@ -219,9 +225,9 @@ export default function DriverPartnerPage() {
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Why Drive with Us?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {/* Guaranteed Earnings */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                <Zap className="w-8 h-8 text-blue-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-8 border border-slate-100 dark:border-zinc-700 hover:shadow-xl transition-all hover:border-emerald-500/30">
+              <div className="inline-block p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl mb-6">
+                <Zap className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Guaranteed Earnings</h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -230,9 +236,9 @@ export default function DriverPartnerPage() {
             </div>
 
             {/* Flexible Hours */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4">
-                <Clock className="w-8 h-8 text-purple-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-8 border border-slate-100 dark:border-zinc-700 hover:shadow-xl transition-all hover:border-emerald-500/30">
+              <div className="inline-block p-4 bg-teal-100 dark:bg-teal-900/30 rounded-2xl mb-6">
+                <Clock className="w-8 h-8 text-teal-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Flexible Hours</h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -241,9 +247,9 @@ export default function DriverPartnerPage() {
             </div>
 
             {/* Premium EVs */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 hover:shadow-xl transition">
-              <div className="inline-block p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                <Car className="w-8 h-8 text-green-600" />
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-8 border border-slate-100 dark:border-zinc-700 hover:shadow-xl transition-all hover:border-emerald-500/30">
+              <div className="inline-block p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl mb-6">
+                <Car className="w-8 h-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Premium EVs</h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">

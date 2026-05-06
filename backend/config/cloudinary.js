@@ -20,4 +20,12 @@ async function getCloudinary() {
   }
 }
 
+export const verifyCloudinaryConfig = () => {
+  if (isCloudinaryConfigured()) {
+    console.log(`✅ Cloudinary configured: ${cloudName}`);
+  } else {
+    console.warn('⚠️ Cloudinary not fully configured. File uploads will use local storage.');
+  }
+};
+
 export { getCloudinary };

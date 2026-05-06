@@ -102,7 +102,7 @@ export default function BookingConfirmationPage() {
     };
 
     fetchBooking();
-  }, [booking, params.bookingId]);
+  }, [booking, params.bookingId, location.search]);
 
   // Auto-refresh booking status every 10 seconds to check for cancellations/completions
   useEffect(() => {

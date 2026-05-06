@@ -42,3 +42,7 @@ export async function googleLogin(idToken) {
   const { data } = await api.post('/auth/google', { idToken });
   return data;
 }
+export async function getDriverStatus() {
+  const { data } = await api.get('/partners/driver/status');
+  return data;
+}

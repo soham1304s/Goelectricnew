@@ -13,6 +13,20 @@ const DriverBookingDashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [editingId, setEditingId] = useState(null);
   const [newStatus, setNewStatus] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    licenseNumber: '',
+    vehicleDetails: {
+      vehicleNumber: '',
+      vehicleModel: '',
+      vehicleType: 'economy',
+      vehicleColor: ''
+    }
+  });
 
   // Fetch drivers
   useEffect(() => {
@@ -109,6 +123,48 @@ const DriverBookingDashboard = () => {
     } catch (err) {
       console.error('❌ Error updating driver:', err);
       setError('Failed to update driver');
+    }
+  };
+
+  const handleEdit = (driver) => {
+    setSelectedDriver(driver);
+    setEditForm({
+      name: driver.name || '',
+      email: driver.email || '',
+      phone: driver.phone || '',
+      licenseNumber: driver.licenseNumber || '',
+      vehicleDetails: {
+        vehicleNumber: driver.vehicleDetails?.vehicleNumber || '',
+        vehicleModel: driver.vehicleDetails?.vehicleModel || '',
+        vehicleType: driver.vehicleDetails?.vehicleType || 'economy',
+        vehicleColor: driver.vehicleDetails?.vehicleColor || ''
+      }
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `${apiConfig.api.baseUrl}/admin/drivers/${selectedDriver._id}`,
+        editForm,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setIsEditModalOpen(false);
+      fetchDrivers();
+    } catch (err) {
+      console.error('❌ Error updating driver:', err);
+      setError('Failed to update driver details');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -343,13 +399,22 @@ const DriverBookingDashboard = () => {
 
                       {/* Actions */}
                       <td className="px-3 md:px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleDelete(driver._id)}
-                          className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 p-2 rounded transition"
-                          title="Delete driver"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEdit(driver)}
+                            className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 p-2 rounded transition"
+                            title="Edit profile"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(driver._id)}
+                            className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 p-2 rounded transition"
+                            title="Delete driver"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -400,6 +465,140 @@ const DriverBookingDashboard = () => {
             >
               Next
             </button>
+          </div>
+        )}
+
+        {/* Edit Modal */}
+        {isEditModalOpen && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden">
+              <div className="px-6 py-4 bg-blue-600 text-white flex justify-between items-center">
+                <h3 className="text-xl font-bold">Edit Driver Details</h3>
+                <button onClick={() => setIsEditModalOpen(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitEdit} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Name</label>
+                    <input
+                      type="text"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Email</label>
+                    <input
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Phone</label>
+                    <input
+                      type="text"
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                      className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">License Number</label>
+                    <input
+                      type="text"
+                      value={editForm.licenseNumber}
+                      onChange={(e) => setEditForm({ ...editForm, licenseNumber: e.target.value })}
+                      className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t dark:border-gray-700 pt-6">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-4">Vehicle Assignment</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Vehicle Model</label>
+                      <input
+                        type="text"
+                        value={editForm.vehicleDetails.vehicleModel}
+                        onChange={(e) => setEditForm({ 
+                          ...editForm, 
+                          vehicleDetails: { ...editForm.vehicleDetails, vehicleModel: e.target.value } 
+                        })}
+                        className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="e.g. Tata Nexon EV"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Registration Number</label>
+                      <input
+                        type="text"
+                        value={editForm.vehicleDetails.vehicleNumber}
+                        onChange={(e) => setEditForm({ 
+                          ...editForm, 
+                          vehicleDetails: { ...editForm.vehicleDetails, vehicleNumber: e.target.value.toUpperCase() } 
+                        })}
+                        className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="e.g. RJ 14 EV 1234"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Vehicle Type</label>
+                      <select
+                        value={editForm.vehicleDetails.vehicleType}
+                        onChange={(e) => setEditForm({ 
+                          ...editForm, 
+                          vehicleDetails: { ...editForm.vehicleDetails, vehicleType: e.target.value } 
+                        })}
+                        className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      >
+                        <option value="economy">Economy</option>
+                        <option value="premium">Premium</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Vehicle Color</label>
+                      <input
+                        type="text"
+                        value={editForm.vehicleDetails.vehicleColor}
+                        onChange={(e) => setEditForm({ 
+                          ...editForm, 
+                          vehicleDetails: { ...editForm.vehicleDetails, vehicleColor: e.target.value } 
+                        })}
+                        className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="e.g. White"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 border-t dark:border-gray-700">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-8 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

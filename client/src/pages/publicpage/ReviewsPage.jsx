@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Star, MessageSquare, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getAllFeedback } from '../../services/feedbackService.js';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const renderStars = (rating = 5) =>
   Array.from({ length: 5 }, (_, i) => (
@@ -22,7 +23,7 @@ const ReviewAvatar = ({ profileImage, name }) => {
     <div className="flex-shrink-0">
       {!showDefault && profileImage ? (
         <img
-          src={profileImage}
+          src={getImageUrl(profileImage)}
           alt={name}
           className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 dark:border-white/10"
           onError={() => {

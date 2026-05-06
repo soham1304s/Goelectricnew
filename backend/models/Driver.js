@@ -80,11 +80,6 @@ const driverSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    status: {
-      type: String,
-      enum: ['active', 'inactive', 'blocked', 'pending'],
-      default: 'pending',
-    },
     availability: {
       type: String,
       enum: ['available', 'busy', 'offline'],
@@ -125,6 +120,11 @@ const driverSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'active', 'inactive', 'blocked'],
+      default: 'pending',
     },
     isApproved: {
       type: Boolean,

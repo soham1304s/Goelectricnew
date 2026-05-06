@@ -8,6 +8,8 @@ import Feedback from '../models/Feedback.js';
 import Payment from '../models/Payment.js';
 import Pricing from '../models/Pricing.js';
 
+import ChargingEnquiry from '../models/ChargingEnquiry.js';
+
 const defaultPricingConfig = {
   economy: {
     displayName: 'Economy',
@@ -131,6 +133,7 @@ export const getAnalytics = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const activeUsers = await User.countDocuments({ isActive: true });
     const activeDrivers = await Driver.countDocuments({ status: 'active' });
+    const chargingEnquiries = await ChargingEnquiry.countDocuments();
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -146,7 +149,7 @@ export const getAnalytics = async (req, res) => {
     ];
     const tourRevenuePipeline = [
       { $match: { status: { $in: ['confirmed', 'completed'] } } },
-      { $group: { _id: null, total: { $sum: '$paidAmount' } } }, // Sum paidAmount for tours too
+      { $group: { _id: null, total: { $sum: '$pricing.paidAmount' } } }, // Sum pricing.paidAmount for tours
     ];
     const rideRevenue = await Booking.aggregate(rideRevenuePipeline);
     const tourRevenue = await TourBooking.aggregate(tourRevenuePipeline);
@@ -168,7 +171,7 @@ export const getAnalytics = async (req, res) => {
 
       const dayTourRevenue = await TourBooking.aggregate([
         { $match: { createdAt: { $gte: d, $lte: de }, status: { $in: ['confirmed', 'completed'] } } },
-        { $group: { _id: null, total: { $sum: '$paidAmount' } } }
+        { $group: { _id: null, total: { $sum: '$pricing.paidAmount' } } }
       ]);
 
       revenueData.push({
@@ -195,6 +198,7 @@ export const getAnalytics = async (req, res) => {
         completedBookings: completedBookings + completedTourBookings,
         activeUsers,
         activeDrivers,
+        chargingEnquiries,
         totalRevenue,
         revenueData,
         recentBookings,
@@ -632,20 +636,76 @@ export const updateDriverStatusAdmin = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!['active', 'pending', 'rejected', 'suspended'].includes(status)) {
-      return res.status(400).json({ success: false, message: 'Invalid status' });
-    }
+    const isApproved = status === 'approved' || status === 'active';
 
     const driver = await Driver.findByIdAndUpdate(
       id,
-      { status },
+      { status, isApproved },
       { new: true }
     ).select('-bankDetails -password');
 
     if (!driver) return res.status(404).json({ success: false, message: 'Driver not found' });
+
+    // Synchronize User role if approved/active
+    if (isApproved) {
+      await User.findOneAndUpdate(
+        { $or: [{ email: driver.email }, { phone: driver.phone }] },
+        { role: 'driver' }
+      );
+    } else if (status === 'rejected' || status === 'inactive' || status === 'blocked') {
+      // Optional: Revert role if rejected/blocked? 
+      // Usually better to keep as user but restricted.
+    }
+
     res.status(200).json({ success: true, data: driver });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateDriverAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Don't allow password update through this route
+    delete updateData.password;
+
+    if (updateData.status) {
+      updateData.isApproved = updateData.status === 'approved' || updateData.status === 'active';
+    }
+
+    const driver = await Driver.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!driver) {
+      return res.status(404).json({
+        success: false,
+        message: 'Driver not found'
+      });
+    }
+
+    // Synchronize User role if approved
+    if (driver.isApproved) {
+      await User.findOneAndUpdate(
+        { $or: [{ email: driver.email }, { phone: driver.phone }] },
+        { role: 'driver' }
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Driver updated successfully',
+      data: driver
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
@@ -1111,7 +1171,7 @@ export const rejectRideBooking = async (req, res) => {
 export const completeRideBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { completionNotes } = req.body;
+    const { completionNotes, paymentMethod: manualPaymentMethod, amount: manualAmount } = req.body;
     const adminId = req.user.id;
 
     const booking = await Booking.findById(id)
@@ -1133,14 +1193,15 @@ export const completeRideBooking = async (req, res) => {
 
     await booking.save();
 
-    // Detect payment method from completion notes
-    const notesLower = (completionNotes || '').toLowerCase();
-    let paymentMethod = 'cash'; // Default to cash for manual payments
-
-    if (notesLower.includes('upi') || notesLower.includes('online') || notesLower.includes('razorpay')) {
-      paymentMethod = 'razorpay';
-    } else if (notesLower.includes('wallet')) {
-      paymentMethod = 'wallet';
+    // Detect or use provided payment method
+    let paymentMethod = manualPaymentMethod || 'cash'; 
+    if (!manualPaymentMethod) {
+      const notesLower = (completionNotes || '').toLowerCase();
+      if (notesLower.includes('upi') || notesLower.includes('online') || notesLower.includes('razorpay')) {
+        paymentMethod = 'razorpay';
+      } else if (notesLower.includes('wallet')) {
+        paymentMethod = 'wallet';
+      }
     }
 
     // Check if payment already exists for this booking
@@ -1522,5 +1583,80 @@ export const deleteAdminCabPartner = async (req, res) => {
       message: 'Error deleting cab partner',
       error: error.message,
     });
+  }
+};
+/**
+ * @desc    Admin collect manual payment for tour booking
+ * @route   POST /api/admin/tour-bookings/:id/collect-payment
+ * @access  Private (Admin only)
+ */
+export const collectTourPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentMethod = 'cash', notes = '', amount } = req.body;
+    const adminId = req.user.id;
+
+    const tourBooking = await TourBooking.findById(id)
+      .populate('user')
+      .populate('package');
+
+    if (!tourBooking) {
+      return res.status(404).json({ success: false, message: 'Tour booking not found' });
+    }
+
+    const totalAmount = tourBooking.pricing?.totalAmount || 0;
+    const alreadyPaid = tourBooking.pricing?.paidAmount || 0;
+    const remainingAmount = totalAmount - alreadyPaid;
+
+    if (remainingAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full payment already received for this tour'
+      });
+    }
+
+    // Accept the payment amount provided or collect full remaining
+    const collectAmount = amount ? Math.min(amount, remainingAmount) : remainingAmount;
+
+    // Update tour booking with payment info
+    tourBooking.pricing.paidAmount = alreadyPaid + collectAmount;
+    
+    // Mark as paid if full amount is collected
+    if (tourBooking.pricing.paidAmount >= totalAmount) {
+      tourBooking.paymentStatus = 'paid';
+    } else {
+      tourBooking.paymentStatus = 'partial';
+    }
+
+    await tourBooking.save();
+
+    // Create payment record
+    const payment = new Payment({
+      tourBooking: tourBooking._id,
+      user: tourBooking.user._id,
+      amount: collectAmount,
+      currency: 'INR',
+      paymentMethod: paymentMethod,
+      paymentType: 'tour_booking',
+      status: 'success',
+      transactionId: `MANUAL_TOUR_${tourBooking._id.toString().slice(-6)}_${Date.now()}`,
+      paidAt: new Date(),
+      paymentDetails: {
+        method: paymentMethod,
+        notes: notes,
+        collectedBy: adminId,
+      }
+    });
+
+    await payment.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Payment of ₹${collectAmount} collected successfully`,
+      data: tourBooking
+    });
+  } catch (error) {
+    console.error('❌ Error collecting tour payment:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

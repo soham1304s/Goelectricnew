@@ -100,6 +100,11 @@ export async function updateTourBookingStatus(id, body) {
   return data;
 }
 
+export async function collectTourPayment(id, paymentData = {}) {
+  const { data } = await api.post(`/admin/tour-bookings/${id}/collect-payment`, paymentData);
+  return data;
+}
+
 // ============ PACKAGES ============
 export async function getAllPackages(params = {}) {
   const { data } = await retryWithBackoff(() => api.get('/admin/packages', { params }));

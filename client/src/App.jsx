@@ -34,6 +34,7 @@ import UserProfile from './pages/user/UserProfile';
 import UserRidesPage from './pages/user/RidesPage';
 import UserToursPage from './pages/user/ToursPage';
 import BookingConfirmationPage from './pages/user/BookingConfirmationPage';
+import DriverStatusPage from './pages/user/DriverStatusPage';
 
 import DashboardPage from './pages/admin/DashboardPage';
 import UsersPage from './pages/admin/UsersPage';
@@ -185,6 +186,7 @@ function App() {
             <Route path="/user/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/user/booking-confirmation" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
             <Route path="/user/booking-confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmationPage /></ProtectedRoute>} />
+            <Route path="/user/application-status" element={<ProtectedRoute><DriverStatusPage /></ProtectedRoute>} />
           </Route>
 
           {/* ================= AUTH ROUTES (No Navbar) ================= */}

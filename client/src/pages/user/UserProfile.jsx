@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import UserLayout from './UserLayout.jsx';
 import * as userService from '../../services/userService.js';
 import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, Upload } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUrl';
 
 export default function UserProfile() {
   const { user: authUser, isAuthenticated, loading: authLoading, loadUser } = useAuth();
@@ -71,14 +72,33 @@ export default function UserProfile() {
     }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setProfileImage(event.target.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setError('');
+        setSuccessMessage('Uploading image...');
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        const res = await userService.updateProfileImage(formData);
+        
+        if (res.success) {
+          setUser(res.data);
+          setFormData(res.data);
+          setSuccessMessage('Profile picture updated!');
+          setTimeout(() => setSuccessMessage(''), 3000);
+          
+          // Force auth context update
+          if (loadUser) await loadUser();
+        } else {
+          setError(res.message || 'Failed to upload image');
+        }
+      } catch (err) {
+        console.error('❌ Upload error:', err);
+        setError('Failed to upload image. Please try again.');
+      }
     }
   };
 
@@ -175,10 +195,8 @@ export default function UserProfile() {
           <div className="mb-8 flex flex-col items-center">
             <div className="relative mb-4">
               <div className="w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-3xl sm:text-5xl font-bold overflow-hidden">
-                {profileImage ? (
-                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                ) : user?.profileImage ? (
-                  <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                {user?.profileImage ? (
+                  <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   (user?.firstName?.charAt(0) || user?.lastName?.charAt(0) || 'U')
                 )}

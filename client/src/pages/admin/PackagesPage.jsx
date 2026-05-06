@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import { getAllPackages, deletePackage, createPackage, updatePackage } from '../../services/adminService';
 import ImageUpload from '../../components/ImageUpload';
 import api from '../../services/api';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const PackagesPage = () => {
   const [packages, setPackages] = useState([]);
@@ -247,7 +248,7 @@ const PackagesPage = () => {
               >
                 {pkg.coverImage ? (
                   <img
-                    src={pkg.coverImage}
+                    src={getImageUrl(pkg.coverImage)}
                     alt={pkg.title}
                     className="w-full h-40 sm:h-48 lg:h-52 object-cover"
                   />
@@ -499,7 +500,7 @@ const PackagesPage = () => {
               </div>
               {selectedPackage.coverImage && (
                 <img
-                  src={selectedPackage.coverImage}
+                  src={getImageUrl(selectedPackage.coverImage)}
                   alt={selectedPackage.title}
                   className="w-full h-40 sm:h-56 object-cover rounded-lg"
                 />

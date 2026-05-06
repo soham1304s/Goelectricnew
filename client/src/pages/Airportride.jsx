@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Calendar, CarTaxiFront, ChevronLeft, Clock3, Loader2, Navigation, Plane, MapPin, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import LocationPickerComponent from '../components/LocationPickerComponent.jsx';
@@ -63,6 +63,42 @@ export default function AirportRidePage() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [fetchingLocation, setFetchingLocation] = useState(false);
+  const location = useLocation();
+
+  // Consume state from navigate (e.g. from Home Hero)
+  useEffect(() => {
+    if (location.state) {
+      const { pickup, destination, date, time, pickupData, destData } = location.state;
+      
+      // Determine if it's a pickup (from airport) or drop (to airport)
+      if (pickup && (pickup.toLowerCase().includes('airport') || pickup.toLowerCase().includes('jai'))) {
+        setRideType('pickup');
+        if (destination) setDestinationCity(destination);
+        if (destData?.latitude) {
+          setDestinationCoordinates({
+            latitude: destData.latitude,
+            longitude: destData.longitude
+          });
+        }
+      } else if (destination && (destination.toLowerCase().includes('airport') || destination.toLowerCase().includes('jai'))) {
+        setRideType('drop');
+        if (pickup) setPickupLocation(pickup);
+        if (pickupData?.latitude) {
+          setPickupCoordinates({
+            latitude: pickupData.latitude,
+            longitude: pickupData.longitude
+          });
+        }
+      } else {
+        // Default to pickup if neither matches airport clearly
+        setRideType('pickup');
+        if (destination) setDestinationCity(destination);
+      }
+
+      if (date) setSelectedDate(date);
+      if (time) setSelectedTime(time);
+    }
+  }, [location.state]);
 
   // Save rideType to localStorage whenever it changes
   useEffect(() => {
