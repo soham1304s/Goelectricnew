@@ -48,7 +48,7 @@ export const sendEmail = async (options) => {
  */
 export const verifyEmailConfig = () => {
   try {
-    if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER) {
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
       console.warn('⚠️  Email not configured. Outgoing emails will not be sent.');
       return false;
     }

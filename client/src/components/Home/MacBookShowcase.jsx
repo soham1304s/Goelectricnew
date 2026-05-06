@@ -256,7 +256,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="md:hidden relative mx-auto w-[280px] z-20 group animate-float-phone"
+            className="md:hidden relative mx-auto w-[260px] sm:w-[300px] z-20 group animate-float-phone"
           >
             <div className={`relative rounded-[2.5rem] p-2 shadow-2xl border-[6px] ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-slate-800'}`}>
               {/* Speaker / Notch */}
@@ -265,7 +265,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
               {/* Screen Content */}
               <div className="aspect-[9/19.5] rounded-[2rem] overflow-hidden bg-white relative">
                 {/* Mobile UI - Full Smart Booking Form */}
-                <div className="p-5 flex flex-col h-full bg-white overflow-y-auto scrollbar-hide">
+                <div className="p-4 sm:p-5 flex flex-col h-full bg-white overflow-y-auto scrollbar-hide">
                   {/* Status Bar */}
                   <div className="flex items-center justify-between mb-4 mt-2">
                     <span className="text-[10px] font-black text-slate-900">9:41</span>
@@ -280,7 +280,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                     <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest mb-2">
                       <Zap size={8} className="fill-current animate-pulse" /> Smart Booking
                     </div>
-                    <h4 className="text-xl font-black text-slate-900 leading-tight">Plan Your Ride</h4>
+                    <h4 className="text-lg sm:text-xl font-black text-slate-900 leading-tight">Plan Your Ride</h4>
                   </div>
 
                   {/* Service Toggle */}
@@ -301,13 +301,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
 
                   {/* Inputs */}
                   <div className="space-y-3 mb-5 relative z-[60]">
-                    <LocationPickerComponent
-                      value={pickup.address}
-                      onChange={(val) => setPickup({ ...pickup, address: val })}
-                      onSelectLocation={(loc) => setPickup(loc)}
-                      placeholder="Pickup location"
-                      darkMode={false} // iPhone content is white
-                      inputClassName="!py-3 !rounded-xl !text-[10px] !font-bold"
+                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[10px] !font-bold"
                     />
                     <LocationPickerComponent
                       value={dest.address}
@@ -315,7 +309,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                       onSelectLocation={(loc) => setDest(loc)}
                       placeholder="Destination"
                       darkMode={false}
-                      inputClassName="!py-3 !rounded-xl !text-[10px] !font-bold"
+                      inputClassName="!py-2.5 sm:!py-3 !rounded-xl !text-[10px] !font-bold"
                     />
                   </div>
 
@@ -345,7 +339,7 @@ const MacBookShowcase = ({ darkMode, isHero = false }) => {
                   <button
                     onClick={handleSearch}
                     disabled={isSearching}
-                    className="w-full mt-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-2xl font-black text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70"
+                    className="w-full mt-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-[11px] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-70"
                   >
                     {isSearching ? (
                       <div className="flex items-center justify-center gap-2">

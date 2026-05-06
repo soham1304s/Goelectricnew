@@ -82,7 +82,7 @@ const AboutUsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter"
+            className="text-4xl sm:text-5xl md:text-8xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter"
           >
             Clean Travel. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-blue-600">Smart Future.</span>
@@ -109,16 +109,16 @@ const AboutUsPage = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div {...fadeIn} className="relative group">
-              <div className="relative rounded-[3rem] overflow-hidden shadow-2xl">
+              <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl">
                 <img 
                   src="/car/car1.jpeg" 
                   alt="Our Fleet" 
-                  className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
               </div>
               {/* Floating badge */}
-              <div className="absolute -bottom-8 -right-8 bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 max-w-[240px]">
+              <div className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 bg-white dark:bg-slate-800 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-700 max-w-[180px] md:max-w-[240px]">
                 <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-emerald-500/20">
                   <Award size={24} />
                 </div>
@@ -128,8 +128,8 @@ const AboutUsPage = () => {
 
             <motion.div {...fadeIn} transition={{ delay: 0.2 }} className="space-y-8">
               <div>
-                <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
-                  Born to solve <br /> Urban Challenges.
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
+                  Born to solve <br className="hidden sm:block" /> Urban Challenges.
                 </h2>
                 <div className="space-y-4 text-lg text-slate-600 dark:text-gray-400 font-medium leading-relaxed">
                   <p>
@@ -256,13 +256,13 @@ const AboutUsPage = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-5xl mx-auto p-12 md:p-24 rounded-[4rem] bg-gradient-to-br from-emerald-600 to-blue-700 text-center text-white relative overflow-hidden shadow-2xl"
+          className="max-w-5xl mx-auto p-8 sm:p-12 md:p-24 rounded-[3rem] md:rounded-[4rem] bg-gradient-to-br from-emerald-600 to-blue-700 text-center text-white relative overflow-hidden shadow-2xl"
         >
           {/* Shine effect */}
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_5s_infinite] pointer-events-none" />
           
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight">Ready to Ride the Future?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black mb-8 tracking-tight">Ready to Ride the Future?</h2>
             <p className="text-xl md:text-2xl text-emerald-50 font-medium mb-12 max-w-2xl mx-auto">
               Join thousands of riders who have already switched to a cleaner, quieter travel experience.
             </p>

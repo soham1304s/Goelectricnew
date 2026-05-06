@@ -171,11 +171,19 @@ export const sendWhatsAppViaTwilio = async (to, message) => {
  * Verify WhatsApp configuration
  */
 export const verifyWhatsAppConfig = () => {
-  if (!whatsappConfig.phoneNumberId || !whatsappConfig.accessToken) {
+  const hasMeta = !!(whatsappConfig.phoneNumberId && whatsappConfig.accessToken);
+  const hasTwilio = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN);
+
+  if (!hasMeta && !hasTwilio) {
     console.warn('⚠️  WhatsApp not configured. Messages will not be sent.');
     return false;
   }
-  console.log('✅ WhatsApp configuration verified');
+  
+  if (hasTwilio) {
+    console.log('✅ WhatsApp configuration verified (Twilio)');
+  } else if (hasMeta) {
+    console.log('✅ WhatsApp configuration verified (Meta Cloud API)');
+  }
   return true;
 };
 

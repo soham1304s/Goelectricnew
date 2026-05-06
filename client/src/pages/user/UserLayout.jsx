@@ -142,12 +142,12 @@ const UserLayout = ({ children }) => {
         variants={sidebarVariants}
         className="fixed inset-y-0 left-0 z-50 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800 shadow-xl flex flex-col lg:relative lg:translate-x-0"
       >
-        <div className="h-20 flex items-center px-6 border-b border-slate-100 justify-between">
+        <div className="h-16 md:h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-800 justify-between">
           <Link to="/" className="flex items-center group">
             <img
               src={darkMode ? logoDark : logoLight}
               alt="GoElectriQ Logo"
-              className="h-32 md:h-40 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-24 sm:h-32 md:h-40 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
           {isMobile && (
@@ -397,7 +397,7 @@ const UserLayout = ({ children }) => {
       </motion.aside>
 
       <div className="flex-1 flex flex-col relative overflow-hidden">
-        <header className="h-20 bg-white dark:bg-slate-900 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 lg:px-10 z-30">
+        <header className="h-16 md:h-20 bg-white dark:bg-slate-900 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 lg:px-10 z-30">
           <div className="flex items-center gap-4">
             {isMobile && (
               <button onClick={() => setSidebarOpen(true)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">

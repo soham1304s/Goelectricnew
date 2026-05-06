@@ -97,7 +97,7 @@ const ServicesPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight"
+              className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight"
             >
               Premium Mobility, <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">100% Electric.</span>
@@ -125,7 +125,7 @@ const ServicesPage = () => {
                   transition={{ delay: i * 0.1 }}
                   className="group h-full"
                 >
-                  <div className="p-8 md:p-10 rounded-[2.5rem] h-full flex flex-col transition-all duration-300 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
+                  <div className="p-6 sm:p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] h-full flex flex-col transition-all duration-300 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
 
                     {/* Background Glow on Hover */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 dark:from-emerald-900/20 dark:to-teal-900/10 rounded-bl-full transition-transform duration-500 translate-x-8 -translate-y-8 group-hover:translate-x-0 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 -z-0"></div>
@@ -203,7 +203,7 @@ const ServicesPage = () => {
         {/* Driver Recruitment Section */}
         <section className="py-24 md:py-32 px-4 relative overflow-hidden">
           <div className="max-w-7xl mx-auto">
-            <div className={`rounded-[3.5rem] p-8 md:p-20 relative overflow-hidden transition-all duration-500 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-2xl shadow-emerald-500/5 group`}>
+            <div className={`rounded-[2.5rem] md:rounded-[3.5rem] p-6 sm:p-8 md:p-20 relative overflow-hidden transition-all duration-500 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-2xl shadow-emerald-500/5 group`}>
               
               {/* Background Accents */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-emerald-500/5 to-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-700"></div>
@@ -213,7 +213,7 @@ const ServicesPage = () => {
                   <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-8">
                     <UserPlus size={14} /> Join the Revolution
                   </div>
-                  <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight leading-tight">
+                  <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight leading-tight">
                     Drive with Purpose. <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Earn with Pride.</span>
                   </h2>
@@ -247,7 +247,7 @@ const ServicesPage = () => {
                   </button>
                 </div>
 
-                <div className="relative h-[400px] md:h-[600px] rounded-[3rem] overflow-hidden group/img shadow-2xl border border-slate-200 dark:border-zinc-800">
+                <div className="relative h-[250px] sm:h-[400px] md:h-[600px] rounded-[2rem] md:rounded-[3rem] overflow-hidden group/img shadow-2xl border border-slate-200 dark:border-zinc-800">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 opacity-0 group-hover/img:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-12">
                     <p className="text-white text-2xl font-black mb-2 italic">"Switching to EV was the best career move I made."</p>
                     <p className="text-emerald-400 font-bold">- Pilot Rajesh, Joined 2023</p>
@@ -282,9 +282,9 @@ const ServicesPage = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-5xl mx-auto p-12 md:p-24 rounded-[4rem] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 text-center border border-slate-200 dark:border-slate-700 shadow-2xl"
+            className="max-w-5xl mx-auto p-8 sm:p-12 md:p-24 rounded-[3rem] md:rounded-[4rem] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 text-center border border-slate-200 dark:border-slate-700 shadow-2xl"
           >
-            <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">Need a Custom Plan?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">Need a Custom Plan?</h2>
             <p className="text-xl md:text-2xl text-slate-500 dark:text-gray-400 font-medium mb-12 max-w-2xl mx-auto">
               Contact our corporate team for bulk bookings, employee commuting, or recurring travel needs.
             </p>
