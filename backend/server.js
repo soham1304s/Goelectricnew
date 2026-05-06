@@ -136,6 +136,7 @@ app.use('/uploads', (req, res, next) => {
   }
 }, express.static(path.join(__dirname, 'uploads')));
 
+
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -162,30 +163,6 @@ app.use('/api/offers', offerRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/charging-bookings', chargingBookingRoutes);
 app.use('/api/charging-enquiries', chargingEnquiryRoutes);
-
-// Serving Frontend in Production
-if (process.env.NODE_ENV === 'production') {
-  const clientDistPath = path.join(__dirname, '../client/dist');
-  app.use(express.static(clientDistPath));
-  
-  app.use((req, res) => {
-    // Only serve index.html for non-API routes
-    if (!req.path.startsWith('/api/')) {
-      res.sendFile(path.join(clientDistPath, 'index.html'));
-    } else {
-      res.status(404).json({ success: false, message: 'API Route not found' });
-    }
-  });
-} else {
-  // Welcome route for development
-  app.get('/', (req, res) => {
-    res.json({
-      success: true,
-      message: 'Welcome to Electric Cab Booking API (Development Mode)',
-      version: '1.0.0',
-    });
-  });
-}
 
 // 404 handler
 app.use(notFound);
