@@ -68,3 +68,12 @@ export const cancelBooking = async (id, reason) => {
 };
 
 export default bookingService;
+export const getDriverBookings = async () => {
+  const { data } = await api.get('/driver/my-bookings');
+  return data;
+};
+
+export const getMyTourBookings = async () => {
+  const { data } = await api.get('/tours/my-bookings');
+  return data;
+};
