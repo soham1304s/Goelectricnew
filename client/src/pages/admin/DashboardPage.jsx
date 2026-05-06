@@ -20,7 +20,8 @@ import {
   Globe,
   Layers,
   Search,
-  Bell
+  Bell,
+  ArrowRight
 } from 'lucide-react';
 import {
   AreaChart,

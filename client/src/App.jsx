@@ -70,25 +70,23 @@ function ProtectedRoute({ children }) {
 }
 
 
-// ================= ADMIN ROUTES =================
-const AdminGuard = (Component) => {
-  return function Wrapped() {
-    const { user, loading } = useAuth();
+// ================= ADMIN PROTECTED ROUTE =================
+const AdminProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
 
-    if (loading)
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-900">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-white font-semibold">Loading dashboard...</p>
-          </div>
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white font-semibold">Loading dashboard...</p>
         </div>
-      );
+      </div>
+    );
 
-    if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
+  if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
 
-    return <Component />;
-  };
+  return children;
 };
 
 
@@ -207,22 +205,22 @@ function App() {
 
           {/* ================= ADMIN ROUTES ================= */}
           <Route element={<DashboardLayout />}>
-            <Route path="/admin" element={AdminGuard(DashboardPage)()} />
-            <Route path="/admin/rides" element={AdminGuard(RidesPage)()} />
-            <Route path="/admin/users" element={AdminGuard(UsersPage)()} />
-            <Route path="/admin/tours" element={AdminGuard(ToursAdminPage)()} />
-            <Route path="/admin/packages" element={AdminGuard(PackagesPage)()} />
-            <Route path="/admin/offers" element={AdminGuard(OffersPage)()} />
-            <Route path="/admin/pricing" element={AdminGuard(PricingPage)()} />
-            <Route path="/admin/airport-rides" element={AdminGuard(AirportRidesPage)()} />
-            <Route path="/admin/charging-bookings" element={AdminGuard(ChargingBookingDashboard)()} />
-            <Route path="/admin/driver-bookings" element={AdminGuard(DriverBookingDashboard)()} />
-            <Route path="/admin/cab-partners" element={AdminGuard(CabPartnerDashboard)()} />
-            <Route path="/admin/payments" element={AdminGuard(PaymentsPage)()} />
-            <Route path="/admin/pending-payments" element={AdminGuard(PendingPaymentsDashboard)()} />
-            <Route path="/admin/feedback" element={AdminGuard(FeedbackAdminPage)()} />
-            <Route path="/admin/settings" element={AdminGuard(SettingsPage)()} />
-            <Route path="/admin/profile" element={AdminGuard(AdminProfilePage)()} />
+            <Route path="/admin" element={<AdminProtectedRoute><DashboardPage /></AdminProtectedRoute>} />
+            <Route path="/admin/rides" element={<AdminProtectedRoute><RidesPage /></AdminProtectedRoute>} />
+            <Route path="/admin/users" element={<AdminProtectedRoute><UsersPage /></AdminProtectedRoute>} />
+            <Route path="/admin/tours" element={<AdminProtectedRoute><ToursAdminPage /></AdminProtectedRoute>} />
+            <Route path="/admin/packages" element={<AdminProtectedRoute><PackagesPage /></AdminProtectedRoute>} />
+            <Route path="/admin/offers" element={<AdminProtectedRoute><OffersPage /></AdminProtectedRoute>} />
+            <Route path="/admin/pricing" element={<AdminProtectedRoute><PricingPage /></AdminProtectedRoute>} />
+            <Route path="/admin/airport-rides" element={<AdminProtectedRoute><AirportRidesPage /></AdminProtectedRoute>} />
+            <Route path="/admin/charging-bookings" element={<AdminProtectedRoute><ChargingBookingDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/driver-bookings" element={<AdminProtectedRoute><DriverBookingDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/cab-partners" element={<AdminProtectedRoute><CabPartnerDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/payments" element={<AdminProtectedRoute><PaymentsPage /></AdminProtectedRoute>} />
+            <Route path="/admin/pending-payments" element={<AdminProtectedRoute><PendingPaymentsDashboard /></AdminProtectedRoute>} />
+            <Route path="/admin/feedback" element={<AdminProtectedRoute><FeedbackAdminPage /></AdminProtectedRoute>} />
+            <Route path="/admin/settings" element={<AdminProtectedRoute><SettingsPage /></AdminProtectedRoute>} />
+            <Route path="/admin/profile" element={<AdminProtectedRoute><AdminProfilePage /></AdminProtectedRoute>} />
           </Route>
 
           {/* ================= 404 ================= */}
