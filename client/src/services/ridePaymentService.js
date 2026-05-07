@@ -61,19 +61,32 @@ export const ridePaymentService = {
     }
   },
 
-  // Initialize Razorpay payment for ride
   async initiateRazorpayPayment(orderData, userDetails, rideDetails, onSuccess, onFailure) {
-    await loadRazorpaySdk();
+    console.log('🚀 Initiating Razorpay payment with data:', { orderId: orderData.orderId, amount: orderData.amount });
+    
+    try {
+      await loadRazorpaySdk();
+      console.log('📦 Razorpay SDK loaded successfully');
+    } catch (sdkError) {
+      console.error('❌ Failed to load Razorpay SDK:', sdkError);
+      if (onFailure) onFailure('Failed to load payment gateway. Please check your internet connection.');
+      return;
+    }
 
     return new Promise((resolve, reject) => {
       if (!window.Razorpay) {
-        reject(new Error('Razorpay SDK not loaded'));
+        const msg = 'Razorpay SDK not available on window object';
+        console.error('❌ ' + msg);
+        if (onFailure) onFailure(msg);
+        reject(new Error(msg));
         return;
       }
 
       // Provide default values if rideDetails is not provided
       const rideType = rideDetails?.rideType || 'Standard';
-      const description = `${rideType} Ride Booking`;
+      const description = rideDetails?.tourName ? `Tour: ${rideDetails.tourName}` : `${rideType} Ride Booking`;
+
+      console.log('💳 Opening Razorpay modal with key:', orderData.keyId);
 
       const options = {
         key: orderData.keyId,
@@ -91,6 +104,7 @@ export const ridePaymentService = {
           color: '#5CE65C',
         },
         handler: function (response) {
+          console.log('✅ Razorpay payment handler triggered:', response.razorpay_payment_id);
           const paymentData = {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
@@ -105,6 +119,7 @@ export const ridePaymentService = {
         },
         modal: {
           ondismiss: function () {
+            console.log('⚠️ Razorpay modal dismissed by user');
             if (onFailure) {
               onFailure('Payment cancelled by user');
             }
@@ -113,8 +128,21 @@ export const ridePaymentService = {
         },
       };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      try {
+        const razorpay = new window.Razorpay(options);
+        razorpay.on('payment.failed', function (response) {
+          console.error('❌ Razorpay payment failed:', response.error);
+          if (onFailure) {
+            onFailure(response.error.description || 'Payment failed');
+          }
+        });
+        razorpay.open();
+        console.log('📱 Razorpay modal.open() called');
+      } catch (openError) {
+        console.error('❌ Error opening Razorpay modal:', openError);
+        if (onFailure) onFailure('Could not open payment window. ' + openError.message);
+        reject(openError);
+      }
     });
   }
 };

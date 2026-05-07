@@ -26,9 +26,7 @@ router.get('/status/:paymentId', getPaymentStatus);
 router.use(protect);
 
 router.post('/create-order', paymentLimiter, createPaymentOrder);
-router.post('/verify', (req, res) => {
-  res.json({ success: true, message: 'Verify payment' });
-});
+router.post('/verify', verifyRidePayment);
 
 // Ride booking payment routes
 router.post('/ride/create-order', paymentLimiter, createRidePaymentOrder);

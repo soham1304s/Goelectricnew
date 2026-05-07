@@ -33,7 +33,7 @@ export const createRazorpayOrder = async (amount, receiptId) => {
     const options = {
       amount: Math.round(amount * 100), // paise
       currency: 'INR',
-      receipt: `rcpt_${String(receiptId).slice(0, 36)}`,
+      receipt: `rcpt_${String(receiptId).slice(0, 35)}`,
       notes: { receiptId: String(receiptId) },
     };
     console.log('📡 Sending order request to Razorpay:', options);
@@ -41,13 +41,14 @@ export const createRazorpayOrder = async (amount, receiptId) => {
     console.log('✅ Razorpay order created:', order.id);
     return order;
   } catch (error) {
-    console.error('❌ Razorpay order creation error:', error);
-    // Log specific Razorpay error details if available
-    if (error.error && error.error.description) {
-      console.error('❌ Razorpay Error Description:', error.error.description);
-      console.error('❌ Razorpay Error Code:', error.error.code);
-    }
-    throw new Error(error.description || error.message || 'Failed to create payment order');
+    console.error('❌ RAZORPAY ORDER CREATION FAILED:');
+    console.error('Error Details:', JSON.stringify(error, null, 2));
+    
+    // Extract a clear error message for the frontend
+    const errorDescription = error.error?.description || error.description || error.message;
+    const finalMessage = errorDescription ? `Razorpay Error: ${errorDescription}` : 'Failed to create payment order';
+    
+    throw new Error(finalMessage);
   }
 };
 

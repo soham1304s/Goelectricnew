@@ -17,7 +17,8 @@ import {
   Calendar,
   User,
   MapPin,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import axios from 'axios';

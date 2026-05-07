@@ -389,7 +389,7 @@ const ChargingBookingPage = () => {
                       {errors.name && <p className="text-rose-500 text-[10px] font-bold ml-1">{errors.name}</p>}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone</label>
                         <input
@@ -402,6 +402,20 @@ const ChargingBookingPage = () => {
                         />
                       </div>
                       <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email</label>
+                        <input
+                          type="email"
+                          id="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="john@example.com"
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
                         <input
                           type="text"
@@ -412,20 +426,19 @@ const ChargingBookingPage = () => {
                           className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white"
                         />
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Protocol Type</label>
-                      <select
-                        id="enquiryType"
-                        value={formData.enquiryType}
-                        onChange={handleChange}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white appearance-none"
-                      >
-                        <option value="installation">Home Installation</option>
-                        <option value="commercial">Commercial/Enterprise</option>
-                        <option value="maintenance">Maintenance Service</option>
-                      </select>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Protocol Type</label>
+                        <select
+                          id="enquiryType"
+                          value={formData.enquiryType}
+                          onChange={handleChange}
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 outline-none focus:border-emerald-500/50 transition-all font-bold text-slate-900 dark:text-white appearance-none"
+                        >
+                          <option value="installation">Home Installation</option>
+                          <option value="commercial">Commercial/Enterprise</option>
+                          <option value="maintenance">Maintenance Service</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div className="space-y-2">

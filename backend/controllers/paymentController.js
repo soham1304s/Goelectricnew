@@ -24,27 +24,21 @@ export const createPaymentOrder = async (req, res) => {
       });
     }
 
-    if (!isValidObjectId(bookingId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid booking ID format. Must be a valid MongoDB ObjectId (24 character hex string)',
-        received: bookingId
-      });
+    let booking;
+    if (isValidObjectId(bookingId)) {
+      booking = await Booking.findById(bookingId);
+    } else {
+      booking = await Booking.findOne({ bookingId: bookingId });
     }
 
-    const booking = await Booking.findById(bookingId);
-
     if (!booking) {
-      console.error(`❌ Booking not found for ID: ${bookingId}`);
+      console.error(`❌ Booking not found for identifier: ${bookingId}`);
       return res.status(404).json({
         success: false,
         message: 'Booking not found',
         details: {
-          bookingId: bookingId,
-          suggestion: 'Please ensure the booking ID is correct and the booking has been created',
-          step1: 'First create a booking using POST /api/bookings',
-          step2: 'Copy the _id from the response',
-          step3: 'Use that _id in this payment request'
+          identifier: bookingId,
+          suggestion: 'Please ensure the booking ID is correct'
         }
       });
     }
@@ -303,23 +297,26 @@ export const createRidePaymentOrder = async (req, res) => {
       });
     }
 
-    // Validate bookingId format
-    if (!isValidObjectId(bookingId)) {
-      console.warn('⚠️ Invalid bookingId format:', bookingId);
+    if (isNaN(amount) || amount <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid booking ID format. Must be a valid MongoDB ObjectId',
-        received: bookingId
+        message: 'Invalid payment amount'
       });
     }
 
-    const booking = await Booking.findById(bookingId);
+    let booking;
+    if (isValidObjectId(bookingId)) {
+      booking = await Booking.findById(bookingId);
+    } else {
+      booking = await Booking.findOne({ bookingId: bookingId });
+    }
+
     if (!booking) {
-      console.error(`❌ Booking not found for ID: ${bookingId}`);
+      console.error(`❌ Booking not found for identifier: ${bookingId}`);
       return res.status(404).json({
         success: false,
         message: 'Booking not found',
-        details: { bookingId }
+        details: { identifier: bookingId }
       });
     }
 
@@ -454,7 +451,13 @@ export const verifyRidePayment = async (req, res) => {
     let bookingData = null;
     if (payment.booking && payment.status === 'success') {
       try {
-        const booking = await Booking.findById(payment.booking);
+        let booking;
+        if (isValidObjectId(payment.booking)) {
+          booking = await Booking.findById(payment.booking);
+        } else {
+          booking = await Booking.findOne({ bookingId: payment.booking });
+        }
+        
         if (booking) {
           const totalFare = booking.pricing?.totalFare || 0;
           const advanceAmount = Math.round(totalFare * 0.2);

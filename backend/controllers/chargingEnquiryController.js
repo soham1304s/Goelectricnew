@@ -3,7 +3,7 @@ import ChargingEnquiry from '../models/ChargingEnquiry.js';
 /**
  * @desc    Create a new charging enquiry
  * @route   POST /api/charging-enquiries
- * @access  Private (Admin)
+ * @access  Public
  */
 export const createChargingEnquiry = async (req, res) => {
   try {

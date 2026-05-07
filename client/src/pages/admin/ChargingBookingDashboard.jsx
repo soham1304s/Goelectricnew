@@ -512,6 +512,7 @@ const ChargingBookingDashboard = () => {
                     >
                       <option value="general">General</option>
                       <option value="installation">Installation</option>
+                      <option value="commercial">Commercial</option>
                       <option value="maintenance">Maintenance</option>
                       <option value="pricing">Pricing</option>
                       <option value="other">Other</option>

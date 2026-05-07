@@ -24,7 +24,7 @@ const chargingEnquirySchema = new mongoose.Schema(
     },
     enquiryType: {
       type: String,
-      enum: ['general', 'installation', 'maintenance', 'pricing', 'other'],
+      enum: ['general', 'installation', 'commercial', 'maintenance', 'pricing', 'other'],
       default: 'general',
     },
     message: {

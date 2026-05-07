@@ -49,29 +49,54 @@ export default function RidesPage() {
 
       toast.loading('Initiating secure payment...', { id: 'payment' });
 
-      const paymentParams = {
-        bookingId: ride.bookingId,
-        _id: ride._id,
-        amount: Math.round(ride.totalFare * 0.2),
-        user: {
+      // Step 1: Create a payment order in the backend
+      const orderPayload = {
+        bookingId: ride._id, // Use the MongoDB _id
+        amount: Math.round((ride.pricing?.totalFare || ride.totalFare || 0) * 0.2), // 20% advance
+        rideType: ride.rideType || 'Standard'
+      };
+
+      const orderResponse = await ridePaymentService.createRidePaymentOrder(orderPayload);
+
+      if (!orderResponse.success) {
+        toast.error(orderResponse.message || 'Failed to initialize payment.', { id: 'payment' });
+        return;
+      }
+
+      // Step 2: Open Razorpay Modal
+      await ridePaymentService.initiateRazorpayPayment(
+        orderResponse.data,
+        {
           name: user.name || `${user.firstName} ${user.lastName}`,
           email: user.email,
           phone: user.phone
-        }
-      };
-
-      await ridePaymentService.initiateRazorpayPayment(
-        paymentParams,
-        (response) => {
-          toast.success('Advance payment successful!', { id: 'payment' });
-          loadRides();
+        },
+        {
+          rideType: ride.rideType,
+          bookingId: ride.bookingId
+        },
+        async (paymentData) => {
+          // Step 3: Verify payment
+          toast.loading('Verifying payment...', { id: 'payment' });
+          try {
+            const verifyRes = await ridePaymentService.verifyRidePayment(paymentData);
+            if (verifyRes.success) {
+              toast.success('Advance payment successful!', { id: 'payment' });
+              loadRides();
+            } else {
+              toast.error('Payment verification failed.', { id: 'payment' });
+            }
+          } catch (err) {
+            toast.error('Verification error: ' + err.message, { id: 'payment' });
+          }
         },
         (error) => {
-          toast.error(error || 'Payment failed.', { id: 'payment' });
+          toast.error(error || 'Payment cancelled.', { id: 'payment' });
         }
       );
     } catch (err) {
-      toast.error('Something went wrong.', { id: 'payment' });
+      console.error('Payment flow error:', err);
+      toast.error(err.message || 'Something went wrong.', { id: 'payment' });
     }
   };
 

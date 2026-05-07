@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Phone, Mail, CreditCard, Car, FileText, Calendar } from 'lucide-react';
+import { X, User, Phone, Mail, CreditCard, Car, FileText, Calendar, Loader2, ShieldCheck, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import partnerPaymentService from '../services/partnerPaymentService.js';
 
 export default function PartnerRegistrationModal({ isOpen, onClose, partnerType }) {

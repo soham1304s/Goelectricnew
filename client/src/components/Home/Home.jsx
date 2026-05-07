@@ -420,11 +420,11 @@ const GoelectriqLanding = () => {
       lastTimestamp = timestamp;
 
       if (window.innerWidth >= 768 && !isPaused) {
-        const maxLoopWidth = slider.scrollWidth / 2;
+        const maxScroll = slider.scrollWidth - slider.clientWidth;
         slider.scrollLeft += speedPxPerSecond * deltaSeconds;
 
-        if (slider.scrollLeft >= maxLoopWidth) {
-          slider.scrollLeft -= maxLoopWidth;
+        if (slider.scrollLeft >= maxScroll) {
+          slider.scrollTo({ left: 0, behavior: "auto" });
         }
       }
 
@@ -485,14 +485,14 @@ const GoelectriqLanding = () => {
         return;
       }
 
-      const maxLoopWidth = slider.scrollWidth / 2;
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
       const slideStep = 230;
 
-      if (slider.scrollLeft >= maxLoopWidth - slideStep) {
-        slider.scrollTo({ left: 0, behavior: "auto" });
+      if (slider.scrollLeft >= maxScroll - 10) {
+        slider.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        slider.scrollBy({ left: slideStep, behavior: "smooth" });
       }
-
-      slider.scrollBy({ left: slideStep, behavior: "smooth" });
     };
 
     const intervalId = setInterval(autoSlideTempleTours, 4000);
@@ -511,14 +511,14 @@ const GoelectriqLanding = () => {
         return;
       }
 
-      const maxLoopWidth = slider.scrollWidth / 2;
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
       const slideStep = 150;
 
-      if (slider.scrollLeft >= maxLoopWidth - slideStep) {
-        slider.scrollTo({ left: 0, behavior: "auto" });
+      if (slider.scrollLeft >= maxScroll - 10) {
+        slider.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        slider.scrollBy({ left: slideStep, behavior: "smooth" });
       }
-
-      slider.scrollBy({ left: slideStep, behavior: "smooth" });
     };
 
     const intervalId = setInterval(autoSlideTravelTours, 5000);
@@ -948,10 +948,8 @@ const GoelectriqLanding = () => {
     },
   ];
 
-  const desktopTempleTours =
-    templateTours.length > 1 ? [...templateTours, ...templateTours] : templateTours;
-  const desktopTravelTours =
-    travelTours.length > 1 ? [...travelTours, ...travelTours] : travelTours;
+  const desktopTempleTours = templateTours;
+  const desktopTravelTours = travelTours;
 
   const renderTempleTourCard = (tour, key, className) => (
     <div
