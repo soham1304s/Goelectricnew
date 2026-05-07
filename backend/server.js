@@ -48,6 +48,9 @@ const __dirname = path.dirname(__filename);
 // Initialize express app
 const app = express();
 
+// Enable trust proxy for rate limiting behind Railway's load balancer
+app.set('trust proxy', 1);
+
 // Connect to database
 connectDB();
 
