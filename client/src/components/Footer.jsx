@@ -12,7 +12,7 @@ const Footer = ({ darkMode }) => {
   return (
     <footer
       id="contact"
-      className={`relative w-full px-6 md:px-16 py-14 overflow-hidden transition-colors duration-500 ${
+      className={`relative w-full px-6 md:px-16 py-10 lg:py-20 overflow-hidden transition-colors duration-500 ${
         isDarkMode
           ? 'bg-slate-950 text-white'
           : 'bg-white text-slate-900 border-t border-slate-100'
@@ -23,25 +23,25 @@ const Footer = ({ darkMode }) => {
 
       <div className="max-w-7xl mx-auto">
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12 text-center sm:text-left">
 
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="flex flex-col items-center sm:items-start space-y-4">
             <img 
               src={isDarkMode ? logoDark : logoLight} 
               alt="GoElectriQ" 
-              className="h-48 w-auto object-contain"
+              className="h-12 lg:h-16 w-auto object-contain"
             />
 
-            <p className={`text-sm leading-relaxed ${
-              isDarkMode ? 'text-gray-400' : 'text-slate-600'
+            <p className={`text-xs lg:text-sm leading-relaxed max-w-xs ${
+              isDarkMode ? 'text-slate-400' : 'text-slate-600'
             }`}>
               Explore Jaipur with eco-friendly EV rides. Smart, affordable &
               sustainable mobility for everyone.
             </p>
 
             {/* Social */}
-            <div className="flex gap-4 pt-3">
+            <div className="flex gap-4 pt-2">
               {[
                 { Icon: Facebook, url: 'https://www.facebook.com/share/1Dx1cu8G8u/?mibextid=wwXIfr' },
                 { Icon: Instagram, url: 'https://www.instagram.com/go_electriq_cabs?igsh=dGh3MWV0NGc2YzZj&utm_source=qr' }
@@ -51,9 +51,9 @@ const Footer = ({ darkMode }) => {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-md border border-white/10 hover:scale-110 transition"
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-emerald-500 hover:text-white transition-all duration-300"
                 >
-                  <item.Icon className="text-lg text-emerald-400" />
+                  <item.Icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
@@ -61,12 +61,12 @@ const Footer = ({ darkMode }) => {
 
           {/* Services */}
           <div>
-            <h4 className="font-semibold text-lg mb-5 text-emerald-400">
+            <h4 className="font-black text-[10px] uppercase tracking-widest mb-6 text-emerald-500">
               Services
             </h4>
 
-            <ul className={`space-y-3 text-sm ${
-              isDarkMode ? 'text-gray-400' : 'text-slate-600'
+            <ul className={`space-y-3 lg:space-y-4 text-sm font-bold ${
+              isDarkMode ? 'text-slate-400' : 'text-slate-600'
             }`}>
               {[
                 { name: 'City Rides', link: '/local-ride' },
@@ -77,7 +77,7 @@ const Footer = ({ darkMode }) => {
                 <li key={i}>
                   <Link
                     to={item.link}
-                    className="hover:text-emerald-400 transition-all duration-300 hover:translate-x-1 inline-block"
+                    className="hover:text-emerald-500 transition-all duration-300 inline-block"
                   >
                     {item.name}
                   </Link>
@@ -88,21 +88,21 @@ const Footer = ({ darkMode }) => {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold text-lg mb-5 text-emerald-400">
-              Quick Links
+            <h4 className="font-black text-[10px] uppercase tracking-widest mb-6 text-emerald-500">
+              Company
             </h4>
 
-            <ul className={`space-y-3 text-sm ${
-              isDarkMode ? 'text-gray-400' : 'text-slate-600'
+            <ul className={`space-y-3 lg:space-y-4 text-sm font-bold ${
+              isDarkMode ? 'text-slate-400' : 'text-slate-600'
             }`}>
               {[
                 { name: 'Refund Policy', path: '/refund-policy' },
-                { name: 'Driver Partner Policy', path: '/driver-partner-policy' },
+                { name: 'Partner Policy', path: '/driver-partner-policy' },
                 { name: 'Privacy Policy', path: '/privacy-policy' },
                 { name: 'Terms of Service', path: '/terms-and-conditions' },
               ].map((item, i) => (
-                <li key={i} className="hover:text-emerald-400 transition hover:translate-x-1">
-                  <Link to={item.path}>
+                <li key={i}>
+                  <Link to={item.path} className="hover:text-emerald-500 transition-all duration-300">
                     {item.name}
                   </Link>
                 </li>
@@ -111,65 +111,60 @@ const Footer = ({ darkMode }) => {
           </div>
 
           {/* Contact + Newsletter */}
-          <div>
-            <h4 className="font-semibold text-lg mb-5 text-emerald-400">
+          <div className="flex flex-col items-center sm:items-start">
+            <h4 className="font-black text-[10px] uppercase tracking-widest mb-6 text-emerald-500">
               Stay Connected
             </h4>
 
-            <div className={`space-y-2 text-sm mb-6 ${
-              isDarkMode ? 'text-gray-400' : 'text-slate-600'
+            <div className={`space-y-3 text-sm font-bold mb-8 ${
+              isDarkMode ? 'text-slate-400' : 'text-slate-600'
             }`}>
-              <p>Jaipur, Rajasthan</p>
-              <a 
-                href="tel:+919876543210"
-                className={`block hover:text-emerald-400 transition ${
-                  isDarkMode ? 'text-gray-400 hover:text-emerald-400' : 'text-slate-600 hover:text-emerald-600'
-                }`}
-              >
+              <p className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="w-1 h-1 bg-emerald-500 rounded-full" />
+                Jaipur, Rajasthan
+              </p>
+              <a href="tel:+918107649476" className="flex items-center justify-center sm:justify-start gap-2 hover:text-emerald-500 transition">
+                <span className="w-1 h-1 bg-emerald-500 rounded-full" />
                 +91 81076 49476
               </a>
-              <a 
-                href="mailto:support@goelectriq.com"
-                className={`block hover:text-emerald-400 transition ${
-                  isDarkMode ? 'text-gray-400 hover:text-emerald-400' : 'text-slate-600 hover:text-emerald-600'
-                }`}
-              >
+              <a href="mailto:info@goelectriq.com" className="flex items-center justify-center sm:justify-start gap-2 hover:text-emerald-500 transition">
+                <span className="w-1 h-1 bg-emerald-500 rounded-full" />
                 info@goelectriq.com
               </a>
             </div>
 
             {/* Newsletter */}
-            <div className="flex items-center rounded-xl overflow-hidden border bg-white/5 backdrop-blur-md border-white/10">
+            <div className="w-full max-w-xs flex items-center p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
               <input
                 type="email"
-                placeholder="Enter email"
-                className="flex-1 px-3 py-2 bg-transparent outline-none text-sm"
+                placeholder="Updates via email"
+                className="flex-1 px-4 py-2 bg-transparent outline-none text-xs font-bold"
               />
-              <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 transition">
-                <Send size={16} />
+              <button className="p-2.5 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/20">
+                <Send size={14} />
               </button>
             </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/30 to-transparent mb-6"></div>
+        <div className="h-px bg-slate-200 dark:bg-slate-800 mb-8"></div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs">
-          <p className={`${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-            © 2026 Goelectriq. All rights reserved.
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-widest">
+          <p className={`${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            © 2026 Goelectriq
           </p>
 
-          <p className={`${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-            Made with <Zap size={14} className="inline-block text-emerald-400 mx-1" /> for Jaipur
+          <p className={`flex items-center gap-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            Made with <Zap size={14} className="text-emerald-500 animate-pulse" /> for Jaipur
           </p>
 
-          <div className="flex gap-4">
-            <Link to="/privacy-policy" className="hover:text-emerald-400 transition">
+          <div className="flex gap-6">
+            <Link to="/privacy-policy" className="hover:text-emerald-500 transition">
               Privacy
             </Link>
-            <Link to="/terms-and-conditions" className="hover:text-emerald-400 transition">
+            <Link to="/terms-and-conditions" className="hover:text-emerald-500 transition">
               Terms
             </Link>
           </div>

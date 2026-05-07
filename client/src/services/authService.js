@@ -46,3 +46,8 @@ export async function getDriverStatus() {
   const { data } = await api.get('/partners/driver/status');
   return data;
 }
+
+export async function resetPassword(token, password) {
+  const { data } = await api.post(`/auth/reset-password/${token}`, { password });
+  return data;
+}

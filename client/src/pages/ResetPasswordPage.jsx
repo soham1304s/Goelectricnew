@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, ArrowLeft, CheckCircle, Loader, ShieldCheck, ArrowRight } from 'lucide-react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Lock, Eye, EyeOff, Loader, ShieldCheck, ArrowRight, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as authService from '../services/authService';
 import AuthLayout from '../components/auth/AuthLayout';
 
-export default function ForgotPasswordPage() {
+export default function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const { token } = useParams();
+  
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -16,18 +20,24 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setError('');
     
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email node address.');
+    if (password.length < 6) {
+      setError('New secret key must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Secret keys do not match.');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await authService.forgotPassword(email);
+      const result = await authService.resetPassword(token, password);
       if (result.success) {
         setSuccess(true);
+        setTimeout(() => navigate('/login'), 3000);
       } else {
-        setError(result.message || 'Protocol failure. Unable to send reset link.');
+        setError(result.message || 'Protocol failure. Link may be expired.');
       }
     } catch (err) {
       setError('Neural link synchronization failed. Try again.');
@@ -38,8 +48,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthLayout 
-      title={success ? "Protocol Initiated" : "Recover Identity"} 
-      subtitle={success ? "Check your communication node" : "Initiate key recovery sequence"}
+      title={success ? "Access Restored" : "Reset Secret Key"} 
+      subtitle={success ? "System access re-established" : "Define your new security credential"}
     >
       <AnimatePresence mode="wait">
         {error && (
@@ -60,16 +70,40 @@ export default function ForgotPasswordPage() {
       {!success ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Node</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">New Secret Key</label>
             <div className="relative group">
               <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
-                <Mail size={18} />
+                <Lock size={18} />
               </div>
               <input
-                type="email"
-                placeholder="name@nexus.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-14 pr-16 py-5 bg-slate-50 rounded-[1.5rem] border-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold transition-all"
+                required
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Confirm Secret Key</label>
+            <div className="relative group">
+              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                <Lock size={18} />
+              </div>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-14 pr-8 py-5 bg-slate-50 rounded-[1.5rem] border-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold transition-all"
                 required
               />
@@ -84,19 +118,15 @@ export default function ForgotPasswordPage() {
             {loading ? (
               <div className="flex items-center gap-3">
                 <Loader className="animate-spin" size={18} />
-                <span>Transmitting...</span>
+                <span>Synchronizing...</span>
               </div>
             ) : (
               <>
-                Send Reset Link
+                Initialize New Key
                 <ArrowRight size={18} />
               </>
             )}
           </button>
-
-          <p className="mt-8 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            Remembered Key? <Link to="/login" className="text-emerald-600 hover:text-emerald-700 ml-1">Establish Link</Link>
-          </p>
         </form>
       ) : (
         <div className="space-y-8 text-center">
@@ -112,22 +142,18 @@ export default function ForgotPasswordPage() {
           
           <div className="space-y-4">
             <p className="text-sm font-bold text-slate-600 leading-relaxed">
-              A synchronization link has been sent to <span className="text-slate-900">{email}</span>. 
-              Please verify within 30 minutes.
+              Your security credentials have been updated successfully. 
+              Redirecting to system access...
             </p>
-            <div className="p-4 bg-slate-50 rounded-2xl text-left border border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">💡 Pro Tip</p>
-              <p className="text-xs text-slate-600">If the node signal doesn't appear, check your spam or junk sector.</p>
-            </div>
           </div>
 
-          <button 
-            onClick={() => setSuccess(false)}
-            className="w-full py-5 border-2 border-slate-100 text-slate-900 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-3"
+          <Link 
+            to="/login"
+            className="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-black transition-all flex items-center justify-center gap-3"
           >
-            <ArrowLeft size={18} />
-            Retry Protocol
-          </button>
+            Go to Login
+            <ArrowRight size={18} />
+          </Link>
         </div>
       )}
     </AuthLayout>

@@ -51,9 +51,9 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error('[Auth] Failed to load user:', error.message || error);
-      // Log API URL for debugging deployment issues
-      if (typeof window !== 'undefined') {
-        console.debug('[Auth] API URL:', import.meta.env.VITE_API_URL || 'DEFAULT (production.up.railway.app)');
+      // Log connection details to help debug local vs production issues
+      if (import.meta.env.DEV) {
+        console.warn('[Auth] Running in DEVELOPMENT mode. Requests should go through Vite proxy to http://localhost:5000');
       }
       clearSession();
     } finally {

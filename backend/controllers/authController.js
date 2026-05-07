@@ -170,13 +170,18 @@ export const loginUser = async (req, res) => {
 
     const emailLower = String(email).toLowerCase().trim();
 
-    // Find user (include password for verification)
-    const user = await User.findOne({ email: emailLower }).select('+password');
+    // Find user by email or phone (include password for verification)
+    const user = await User.findOne({
+      $or: [
+        { email: emailLower },
+        { phone: emailLower.replace(/\D/g, '').slice(-10) }
+      ]
+    }).select('+password');
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'Invalid credentials. Please verify your email/phone and password.',
       });
     }
 
@@ -702,10 +707,10 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     // Create reset URL
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
-    // Send email (implement this)
-    // await sendPasswordResetEmail(user, resetUrl);
+    // Send email
+    await sendPasswordResetEmail(user, resetUrl);
 
     res.status(200).json({
       success: true,
@@ -721,9 +726,63 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Reset password
+ * @route   POST /api/auth/reset-password/:token
+ * @access  Public
+ */
+export const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a password with at least 6 characters',
+      });
+    }
+
+    // Hash token to compare with DB
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      });
+    }
+
+    // Set new password
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successful. You can now login with your new password.',
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error resetting password',
+      error: error.message,
+    });
+  }
+};
+
 export default {
   registerUser,
   loginUser,
+  loginAdmin,
   registerDriver,
   loginDriver,
   googleAuth,
@@ -731,4 +790,5 @@ export default {
   logout,
   updatePassword,
   forgotPassword,
+  resetPassword,
 };

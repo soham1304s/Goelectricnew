@@ -10,6 +10,7 @@ import {
   logout,
   updatePassword,
   forgotPassword,
+  resetPassword,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
@@ -24,6 +25,7 @@ router.post('/google', authLimiter, googleAuth);
 router.post('/register-driver', authLimiter, registerDriver);
 router.post('/login-driver', authLimiter, loginDriver);
 router.post('/forgot-password', authLimiter, forgotPassword);
+router.post('/reset-password/:token', authLimiter, resetPassword);
 
 // Protected routes
 router.get('/me', protect, getMe);
