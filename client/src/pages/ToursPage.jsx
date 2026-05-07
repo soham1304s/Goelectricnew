@@ -1,6 +1,6 @@
-import { ArrowRight, Zap, Loader2 } from 'lucide-react';
+import { ArrowRight, Zap, Loader2, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SEO from '../components/SEO';
 import TourBookingModal from '../components/TourBookingModal.jsx';
 import { getPackages } from '../services/packageService.js';
@@ -11,6 +11,7 @@ export default function ToursPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchPackages();
@@ -65,6 +66,17 @@ export default function ToursPage() {
 
   const displayPackages = packages.length > 0 ? packages : fallbackPackages;
 
+  const filteredPackages = useMemo(() => {
+    if (!searchTerm.trim()) return displayPackages;
+    
+    const term = searchTerm.toLowerCase();
+    return displayPackages.filter(pkg => 
+      pkg.title?.toLowerCase().includes(term) || 
+      pkg.description?.toLowerCase().includes(term) ||
+      pkg.details?.toLowerCase().includes(term)
+    );
+  }, [displayPackages, searchTerm]);
+
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-black transition-colors duration-300">
       <SEO 
@@ -89,15 +101,49 @@ export default function ToursPage() {
         </div>
       </div>
 
+      {/* Search Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-12 relative z-20">
+        <div className="max-w-2xl mx-auto">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search for heritage, nature, or skyline tours..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-12 pr-12 py-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl leading-5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition-all shadow-lg shadow-slate-200/50 dark:shadow-none"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center hover:text-emerald-500 text-slate-400 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          
+          {searchTerm && (
+            <div className="mt-3 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Found {filteredPackages.length} {filteredPackages.length === 1 ? 'tour' : 'tours'} for "{searchTerm}"
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Tours Grid Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
           </div>
-        ) : (
+        ) : filteredPackages.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
-            {displayPackages.map((pkg) => (
+            {filteredPackages.map((pkg) => (
               <div 
                 key={pkg._id} 
                 className="group bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 dark:hover:shadow-emerald-900/20 border border-slate-100 dark:border-zinc-800 transition-all duration-500 flex flex-col"
@@ -157,6 +203,20 @@ export default function ToursPage() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-dashed border-slate-200 dark:border-zinc-800">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-400 mb-4">
+              <Search size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No tours found</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">We couldn't find any tours matching "{searchTerm}".</p>
+            <button
+              onClick={() => setSearchTerm('')}
+              className="text-emerald-500 font-bold hover:underline"
+            >
+              Clear search and show all tours
+            </button>
           </div>
         )}
       </div>
