@@ -487,20 +487,22 @@ export const verifyRidePayment = async (req, res) => {
           bookingData = booking;
           console.log('✅ Booking updated:', { status: booking.status, paymentStatus: booking.paymentStatus });
 
-          // Send WhatsApp notification
+          // Send WhatsApp and Email notifications (non-blocking)
           try {
             await booking.populate('user', 'firstName lastName email phone');
-            await sendRidePaymentSuccessWhatsApp(booking, booking.user, payment._id);
+            sendRidePaymentSuccessWhatsApp(booking, booking.user, payment._id);
 
             // Send Email confirmation for successful payment
-            try {
-              const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
-              await sendBookingConfirmationEmail(booking, booking.user);
-            } catch (emailErr) {
-              console.error('⚠️ Ride Payment Email notification failed:', emailErr.message);
-            }
-          } catch (whatsappError) {
-            console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
+            (async () => {
+              try {
+                const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
+                sendBookingConfirmationEmail(booking, booking.user);
+              } catch (emailErr) {
+                console.error('⚠️ Ride Payment Email notification failed:', emailErr.message);
+              }
+            })();
+          } catch (notifyError) {
+            console.error('⚠️ Notification error:', notifyError.message);
           }
         }
       } catch (err) {
@@ -705,20 +707,22 @@ export const verifyTourPayment = async (req, res) => {
           await booking.save();
           console.log('✅ Tour booking updated:', { bookingId: booking._id });
 
-          // Send WhatsApp
+          // Send WhatsApp and Email (non-blocking)
           try {
             await booking.populate('user', 'firstName lastName email phone');
-            await sendTourPaymentSuccessWhatsApp(booking, booking.user, payment._id);
+            sendTourPaymentSuccessWhatsApp(booking, booking.user, payment._id);
 
             // Send Email confirmation for successful payment
-            try {
-              const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
-              await sendBookingConfirmationEmail(booking, booking.user);
-            } catch (emailErr) {
-              console.error('⚠️ Tour Payment Email notification failed:', emailErr.message);
-            }
-          } catch (whatsappError) {
-            console.error('⚠️ WhatsApp notification failed:', whatsappError.message);
+            (async () => {
+              try {
+                const { sendBookingConfirmationEmail } = await import('../services/emailService.js');
+                sendBookingConfirmationEmail(booking, booking.user);
+              } catch (emailErr) {
+                console.error('⚠️ Tour Payment Email notification failed:', emailErr.message);
+              }
+            })();
+          } catch (notifyError) {
+            console.error('⚠️ Notification error:', notifyError.message);
           }
         }
       } catch (err) {

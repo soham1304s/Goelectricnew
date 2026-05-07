@@ -301,13 +301,12 @@ export const createBooking = async (req, res) => {
     // Populate user details
     await booking.populate('user', 'firstName lastName email phone');
 
-    // Send notifications to user and admin
+    // Send notifications to user and admin (non-blocking)
     try {
-      await sendRideBookingNotification(booking, booking.user);
-      await sendBookingConfirmationEmail(booking, booking.user);
+      sendRideBookingNotification(booking, booking.user);
+      sendBookingConfirmationEmail(booking, booking.user);
     } catch (notifyError) {
-      console.error('⚠️ Notifications failed:', notifyError.message);
-      // Don't fail the booking if notifications fail - just log it
+      console.error('⚠️ Notifications failed to initiate:', notifyError.message);
     }
 
     res.status(201).json({
