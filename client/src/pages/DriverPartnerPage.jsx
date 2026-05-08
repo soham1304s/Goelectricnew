@@ -17,7 +17,9 @@ import {
   Briefcase,
   AlertCircle,
   X,
-  Plus
+  Plus,
+  Loader,
+  Mail
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -26,7 +28,7 @@ import apiConfig from '../config/api.config.json';
 const StatusBadge = ({ children, type = 'emerald' }) => {
   const colors = {
     emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
+    teal: 'bg-teal-50 text-teal-600 border-teal-100',
     violet: 'bg-violet-50 text-violet-600 border-violet-100',
     amber: 'bg-amber-50 text-amber-600 border-amber-100',
   };
@@ -126,7 +128,7 @@ export default function DriverPartnerPage() {
         {/* ===== HERO SECTION ===== */}
         <div className="relative bg-slate-900 rounded-[4rem] p-12 md:p-20 text-white overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] -mr-48 -mt-48" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] -ml-48 -mb-48" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[100px] -ml-48 -mb-48" />
           
           <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -143,7 +145,7 @@ export default function DriverPartnerPage() {
               
               <div className="flex flex-wrap gap-4 mb-12">
                 <StatusBadge type="emerald">Weekly Payouts</StatusBadge>
-                <StatusBadge type="blue">Zero Fuel Cost</StatusBadge>
+                <StatusBadge type="teal">Zero Fuel Cost</StatusBadge>
                 <StatusBadge type="violet">Flexible Grid</StatusBadge>
               </div>
 
@@ -204,8 +206,8 @@ export default function DriverPartnerPage() {
               value: `₹${apiConfig.driver.earningsWeekly.min.toLocaleString()} - ₹${apiConfig.driver.earningsWeekly.max.toLocaleString()}`, 
               sub: '5-6 Days Active',
               icon: Zap,
-              color: 'text-blue-500',
-              bg: 'bg-blue-50',
+              color: 'text-teal-500',
+              bg: 'bg-teal-50',
               popular: true
             },
             { 

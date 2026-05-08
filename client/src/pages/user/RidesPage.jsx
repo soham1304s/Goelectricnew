@@ -279,7 +279,7 @@ export default function RidesPage() {
               </p>
               <div className="flex gap-4">
                 <button 
-                  onClick={() => navigate('/airport-ride')}
+                  onClick={() => navigate('/services')}
                   className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-black transition-all flex items-center gap-2 group/btn"
                 >
                   Initiate New Journey
@@ -468,7 +468,7 @@ export default function RidesPage() {
             <h3 className="text-3xl font-black text-slate-900 mb-4">No Historical Data</h3>
             <p className="text-slate-500 font-medium max-w-sm mx-auto">Your journey log is currently empty. Initiate your first carbon-neutral mission today.</p>
             <button 
-              onClick={() => navigate('/airport-ride')}
+              onClick={() => navigate('/services')}
               className="mt-8 px-10 py-5 bg-emerald-500 text-white rounded-2xl font-black text-sm hover:bg-emerald-600 transition-all shadow-2xl"
             >
               Start Your First Journey

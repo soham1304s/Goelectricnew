@@ -27,6 +27,7 @@ import {
   deleteBookingAdmin,
   updateBookingStatusAdmin,
   deleteTourBookingAdmin,
+  createFeedbackAdmin,
   deleteFeedbackAdmin,
   getAllPaymentsAdmin,
   getAdminProfile,
@@ -98,6 +99,7 @@ router.delete('/packages/:id', deletePackage);
 
 // ============ FEEDBACK MANAGEMENT ============
 router.get('/feedback', getAdminFeedback);
+router.post('/feedback', createFeedbackAdmin);
 router.delete('/feedback/:id', deleteFeedbackAdmin);
 
 // ============ ADMIN SETTINGS ============

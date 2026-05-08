@@ -392,7 +392,7 @@ export default function IntercityRidePage() {
 
   return (
     <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
-      <div className="container mx-auto px-4 py-8 md:py-16">
+      <div className="container mx-auto px-4 pt-24 pb-8 md:pt-32 md:pb-16">
         <div className="mx-auto max-w-6xl">
           {/* Header Section */}
           <div className="mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">

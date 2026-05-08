@@ -26,7 +26,7 @@ export const submitFeedback = async (req, res) => {
     // If user is authenticated, add user ID and profile image
     if (req.user) {
       feedbackData.userId = req.user._id;
-      
+
       // Get user's profile image
       const user = await User.findById(req.user._id).select('profileImage');
       if (user && user.profileImage) {

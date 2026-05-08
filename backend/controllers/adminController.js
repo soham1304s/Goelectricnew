@@ -758,6 +758,35 @@ export const deleteTourBookingAdmin = async (req, res) => {
 };
 
 // ============ FEEDBACK MANAGEMENT ============
+export const createFeedbackAdmin = async (req, res) => {
+  try {
+    const { name, mobile, feedback, rating, createdAt, profileImage } = req.body;
+
+    if (!name || !mobile || !feedback) {
+      return res.status(400).json({ success: false, message: 'Name, mobile, and feedback are required' });
+    }
+
+    const feedbackData = {
+      name: name.trim(),
+      mobile: mobile.trim().replace(/\s/g, ''),
+      feedback: feedback.trim(),
+      rating: rating ? Number(rating) : null,
+      createdAt: createdAt ? new Date(createdAt) : new Date(),
+      profileImage: profileImage || null,
+    };
+
+    const fb = await Feedback.create(feedbackData);
+
+    res.status(201).json({
+      success: true,
+      message: 'Feedback created successfully',
+      data: fb,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const deleteFeedbackAdmin = async (req, res) => {
   try {
     const { id } = req.params;

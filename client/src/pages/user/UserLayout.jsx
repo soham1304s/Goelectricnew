@@ -163,7 +163,7 @@ const UserLayout = ({ children }) => {
 
         <div className="p-6 pb-2">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 flex items-center gap-4 border border-slate-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md group">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transform transition-transform group-hover:scale-110 ${user?.role === 'driver' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600' : 'bg-gradient-to-tr from-emerald-500 to-teal-500'
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transform transition-transform group-hover:scale-110 ${user?.role === 'driver' ? 'bg-gradient-to-tr from-teal-600 to-emerald-600' : 'bg-gradient-to-tr from-emerald-500 to-teal-500'
               }`}>
               {user?.role === 'driver' ? user?.name?.charAt(0) : (user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'U')}
             </div>
@@ -174,7 +174,7 @@ const UserLayout = ({ children }) => {
                 </p>
                 {(user?.isVerified || user?.role === 'driver') && (
                   <div className="flex-shrink-0" title="Verified Professional">
-                    <ShieldCheck size={14} className="text-blue-500 fill-blue-500/10" />
+                    <ShieldCheck size={14} className="text-emerald-500 fill-emerald-500/10" />
                   </div>
                 )}
               </div>
@@ -188,17 +188,17 @@ const UserLayout = ({ children }) => {
         {user?.role === 'driver' && (
           <div className="px-6 py-4">
             <div className="bg-slate-900 rounded-[1.5rem] p-5 border border-slate-800 shadow-2xl relative overflow-hidden group">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full blur-2xl group-hover:bg-blue-600/20 transition-all duration-500" />
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-teal-600/10 rounded-full blur-2xl group-hover:bg-teal-600/20 transition-all duration-500" />
               <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-emerald-600/10 rounded-full blur-xl group-hover:bg-emerald-600/20 transition-all duration-500" />
 
               <div className="relative z-10 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                        <Car size={12} className="text-blue-400" />
+                      <div className="w-6 h-6 rounded-lg bg-teal-500/20 flex items-center justify-center">
+                        <Car size={12} className="text-teal-400" />
                       </div>
-                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Vehicle Fleet</p>
+                      <p className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em]">Vehicle Fleet</p>
                     </div>
                     <p className="text-sm font-black text-white tracking-tight">
                       {user?.vehicleDetails?.vehicleModel || 'Electric Sedan'}
@@ -224,7 +224,7 @@ const UserLayout = ({ children }) => {
                   <div className="text-right">
                     <p className="text-[9px] font-bold text-slate-500 uppercase mb-1">Current Zone</p>
                     <div className="flex items-center justify-end gap-1">
-                      <MapPin size={10} className="text-blue-400" />
+                      <MapPin size={10} className="text-teal-400" />
                       <span className="text-[10px] font-black text-white">{user?.address?.city || 'Jaipur'}</span>
                     </div>
                   </div>
@@ -250,12 +250,12 @@ const UserLayout = ({ children }) => {
 
         {user?.role === 'driver' && activeBooking && (
           <div className="px-6 py-4">
-            <div className="bg-blue-600 rounded-[1.5rem] p-5 shadow-xl relative overflow-hidden group">
+            <div className="bg-teal-600 rounded-[1.5rem] p-5 shadow-xl relative overflow-hidden group">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700" />
               <div className="relative z-10 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black text-blue-100 uppercase tracking-[0.2em]">Active Trip</p>
+                    <p className="text-[10px] font-black text-teal-100 uppercase tracking-[0.2em]">Active Trip</p>
                     <p className="text-sm font-black text-white tracking-tight">
                       {activeBooking.user?.name || `${activeBooking.user?.firstName || ''} ${activeBooking.user?.lastName || ''}`.trim() || 'Guest Customer'}
                     </p>
@@ -263,7 +263,7 @@ const UserLayout = ({ children }) => {
                       <a href={`tel:${activeBooking.user?.phone}`} className="bg-white/20 hover:bg-white/30 p-1.5 rounded-lg transition-colors group/phone">
                         <Phone size={12} className="text-white group-hover/phone:scale-110 transition-transform" />
                       </a>
-                      <span className="text-xs font-bold text-blue-50">{activeBooking.user?.phone || 'N/A'}</span>
+                      <span className="text-xs font-bold text-teal-50">{activeBooking.user?.phone || 'N/A'}</span>
                     </div>
                   </div>
                   <div className="bg-white/20 p-2 rounded-2xl">
@@ -273,8 +273,8 @@ const UserLayout = ({ children }) => {
 
                 <div className="pt-3 border-t border-white/20">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="text-[9px] font-bold text-blue-100 uppercase">Trip Details</p>
-                    <span className={`text-[9px] font-black bg-white px-2 py-0.5 rounded-full uppercase ${activeBooking.status === 'ongoing' ? 'text-blue-600' : 'text-amber-600'
+                    <p className="text-[9px] font-bold text-teal-100 uppercase">Trip Details</p>
+                    <span className={`text-[9px] font-black bg-white px-2 py-0.5 rounded-full uppercase ${activeBooking.status === 'ongoing' ? 'text-teal-600' : 'text-amber-600'
                       }`}>
                       {activeBooking.status}
                     </span>
@@ -444,12 +444,12 @@ const UserLayout = ({ children }) => {
                 <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mb-1">
                   {user?.role === 'driver' ? user.name : (user?.firstName || 'User')}
                 </p>
-                <p className={`text-[11px] font-bold uppercase tracking-wider ${user?.role === 'driver' ? 'text-blue-500' : 'text-emerald-500'}`}>
+                <p className={`text-[11px] font-bold uppercase tracking-wider ${user?.role === 'driver' ? 'text-teal-500' : 'text-emerald-500'}`}>
                   {user?.role === 'driver' ? 'Certified Partner' : 'Premium Member'}
                 </p>
               </div>
-              <div className={`w-10 h-10 rounded-full border-2 group-hover:border-slate-400 transition-colors duration-300 overflow-hidden shadow-md ${user?.role === 'driver' ? 'border-blue-100' : 'border-emerald-100'}`}>
-                <div className={`w-full h-full flex items-center justify-center font-bold ${user?.role === 'driver' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-emerald-600'}`}>
+              <div className={`w-10 h-10 rounded-full border-2 group-hover:border-slate-400 transition-colors duration-300 overflow-hidden shadow-md ${user?.role === 'driver' ? 'border-teal-100' : 'border-emerald-100'}`}>
+                <div className={`w-full h-full flex items-center justify-center font-bold ${user?.role === 'driver' ? 'bg-teal-600 text-white' : 'bg-slate-200 text-emerald-600'}`}>
                   {user?.role === 'driver' ? user?.name?.charAt(0) : (user?.firstName?.charAt(0) || 'U')}
                 </div>
               </div>

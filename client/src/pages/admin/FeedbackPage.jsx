@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Eye, Star } from 'lucide-react';
+import { Search, Trash2, Eye, Star, Plus, X as CloseIcon, Loader2 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { getAllFeedback, deleteFeedback } from '../../services/adminService';
+import { getAllFeedback, deleteFeedback, createFeedbackAdmin } from '../../services/adminService';
 
 const FeedbackPage = () => {
   const [feedback, setFeedback] = useState([]);
@@ -10,6 +9,15 @@ const FeedbackPage = () => {
   const [ratingFilter, setRatingFilter] = useState('all');
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newFeedback, setNewFeedback] = useState({
+    name: '',
+    mobile: '',
+    feedback: '',
+    rating: 5,
+    createdAt: new Date().toISOString().split('T')[0]
+  });
 
   const fetchFeedback = async (page = 1) => {
     try {
@@ -59,6 +67,33 @@ const FeedbackPage = () => {
     }
   };
 
+  const handleAddFeedback = async (e) => {
+    e.preventDefault();
+    if (!newFeedback.name || !newFeedback.mobile || !newFeedback.feedback) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await createFeedbackAdmin(newFeedback);
+      setIsAddModalOpen(false);
+      setNewFeedback({
+        name: '',
+        mobile: '',
+        feedback: '',
+        rating: 5,
+        createdAt: new Date().toISOString().split('T')[0]
+      });
+      await fetchFeedback(1);
+    } catch (error) {
+      console.error('Error creating feedback:', error);
+      alert(error.response?.data?.message || 'Failed to create feedback');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const renderStars = (rating) => {
     return Array(5)
       .fill(0)
@@ -74,7 +109,16 @@ const FeedbackPage = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Customer Feedback</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Customer Feedback</h1>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition font-semibold shadow-md"
+          >
+            <Plus size={18} />
+            Add Manual Feedback
+          </button>
+        </div>
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6 space-y-4">
@@ -204,6 +248,105 @@ const FeedbackPage = () => {
               >
                 Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Add Feedback Modal */}
+        {isAddModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 md:p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+              <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Star className="text-emerald-500" size={20} /> Add Manual Feedback
+                </h2>
+                <button
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
+                >
+                  <CloseIcon size={20} className="text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddFeedback} className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Customer Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={newFeedback.name}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
+                      placeholder="e.g. Rahul Sharma"
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Mobile Number</label>
+                    <input
+                      type="text"
+                      required
+                      value={newFeedback.mobile}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, mobile: e.target.value })}
+                      placeholder="e.g. 9876543210"
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Rating (1-5)</label>
+                    <select
+                      value={newFeedback.rating}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, rating: Number(e.target.value) })}
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                    >
+                      {[5, 4, 3, 2, 1].map(r => (
+                        <option key={r} value={r}>{r} Stars</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Submission Date</label>
+                    <input
+                      type="date"
+                      value={newFeedback.createdAt}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, createdAt: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Feedback Message</label>
+                  <textarea
+                    required
+                    value={newFeedback.feedback}
+                    onChange={(e) => setNewFeedback({ ...newFeedback, feedback: e.target.value })}
+                    rows="4"
+                    placeholder="Describe the customer's experience..."
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition font-semibold shadow-md flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : 'Save Feedback'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

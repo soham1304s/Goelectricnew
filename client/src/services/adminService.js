@@ -153,6 +153,11 @@ export async function deleteFeedback(id) {
   return data;
 }
 
+export async function createFeedbackAdmin(feedbackData) {
+  const { data } = await api.post('/admin/feedback', feedbackData);
+  return data;
+}
+
 // ============ ADMIN SETTINGS ============
 export async function getAdminProfile() {
   const { data } = await api.get('/admin/profile');

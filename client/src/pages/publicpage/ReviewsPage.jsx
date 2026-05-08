@@ -81,7 +81,7 @@ export default function ReviewsPage() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Rider Reviews - Real Experiences with GoElectriQ"
         description="Discover what our community says about Jaipur's most premium electric mobility service. Read verified testimonials from GoElectriQ riders."
         keywords="GoElectriQ reviews, electric cab feedback, Jaipur taxi testimonials, premium EV ride reviews"
@@ -124,14 +124,14 @@ export default function ReviewsPage() {
               ))}
             </div>
           ) : reviews.length === 0 ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-center py-32 bg-white dark:bg-slate-900/50 rounded-[3.5rem] border border-dashed border-slate-200 dark:border-slate-800"
             >
               <MessageSquare size={48} className="mx-auto text-slate-300 dark:text-slate-700 mb-6" />
               <p className="text-xl font-bold text-slate-400">Our wall is waiting for your story.</p>
-              <button 
+              <button
                 onClick={() => navigate('/feedback')}
                 className="mt-8 px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-transform"
               >
@@ -139,7 +139,7 @@ export default function ReviewsPage() {
               </button>
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               variants={container}
               initial="hidden"
               animate="show"
@@ -161,7 +161,7 @@ export default function ReviewsPage() {
                       <div className="flex items-center gap-1 mb-8">
                         {renderStars(review.rating || 5)}
                       </div>
-                      
+
                       <p className="text-lg md:text-xl text-slate-700 dark:text-slate-200 font-medium leading-relaxed mb-10 italic">
                         "{review.feedback}"
                       </p>
@@ -190,7 +190,7 @@ export default function ReviewsPage() {
             className="mt-20 p-10 md:p-20 rounded-[3rem] md:rounded-[4rem] bg-gradient-to-br from-slate-900 to-slate-800 text-center relative overflow-hidden group shadow-2xl"
           >
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-700"></div>
-            
+
             <div className="relative z-10 max-w-2xl mx-auto">
               <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight">Your Voice Matters.</h2>
               <p className="text-lg md:text-xl text-slate-400 font-medium mb-12">

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageSquare, 
-  Star, 
-  Send, 
-  CheckCircle, 
-  ArrowLeft, 
-  Shield, 
-  Zap, 
+import {
+  MessageSquare,
+  Star,
+  Send,
+  CheckCircle,
+  ArrowLeft,
+  Shield,
+  Zap,
   Clock,
   Sparkles,
   ChevronRight
@@ -92,7 +92,7 @@ export default function FeedbackPage() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Share Your Feedback - GoElectriQ"
         description="Help us shape the future of electric mobility. Share your thoughts, suggestions, or concerns with the GoElectriQ team."
         keywords="GoElectriQ feedback, customer review, ride experience, electric taxi suggestions"
@@ -100,9 +100,9 @@ export default function FeedbackPage() {
       />
       <div className="min-h-screen bg-[#fafafa] dark:bg-[#020617] pt-24 md:pt-32 font-['Inter',sans-serif]">
         <div className="max-w-7xl mx-auto px-4 pb-32">
-          
+
           <div className="grid lg:grid-cols-5 gap-16 items-start">
-            
+
             {/* Left Column: Info & Context */}
             <div className="lg:col-span-2 space-y-12">
               <div>
@@ -113,7 +113,7 @@ export default function FeedbackPage() {
                 >
                   <Sparkles size={14} /> Feedback Protocol
                 </motion.div>
-                <motion.h1 
+                <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-8 tracking-tight leading-tight"
@@ -121,7 +121,7 @@ export default function FeedbackPage() {
                   Help Us <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-blue-500">Refine the Future.</span>
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -137,7 +137,7 @@ export default function FeedbackPage() {
                   { icon: Zap, title: "Rapid Response", desc: "Urgent concerns are flagged and addressed within 15 minutes." },
                   { icon: Clock, title: "Continuous Evolution", desc: "We deploy weekly updates based on aggregated user insights." }
                 ].map((item, i) => (
-                  <motion.div 
+                  <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -155,7 +155,7 @@ export default function FeedbackPage() {
                 ))}
               </div>
 
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -172,14 +172,14 @@ export default function FeedbackPage() {
 
             {/* Right Column: Submission Form */}
             <div className="lg:col-span-3">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white dark:bg-slate-900 rounded-[3rem] md:rounded-[4rem] p-8 md:p-16 border border-slate-200 dark:border-slate-800 shadow-2xl relative"
               >
                 <AnimatePresence mode="wait">
                   {submitted ? (
-                    <motion.div 
+                    <motion.div
                       key="success"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -193,7 +193,7 @@ export default function FeedbackPage() {
                       <p className="text-xl text-slate-500 dark:text-slate-400 font-medium mb-12 max-w-md mx-auto">
                         Thank you for your valuable insights. Your feedback has been prioritized for review.
                       </p>
-                      <button 
+                      <button
                         onClick={() => setSubmitted(false)}
                         className="px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
                       >
@@ -201,7 +201,7 @@ export default function FeedbackPage() {
                       </button>
                     </motion.div>
                   ) : (
-                    <motion.form 
+                    <motion.form
                       key="form"
                       onSubmit={handleSubmit}
                       className="space-y-10"
@@ -223,11 +223,10 @@ export default function FeedbackPage() {
                             >
                               <Star
                                 size={40}
-                                className={`transition-all duration-300 ${
-                                  star <= (hoverRating || rating)
-                                    ? 'fill-emerald-400 text-emerald-400 scale-110 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]'
-                                    : 'text-slate-200 dark:text-slate-800'
-                                }`}
+                                className={`transition-all duration-300 ${star <= (hoverRating || rating)
+                                  ? 'fill-emerald-400 text-emerald-400 scale-110 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]'
+                                  : 'text-slate-200 dark:text-slate-800'
+                                  }`}
                               />
                             </button>
                           ))}
@@ -276,7 +275,7 @@ export default function FeedbackPage() {
                       </div>
 
                       {error && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-rose-500 text-sm font-black uppercase tracking-wider flex items-center gap-2"
@@ -313,7 +312,7 @@ export default function FeedbackPage() {
                 View All Reviews <ChevronRight size={18} />
               </Link>
             </div>
-            
+
             {feedbackLoading ? (
               <div className="grid md:grid-cols-2 gap-8">
                 {[1, 2].map(i => (
@@ -323,7 +322,7 @@ export default function FeedbackPage() {
             ) : (
               <div className="grid md:grid-cols-2 gap-8">
                 {feedbackList.slice(0, 4).map((item) => (
-                  <motion.div 
+                  <motion.div
                     key={item._id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}

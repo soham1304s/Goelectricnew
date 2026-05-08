@@ -1,5 +1,5 @@
-import { ArrowRight, Zap, Loader2, Search, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Zap, Loader2, Search, X, MapPin, Calendar, Clock, Filter } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import SEO from '../components/SEO';
 import TourBookingModal from '../components/TourBookingModal.jsx';
@@ -7,20 +7,23 @@ import { getPackages } from '../services/packageService.js';
 
 export default function ToursPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const categoryFilter = searchParams.get('type') || 'all';
 
   useEffect(() => {
-    fetchPackages();
-  }, []);
+    fetchPackages(categoryFilter);
+  }, [categoryFilter]);
 
-  const fetchPackages = async () => {
+  const fetchPackages = async (category = '') => {
     try {
       setLoading(true);
-      const data = await getPackages();
+      const data = await getPackages(category === 'all' ? '' : category);
       if (data && data.success) {
         setPackages(data.data || []);
       }
@@ -34,6 +37,15 @@ export default function ToursPage() {
   const handleBookNow = (pkg) => {
     setSelectedPackage(pkg);
     setIsModalOpen(true);
+  };
+
+  const handleCategoryChange = (category) => {
+    if (category === 'all') {
+      searchParams.delete('type');
+    } else {
+      searchParams.set('type', category);
+    }
+    setSearchParams(searchParams);
   };
 
   // Fallback data if no packages are in database
@@ -92,47 +104,75 @@ export default function ToursPage() {
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
-            Electric Tour Packages
+          <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-emerald-200 dark:border-emerald-800/50">
+            <Zap size={14} className="fill-current" /> Zero Emission Tours
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+            Electric <span className="text-emerald-600">Tour Packages</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10">
-            Experience premium, whisper-quiet tours in our top-of-the-line electric cabs.
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 font-medium">
+            Experience premium, whisper-quiet tours in our top-of-the-line electric cabs. Heritage, nature, and skyline drives.
           </p>
         </div>
       </div>
 
-      {/* Search Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-12 relative z-20">
-        <div className="max-w-2xl mx-auto">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+      {/* Filter & Search Bar Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 mb-12 relative z-20">
+        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-2xl shadow-emerald-900/10 border border-slate-100 dark:border-zinc-800 p-4 md:p-6">
+          <div className="flex flex-col lg:flex-row gap-6 items-center">
+            
+            {/* Category Tabs */}
+            <div className="flex bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto whitespace-nowrap hide-scrollbar">
+              {[
+                { id: 'all', label: 'All Tours' },
+                { id: 'travel_tour', label: 'Travel Tours' },
+                { id: 'temple_tour', label: 'Temple Tours' }
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.id)}
+                  className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                    categoryFilter === cat.id
+                      ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 shadow-md'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
-            <input
-              type="text"
-              placeholder="Search for heritage, nature, or skyline tours..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-12 pr-12 py-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl leading-5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition-all shadow-lg shadow-slate-200/50 dark:shadow-none"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center hover:text-emerald-500 text-slate-400 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
+
+            {/* Search Input */}
+            <div className="flex-1 w-full relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search destination, heritage site, or package details..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-zinc-800/50 border-none rounded-2xl leading-5 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-emerald-500 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
           </div>
-          
-          {searchTerm && (
-            <div className="mt-3 text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Found {filteredPackages.length} {filteredPackages.length === 1 ? 'tour' : 'tours'} for "{searchTerm}"
-              </p>
-            </div>
-          )}
         </div>
+        
+        {searchTerm && (
+          <div className="mt-4 flex justify-center">
+            <span className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-bold border border-emerald-100 dark:border-emerald-800">
+              Found {filteredPackages.length} results for "{searchTerm}"
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Tours Grid Section */}
@@ -177,11 +217,15 @@ export default function ToursPage() {
                   </p>
 
                   {/* Details */}
-                  <div className="bg-slate-50 dark:bg-zinc-800/50 rounded-xl p-4 mb-6">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">Details: </span>
-                      {pkg.details || `${pkg.duration || ''} • ${pkg.distanceLimit || ''}`}
-                    </p>
+                  <div className="bg-slate-50 dark:bg-zinc-800/50 rounded-2xl p-5 mb-8 space-y-3">
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                      <Clock size={16} className="text-emerald-500" />
+                      {pkg.duration?.days || 0} Days • {pkg.duration?.hours || 0} Hours
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                      <MapPin size={16} className="text-emerald-500" />
+                      {pkg.location || 'Multiple Locations'}
+                    </div>
                   </div>
 
                   {/* Price & Action */}

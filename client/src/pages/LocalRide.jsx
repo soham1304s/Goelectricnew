@@ -387,7 +387,7 @@ export default function LocalRidePage() {
 
   return (
     <div className={`min-h-screen font-['Inter',sans-serif] transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
-      <div className="container mx-auto px-3 pt-12 pb-8 sm:px-4 sm:pt-14 md:py-16">
+      <div className="container mx-auto px-3 pt-24 pb-8 sm:px-4 sm:pt-28 md:pt-32 md:pb-16">
         <div className="mx-auto max-w-6xl">
           {/* Header Section */}
           <div className="mb-6 flex flex-col items-start justify-between gap-4 text-left sm:mb-8 md:mb-10 md:flex-row md:items-center">
